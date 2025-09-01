@@ -772,6 +772,7 @@ namespace ExcelProcessor.WPF.Controls
                 LogDebug($"📊 输入列名数量：{columnNames.Count}");
                 
                 var fieldMappings = new List<FieldMapping>();
+                var usedFieldNames = new HashSet<string>(); // 用于跟踪已使用的数据库字段名
                 
                 LogDebug("🔄 开始生成字段映射...");
                 for (int i = 0; i < columnNames.Count; i++)
@@ -779,11 +780,25 @@ namespace ExcelProcessor.WPF.Controls
                     var columnName = columnNames[i];
                     var columnLetter = GetColumnLetter(i);
                     
+                    // 生成数据库字段名并处理重复
+                    var databaseField = GetDefaultDatabaseField(columnName);
+                    var originalFieldName = databaseField;
+                    int counter = 1;
+                    
+                    // 如果字段名重复，添加数字后缀
+                    while (usedFieldNames.Contains(databaseField))
+                    {
+                        databaseField = $"{originalFieldName}_{counter}";
+                        counter++;
+                    }
+                    
+                    usedFieldNames.Add(databaseField);
+                    
                     var fieldMapping = new FieldMapping
                     {
                         ExcelOriginalColumn = columnLetter,
                         ExcelColumn = columnName,
-                        DatabaseField = GetDefaultDatabaseField(columnName),
+                        DatabaseField = databaseField,
                         DataType = GetDefaultDataType(columnName),
                         IsRequired = IsRequiredByDefault(columnName)
                     };
@@ -875,6 +890,7 @@ namespace ExcelProcessor.WPF.Controls
         private void UpdateFieldMappingsFromColumns(List<string> columnNames)
         {
             var fieldMappings = new List<FieldMapping>();
+            var usedFieldNames = new HashSet<string>(); // 用于跟踪已使用的数据库字段名
             
             for (int i = 0; i < columnNames.Count; i++)
             {
@@ -882,11 +898,25 @@ namespace ExcelProcessor.WPF.Controls
                 // 修复：使用正确的列索引，而不是列表索引
                 var columnLetter = GetColumnLetter(i);
                 
+                // 生成数据库字段名并处理重复
+                var databaseField = GetDefaultDatabaseField(columnName);
+                var originalFieldName = databaseField;
+                int counter = 1;
+                
+                // 如果字段名重复，添加数字后缀
+                while (usedFieldNames.Contains(databaseField))
+                {
+                    databaseField = $"{originalFieldName}_{counter}";
+                    counter++;
+                }
+                
+                usedFieldNames.Add(databaseField);
+                
                 fieldMappings.Add(new FieldMapping
                 {
                     ExcelOriginalColumn = columnLetter,
                     ExcelColumn = columnName,
-                    DatabaseField = GetDefaultDatabaseField(columnName),
+                    DatabaseField = databaseField,
                     DataType = GetDefaultDataType(columnName),
                     IsRequired = IsRequiredByDefault(columnName)
                 });
@@ -900,7 +930,7 @@ namespace ExcelProcessor.WPF.Controls
             System.Diagnostics.Debug.WriteLine($"生成的字段映射数量：{fieldMappings.Count}");
             for (int i = 0; i < fieldMappings.Count; i++)
             {
-                System.Diagnostics.Debug.WriteLine($"映射 {i}: {fieldMappings[i].ExcelOriginalColumn} -> {fieldMappings[i].ExcelColumn}");
+                System.Diagnostics.Debug.WriteLine($"映射 {i}: {fieldMappings[i].ExcelOriginalColumn} -> {fieldMappings[i].ExcelColumn} -> {fieldMappings[i].DatabaseField}");
             }
             System.Diagnostics.Debug.WriteLine("=== 调试信息结束 ===");
         }
