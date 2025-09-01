@@ -109,7 +109,7 @@ namespace ExcelProcessor.WPF.Controls
                     {
                         var matchingItem = items.FirstOrDefault(item => item.Name == config.TargetDataSourceName);
                         if (matchingItem != null)
-                        {
+                {
                             TargetDataSourceComboBox.SelectedValue = matchingItem.Id;
                         }
                     }

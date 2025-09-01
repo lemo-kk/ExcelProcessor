@@ -60,7 +60,7 @@ namespace ExcelProcessor.Data.Services
                 
                 _logger.LogInformation("从数据库获取到 {Count} 个作业配置", jobs.Count);
                 
-                // 反序列化JSON配置
+                // 加载步骤数据
                 foreach (var job in jobs)
                 {
                     _logger.LogInformation("处理作业配置: ID={JobId}, 名称={JobName}, 类型={JobType}, 状态={Status}", 
@@ -89,10 +89,10 @@ namespace ExcelProcessor.Data.Services
                         _logger.LogWarning("作业 {JobName} 的输入参数为空", job.Name);
                     }
                     
-                    DeserializeJobConfig(job);
+                    await LoadJobStepsAsync(job);
                     
-                    // 输出反序列化后的结果
-                    _logger.LogInformation("作业 {JobName} 反序列化完成: 步骤数={StepsCount}, 参数数={ParamsCount}", 
+                    // 输出加载后的结果
+                    _logger.LogInformation("作业 {JobName} 加载完成: 步骤数={StepsCount}, 参数数={ParamsCount}", 
                         job.Name, job.Steps?.Count ?? 0, job.Parameters?.Count ?? 0);
                 }
                 
@@ -115,7 +115,7 @@ namespace ExcelProcessor.Data.Services
                 
                 if (job != null)
                 {
-                    DeserializeJobConfig(job);
+                    await LoadJobStepsAsync(job);
                 }
                 
                 return job;
@@ -136,7 +136,7 @@ namespace ExcelProcessor.Data.Services
                 
                 if (job != null)
                 {
-                    DeserializeJobConfig(job);
+                    await LoadJobStepsAsync(job);
                 }
                 
                 return job;
@@ -157,7 +157,7 @@ namespace ExcelProcessor.Data.Services
                 
                 foreach (var job in jobs)
                 {
-                    DeserializeJobConfig(job);
+                    await LoadJobStepsAsync(job);
                 }
                 
                 return jobs;
@@ -178,7 +178,7 @@ namespace ExcelProcessor.Data.Services
                 
                 foreach (var job in jobs)
                 {
-                    DeserializeJobConfig(job);
+                    await LoadJobStepsAsync(job);
                 }
                 
                 return jobs;
@@ -199,7 +199,7 @@ namespace ExcelProcessor.Data.Services
                 
                 foreach (var job in jobs)
                 {
-                    DeserializeJobConfig(job);
+                    await LoadJobStepsAsync(job);
                 }
                 
                 return jobs;
@@ -220,7 +220,7 @@ namespace ExcelProcessor.Data.Services
                 
                 foreach (var job in jobs)
                 {
-                    DeserializeJobConfig(job);
+                    await LoadJobStepsAsync(job);
                 }
                 
                 return jobs;
@@ -1392,14 +1392,27 @@ namespace ExcelProcessor.Data.Services
         }
 
         /// <summary>
-        /// 反序列化作业配置
+        /// 加载作业步骤数据
         /// </summary>
-        private void DeserializeJobConfig(JobConfig jobConfig)
+        private async Task LoadJobStepsAsync(JobConfig jobConfig)
         {
             try
             {
-                _logger.LogInformation("开始反序列化作业配置: {JobId}, 名称: {JobName}", jobConfig.Id, jobConfig.Name);
+                _logger.LogInformation("开始加载作业步骤: {JobId}, 名称: {JobName}", jobConfig.Id, jobConfig.Name);
                 
+                // 从JobSteps表查询步骤数据（关系型存储）
+                var steps = await _jobStepRepository.GetByJobIdAsync(jobConfig.Id);
+                jobConfig.Steps = steps ?? new List<JobStep>();
+                
+                _logger.LogInformation("从JobSteps表加载步骤数据，共 {Count} 个步骤", jobConfig.Steps.Count);
+                
+                // 输出每个步骤的详细信息
+                foreach (var step in jobConfig.Steps)
+                {
+                    _logger.LogInformation("步骤: {StepName} ({StepType}), 顺序: {OrderIndex}", step.Name, step.Type, step.OrderIndex);
+                }
+
+                // 反序列化输入参数（这部分仍然需要JSON反序列化）
                 var options = new JsonSerializerOptions
                 {
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
@@ -1408,43 +1421,6 @@ namespace ExcelProcessor.Data.Services
                     AllowTrailingCommas = true
                 };
 
-                // 反序列化步骤配置
-                if (!string.IsNullOrWhiteSpace(jobConfig.StepsConfig))
-                {
-                    _logger.LogInformation("反序列化步骤配置，原始长度: {Length}, 内容预览: {Preview}", 
-                        jobConfig.StepsConfig.Length, 
-                        jobConfig.StepsConfig.Length > 100 ? jobConfig.StepsConfig.Substring(0, 100) + "..." : jobConfig.StepsConfig);
-                    
-                    try
-                    {
-                        // 尝试直接反序列化
-                        jobConfig.Steps = JsonSerializer.Deserialize<List<JobStep>>(jobConfig.StepsConfig, options) ?? new List<JobStep>();
-                        _logger.LogInformation("步骤配置反序列化成功，共 {Count} 个步骤", jobConfig.Steps.Count);
-                        
-                        // 输出每个步骤的详细信息
-                        foreach (var step in jobConfig.Steps)
-                        {
-                            _logger.LogInformation("步骤: {StepName} ({StepType})", step.Name, step.Type);
-                        }
-                    }
-                    catch (JsonException jsonEx)
-                    {
-                        _logger.LogWarning(jsonEx, "直接反序列化步骤配置失败，错误位置: {LineNumber}, {Position}, 尝试清理JSON字符串: {JobId}", 
-                            jsonEx.LineNumber, jsonEx.BytePositionInLine, jobConfig.Id);
-                        
-                    // 尝试清理可能的编码问题
-                        var cleanedConfig = CleanJsonString(jobConfig.StepsConfig, "步骤配置");
-                    jobConfig.Steps = JsonSerializer.Deserialize<List<JobStep>>(cleanedConfig, options) ?? new List<JobStep>();
-                        _logger.LogInformation("清理后的步骤配置反序列化成功，共 {Count} 个步骤", jobConfig.Steps.Count);
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("步骤配置为空，使用默认空列表");
-                    jobConfig.Steps = new List<JobStep>();
-                }
-
-                // 反序列化输入参数
                 if (!string.IsNullOrWhiteSpace(jobConfig.InputParameters))
                 {
                     _logger.LogInformation("反序列化输入参数，原始长度: {Length}, 内容预览: {Preview}", 
@@ -1468,9 +1444,9 @@ namespace ExcelProcessor.Data.Services
                         _logger.LogWarning(jsonEx, "直接反序列化输入参数失败，错误位置: {LineNumber}, {Position}, 尝试清理JSON字符串: {JobId}", 
                             jsonEx.LineNumber, jsonEx.BytePositionInLine, jobConfig.Id);
                         
-                    // 尝试清理可能的编码问题
+                        // 尝试清理可能的编码问题
                         var cleanedParams = CleanJsonString(jobConfig.InputParameters, "输入参数");
-                    jobConfig.Parameters = JsonSerializer.Deserialize<List<JobParameter>>(cleanedParams, options) ?? new List<JobParameter>();
+                        jobConfig.Parameters = JsonSerializer.Deserialize<List<JobParameter>>(cleanedParams, options) ?? new List<JobParameter>();
                         _logger.LogInformation("清理后的输入参数反序列化成功，共 {Count} 个参数", jobConfig.Parameters.Count);
                     }
                 }
@@ -1480,12 +1456,12 @@ namespace ExcelProcessor.Data.Services
                     jobConfig.Parameters = new List<JobParameter>();
                 }
                 
-                _logger.LogInformation("作业配置反序列化完成: {JobId}, 步骤数: {StepsCount}, 参数数: {ParamsCount}", 
+                _logger.LogInformation("作业步骤加载完成: {JobId}, 步骤数: {StepsCount}, 参数数: {ParamsCount}", 
                     jobConfig.Id, jobConfig.Steps.Count, jobConfig.Parameters.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "反序列化作业配置失败: {JobId}, 错误: {ErrorMessage}", jobConfig.Id, ex.Message);
+                _logger.LogError(ex, "加载作业步骤失败: {JobId}, 错误: {ErrorMessage}", jobConfig.Id, ex.Message);
                 jobConfig.Steps = new List<JobStep>();
                 jobConfig.Parameters = new List<JobParameter>();
             }

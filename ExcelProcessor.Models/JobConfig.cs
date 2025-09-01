@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using System.Linq; // Added for Select
 
 namespace ExcelProcessor.Models
 {
@@ -268,7 +269,7 @@ namespace ExcelProcessor.Models
                 Remarks = this.Remarks,
                 Progress = this.Progress,
                 // 同步复制非持久化字段，方便编辑界面显示
-                Steps = this.Steps != null ? new List<JobStep>(this.Steps) : new List<JobStep>(),
+                Steps = this.Steps != null ? this.Steps.Select(s => s.Clone()).ToList() : new List<JobStep>(),
                 Parameters = this.Parameters != null ? new List<JobParameter>(this.Parameters) : new List<JobParameter>()
             };
         }

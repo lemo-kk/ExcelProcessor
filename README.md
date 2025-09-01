@@ -114,8 +114,8 @@ cd "E:\code\code demo\EXCEL_V1.0"
 dotnet build
 
 # 运行应用
-dotnet run --project ExcelProcessor.WPF
-```
+   dotnet run --project ExcelProcessor.WPF
+   ```
 
 ## 使用指南
 
@@ -262,7 +262,7 @@ dotnet run --project ExcelProcessor.WPF
 
 ## 联系方式
 
-如有问题或建议，请联系开发团队。
+如有问题或建议，请联系开发团队。 
 
 ## 更新日志
 

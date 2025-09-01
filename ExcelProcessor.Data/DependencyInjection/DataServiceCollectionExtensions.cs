@@ -35,6 +35,7 @@ namespace ExcelProcessor.Data.DependencyInjection
             // 新增：Excel 相关仓储接口映射
             services.AddScoped<IRepository<ExcelConfig>, ExcelConfigRepository>();
             services.AddScoped<IRepository<ExcelFieldMapping>, ExcelFieldMappingRepository>();
+            services.AddScoped<IExcelFieldMappingRepository, ExcelFieldMappingRepository>();
             services.AddScoped<IRepository<ExcelImportResult>, ExcelImportResultRepository>();
 
             // 注册业务服务

@@ -119,6 +119,39 @@ namespace ExcelProcessor.Models
         public string ConditionExpression { get; set; } = string.Empty;
 
         /// <summary>
+        /// 备注
+        /// </summary>
+        [MaxLength(500)]
+        public string Remarks { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 克隆作业步骤
+        /// </summary>
+        /// <returns>新的作业步骤副本</returns>
+        public JobStep Clone()
+        {
+            return new JobStep
+            {
+                Id = this.Id,
+                JobId = this.JobId,
+                Name = this.Name,
+                Description = this.Description,
+                Type = this.Type,
+                OrderIndex = this.OrderIndex,
+                IsEnabled = this.IsEnabled,
+                ExcelConfigId = this.ExcelConfigId,
+                SqlConfigId = this.SqlConfigId,
+                TimeoutSeconds = this.TimeoutSeconds,
+                RetryCount = this.RetryCount,
+                RetryIntervalSeconds = this.RetryIntervalSeconds,
+                ContinueOnFailure = this.ContinueOnFailure,
+                Dependencies = this.Dependencies,
+                ConditionExpression = this.ConditionExpression,
+                Remarks = this.Remarks
+            };
+        }
+
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.Now;

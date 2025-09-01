@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ExcelProcessor.Core.Services;
+using ExcelProcessor.Core.Repositories;
 using ExcelProcessor.Data.Repositories;
 using ExcelProcessor.Models;
 using Microsoft.Extensions.Logging;
@@ -19,13 +20,13 @@ namespace ExcelProcessor.Data.Services
     public class ExcelService : IExcelService
     {
         private readonly IRepository<ExcelConfig> _excelConfigRepository;
-        private readonly IRepository<ExcelFieldMapping> _fieldMappingRepository;
+        private readonly IExcelFieldMappingRepository _fieldMappingRepository;
         private readonly IRepository<ExcelImportResult> _importResultRepository;
         private readonly ILogger<ExcelService> _logger;
 
         public ExcelService(
             IRepository<ExcelConfig> excelConfigRepository,
-            IRepository<ExcelFieldMapping> fieldMappingRepository,
+            IExcelFieldMappingRepository fieldMappingRepository,
             IRepository<ExcelImportResult> importResultRepository,
             ILogger<ExcelService> logger)
         {
@@ -256,13 +257,19 @@ namespace ExcelProcessor.Data.Services
         {
             try
             {
-                var mappings = await _fieldMappingRepository.GetAllAsync();
-                return mappings.Where(m => m.ExcelConfigId == configId && m.IsEnabled)
-                              .OrderBy(m => m.SortOrder);
+                _logger.LogInformation("根据配置ID获取字段映射: ConfigID={ConfigId}", configId);
+                
+                // 直接使用仓储的专用方法，避免获取所有数据再过滤
+                var mappings = await _fieldMappingRepository.GetByExcelConfigIdAsync(configId);
+                
+                _logger.LogInformation("获取字段映射成功: ConfigID={ConfigId}, 映射数量={Count}", 
+                    configId, mappings?.Count() ?? 0);
+                
+                return mappings ?? Enumerable.Empty<ExcelFieldMapping>();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"获取字段映射失败: ConfigID={configId}");
+                _logger.LogError(ex, "获取字段映射失败: ConfigID={ConfigId}", configId);
                 throw;
             }
         }
@@ -271,29 +278,34 @@ namespace ExcelProcessor.Data.Services
         {
             try
             {
+                _logger.LogInformation("开始保存字段映射: ConfigID={ConfigId}, 映射数量={Count}", 
+                    configId, mappings?.Count() ?? 0);
+                
                 // 删除现有映射
-                var existingMappings = await GetFieldMappingsAsync(configId);
-                foreach (var mapping in existingMappings)
-                {
-                    await _fieldMappingRepository.DeleteByIdAsync(mapping.Id);
-                }
-
-                // 保存新映射
+                await _fieldMappingRepository.DeleteByExcelConfigIdAsync(configId);
+                
+                // 准备新映射数据
+                var mappingsList = mappings?.ToList() ?? new List<ExcelFieldMapping>();
                 int sortOrder = 0;
-                foreach (var mapping in mappings)
+                foreach (var mapping in mappingsList)
                 {
                     mapping.ExcelConfigId = configId;
                     mapping.SortOrder = sortOrder++;
                     mapping.CreatedAt = DateTime.Now;
-                    await _fieldMappingRepository.AddAsync(mapping);
+                    mapping.IsEnabled = true;
                 }
 
-                _logger.LogInformation($"保存字段映射成功: ConfigID={configId}, 映射数量={mappings.Count()}");
-                return true;
+                // 使用批量保存方法
+                var result = await _fieldMappingRepository.SaveMappingsAsync(mappingsList);
+                
+                _logger.LogInformation("保存字段映射成功: ConfigID={ConfigId}, 映射数量={Count}", 
+                    configId, mappingsList.Count);
+                
+                return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"保存字段映射失败: ConfigID={configId}");
+                _logger.LogError(ex, "保存字段映射失败: ConfigID={ConfigId}", configId);
                 throw;
             }
         }

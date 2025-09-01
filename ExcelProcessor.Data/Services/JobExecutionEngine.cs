@@ -9,8 +9,10 @@ using ExcelProcessor.Core.Services;
 using ExcelProcessor.Core.Interfaces;
 using ExcelProcessor.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using ExcelProcessor.Data.Repositories;
 using System.IO; // Added for File.Exists
+using ExcelProcessor.Data.Services; // Added for DataImportService
 
 namespace ExcelProcessor.Data.Services
 {
@@ -730,10 +732,30 @@ namespace ExcelProcessor.Data.Services
                     context.AddLog($"字段映射: {mapping.ExcelColumn} -> {mapping.DatabaseField} ({mapping.DataType})");
                 }
 
-                // 调用现有的DataImportService执行导入
+                // 根据ExcelConfig的TargetDataSourceId获取数据源配置
+                context.AddLog($"查找目标数据源: {excelConfig.TargetDataSourceId}");
+                var targetDataSource = await _sqlService.GetDataSourceByIdAsync(excelConfig.TargetDataSourceId);
+                if (targetDataSource == null)
+                {
+                    var errorMessage = $"未找到目标数据源: {excelConfig.TargetDataSourceId}";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                context.AddLog($"找到目标数据源: {targetDataSource.Name}");
+                context.AddLog($"数据源连接字符串: {targetDataSource.ConnectionString}");
+
+                // 创建针对目标数据源的DataImportService实例
+                // 使用ILoggerFactory创建正确的Logger实例
+                var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+                var dataImportLogger = loggerFactory.CreateLogger<DataImportService>();
+                var targetDataImportService = new DataImportService(dataImportLogger, targetDataSource.ConnectionString);
+                context.AddLog("已创建针对目标数据源的DataImportService实例");
+
+                // 调用针对目标数据源的DataImportService执行导入
                 context.AddLog("开始调用DataImportService执行Excel导入...");
                 
-                var importResult = await _dataImportService.ImportExcelDataAsync(
+                var importResult = await targetDataImportService.ImportExcelDataAsync(
                     excelConfig,
                     convertedFieldMappings,
                     excelConfig.TargetTableName,
@@ -863,11 +885,11 @@ namespace ExcelProcessor.Data.Services
                 
                 // 首先尝试直接使用原始ID查找
                 var excelConfig = await _excelService.GetExcelConfigAsync(excelConfigId);
-                if (excelConfig != null)
-                {
+                    if (excelConfig != null)
+                    {
                     context.AddLog($"根据ID {excelConfigId} 找到Excel配置: {excelConfig.ConfigName}");
-                    return excelConfig;
-                }
+                        return excelConfig;
+                    }
                 context.AddLog($"根据ID {excelConfigId} 未找到Excel配置");
 
                 // 尝试作为配置名称查找
