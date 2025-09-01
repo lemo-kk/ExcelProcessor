@@ -202,15 +202,18 @@ namespace ExcelProcessor.Data.Services
             {
                 _logger.LogInformation("执行步骤: {StepName} ({StepId})", step.Name, step.Id);
                 context.AddLog($"开始执行步骤: {step.Name}");
+                context.AddLog($"步骤类型: {step.Type}, 步骤顺序: {step.OrderIndex}");
 
-                // 根据步骤类型执行不同的逻辑
+                // 根据步骤类型查找对应的配置并执行
                 switch (step.Type)
                 {
                     case StepType.ExcelImport:
-                        await ExecuteExcelImportStep(step, context, result);
+                        // 通过ExcelConfigId查找Excel配置，然后执行导入
+                        await ExecuteStepWithExcelConfig(step, context, result);
                         break;
                     case StepType.SqlExecution:
-                        await ExecuteSqlExecutionStep(step, context, result);
+                        // 通过SqlConfigId查找SQL配置，然后执行SQL
+                        await ExecuteStepWithSqlConfig(step, context, result);
                         break;
                     case StepType.DataExport:
                         await ExecuteDataExportStep(step, context, result);
@@ -652,13 +655,15 @@ namespace ExcelProcessor.Data.Services
 
         #region 步骤执行方法
 
-        private async Task ExecuteExcelImportStep(JobStep step, JobExecutionContext context, StepExecutionResult result)
+        /// <summary>
+        /// 通过Excel配置执行步骤
+        /// </summary>
+        private async Task ExecuteStepWithExcelConfig(JobStep step, JobExecutionContext context, StepExecutionResult result)
         {
             try
             {
                 context.AddLog($"执行Excel导入步骤: {step.Name}");
                 context.AddLog($"步骤配置信息: StepId={step.Id}, StepName={step.Name}, ExcelConfigId={step.ExcelConfigId}");
-                context.AddLog($"步骤类型: {step.Type}, 步骤顺序: {step.OrderIndex}");
 
                 // 检查ExcelConfigId
                 if (string.IsNullOrWhiteSpace(step.ExcelConfigId))
@@ -671,7 +676,7 @@ namespace ExcelProcessor.Data.Services
                     throw new ArgumentException(errorMessage);
                 }
 
-                // 获取Excel配置
+                // 根据ExcelConfigId查找Excel配置
                 var excelConfig = await GetExcelConfigById(step.ExcelConfigId, context);
                 if (excelConfig == null)
                 {
@@ -770,6 +775,76 @@ namespace ExcelProcessor.Data.Services
                 result.ErrorDetails = ex.ToString();
             }
         }
+
+        /// <summary>
+        /// 通过SQL配置执行步骤
+        /// </summary>
+        private async Task ExecuteStepWithSqlConfig(JobStep step, JobExecutionContext context, StepExecutionResult result)
+        {
+            try
+            {
+                context.AddLog($"执行SQL执行步骤: {step.Name}");
+                context.AddLog($"步骤配置信息: StepId={step.Id}, StepName={step.Name}, SqlConfigId={step.SqlConfigId}");
+                
+                // 检查SqlConfigId
+                if (string.IsNullOrWhiteSpace(step.SqlConfigId))
+                {
+                    var errorMessage = $"SQL配置ID不能为空。请检查：\n" +
+                                     $"1. 步骤配置是否正确\n" +
+                                     $"2. SQL配置是否已创建\n" +
+                                     $"3. 数据库是否已正确初始化";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                // 根据SqlConfigId查找SQL配置
+                var sqlConfig = await GetSqlConfigById(step.SqlConfigId, context);
+                if (sqlConfig == null)
+                {
+                    var errorMessage = $"未找到ID为 {step.SqlConfigId} 的SQL配置。请检查：\n" +
+                                     $"1. SQL配置是否已创建\n" +
+                                     $"2. SQL配置ID是否正确\n" +
+                                     $"3. 数据库是否已正确初始化";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                _logger.LogInformation("找到SQL配置: {ConfigName}", sqlConfig.Name);
+                context.AddLog($"使用SQL配置: {sqlConfig.Name}");
+                context.AddLog($"SQL语句: {sqlConfig.SqlStatement}");
+                context.AddLog($"数据源ID: {sqlConfig.DataSourceId}");
+
+                // 验证SQL语句
+                if (string.IsNullOrWhiteSpace(sqlConfig.SqlStatement))
+                {
+                    var errorMessage = "SQL语句不能为空";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                // 验证数据源ID
+                if (string.IsNullOrWhiteSpace(sqlConfig.DataSourceId))
+                {
+                    var errorMessage = "数据源ID不能为空";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+                
+                // 使用找到的配置执行SQL
+                await ExecuteSqlWithConfig(sqlConfig, step, context, result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "执行SQL执行步骤时发生错误: {StepName}", step.Name);
+                context.AddLog($"执行SQL执行步骤时发生错误: {ex.Message}");
+                
+                result.IsSuccess = false;
+                result.ErrorMessage = ex.Message;
+                result.ErrorDetails = ex.ToString();
+            }
+        }
+
+
 
         /// <summary>
         /// 根据ExcelConfigId查找Excel配置
@@ -939,71 +1014,7 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        private async Task ExecuteSqlExecutionStep(JobStep step, JobExecutionContext context, StepExecutionResult result)
-        {
-            try
-            {
-                context.AddLog($"执行SQL执行步骤: {step.Name}");
-                context.AddLog($"步骤配置信息: StepId={step.Id}, StepName={step.Name}, SqlConfigId={step.SqlConfigId}");
-                context.AddLog($"步骤类型: {step.Type}, 步骤顺序: {step.OrderIndex}");
-                
-                // 检查SqlConfigId
-                if (string.IsNullOrWhiteSpace(step.SqlConfigId))
-                {
-                    var errorMessage = $"SQL配置ID不能为空。请检查：\n" +
-                                     $"1. 步骤配置是否正确\n" +
-                                     $"2. SQL配置是否已创建\n" +
-                                     $"3. 数据库是否已正确初始化";
-                    context.AddLog(errorMessage);
-                    throw new ArgumentException(errorMessage);
-                }
 
-                // 根据SqlConfigId查找详细配置
-                SqlConfig sqlConfig = await GetSqlConfigById(step.SqlConfigId, context);
-                if (sqlConfig == null)
-                {
-                    var errorMessage = $"未找到ID为 {step.SqlConfigId} 的SQL配置。请检查：\n" +
-                                     $"1. SQL配置是否已创建\n" +
-                                     $"2. SQL配置ID是否正确\n" +
-                                     $"3. 数据库是否已正确初始化";
-                    context.AddLog(errorMessage);
-                    throw new ArgumentException(errorMessage);
-                }
-
-                _logger.LogInformation("找到SQL配置: {ConfigName}", sqlConfig.Name);
-                context.AddLog($"使用SQL配置: {sqlConfig.Name}");
-                context.AddLog($"SQL语句: {sqlConfig.SqlStatement}");
-                context.AddLog($"数据源ID: {sqlConfig.DataSourceId}");
-
-                // 验证SQL语句
-                if (string.IsNullOrWhiteSpace(sqlConfig.SqlStatement))
-                {
-                    var errorMessage = "SQL语句不能为空";
-                    context.AddLog(errorMessage);
-                    throw new ArgumentException(errorMessage);
-                }
-
-                // 验证数据源ID
-                if (string.IsNullOrWhiteSpace(sqlConfig.DataSourceId))
-                {
-                    var errorMessage = "数据源ID不能为空";
-                    context.AddLog(errorMessage);
-                    throw new ArgumentException(errorMessage);
-                }
-                
-                // 使用找到的配置执行SQL
-                await ExecuteSqlWithConfig(sqlConfig, step, context, result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "执行SQL执行步骤时发生错误: {StepName}", step.Name);
-                context.AddLog($"执行SQL执行步骤时发生错误: {ex.Message}");
-                
-                result.IsSuccess = false;
-                result.ErrorMessage = ex.Message;
-                result.ErrorDetails = ex.ToString();
-            }
-        }
 
         /// <summary>
         /// 根据SqlConfigId查找SQL配置
