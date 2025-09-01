@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="ExcelProcessor.WPF.Controls.ConfigPageTemplate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Background="Transparent">
+
+    <UserControl.Resources>
+        <!-- 配置组样式 -->
+        <Style x:Key="ConfigGroupStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1E1E1E" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,20" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="2" Opacity="0.3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                  HorizontalScrollBarVisibility="Disabled"
+                  Padding="20">
+        
+        <StackPanel>
+            <!-- 配置组1：基础配置 -->
+            <Border Style="{StaticResource ConfigGroupStyle}">
+                <StackPanel>
+                    <TextBlock Text="基础配置" 
+                             Style="{StaticResource ConfigGroupTitleStyle}" />
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- 配置名称 -->
+                        <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,10,0">
+                            <TextBlock Text="配置名称" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <TextBox x:Name="ConfigNameTextBox"
+                                   Style="{StaticResource ConfigInputStyle}"
+                                   materialDesign:HintAssist.Hint="请输入配置名称" />
+                        </StackPanel>
+
+                        <!-- 配置类型 -->
+                        <StackPanel Grid.Column="1" Grid.Row="0" Margin="10,0,0,0">
+                            <TextBlock Text="配置类型" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <ComboBox x:Name="ConfigTypeComboBox"
+                                    Style="{StaticResource ConfigComboBoxStyle}"
+                                    materialDesign:HintAssist.Hint="请选择配置类型" />
+                        </StackPanel>
+
+                        <!-- 描述信息 -->
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="0,12,0,0">
+                            <TextBlock Text="描述信息" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <TextBox x:Name="DescriptionTextBox"
+                                   Style="{StaticResource ConfigInputStyle}"
+                                   materialDesign:HintAssist.Hint="请输入配置描述"
+                                   AcceptsReturn="True"
+                                   TextWrapping="Wrap"
+                                   Height="60" />
+                        </StackPanel>
+
+                        <!-- 启用状态 -->
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Margin="0,12,0,0">
+                            <TextBlock Text="配置选项" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <WrapPanel>
+                                <CheckBox x:Name="IsEnabledCheckBox"
+                                        Content="启用配置"
+                                        Style="{StaticResource ConfigCheckBoxStyle}"
+                                        IsChecked="True" />
+                                <CheckBox x:Name="IsDefaultCheckBox"
+                                        Content="设为默认"
+                                        Style="{StaticResource ConfigCheckBoxStyle}" />
+                                <CheckBox x:Name="AutoSaveCheckBox"
+                                        Content="自动保存"
+                                        Style="{StaticResource ConfigCheckBoxStyle}"
+                                        IsChecked="True" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 配置组2：高级配置 -->
+            <Border Style="{StaticResource ConfigGroupStyle}">
+                <StackPanel>
+                    <TextBlock Text="高级配置" 
+                             Style="{StaticResource ConfigGroupTitleStyle}" />
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- 超时设置 -->
+                        <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,10,0">
+                            <TextBlock Text="超时时间（秒）" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <TextBox x:Name="TimeoutTextBox"
+                                   Style="{StaticResource ConfigInputStyle}"
+                                   materialDesign:HintAssist.Hint="请输入超时时间"
+                                   Text="30" />
+                        </StackPanel>
+
+                        <!-- 重试次数 -->
+                        <StackPanel Grid.Column="1" Grid.Row="0" Margin="10,0,0,0">
+                            <TextBlock Text="重试次数" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <TextBox x:Name="RetryCountTextBox"
+                                   Style="{StaticResource ConfigInputStyle}"
+                                   materialDesign:HintAssist.Hint="请输入重试次数"
+                                   Text="3" />
+                        </StackPanel>
+
+                        <!-- 并发数 -->
+                        <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,12,10,0">
+                            <TextBlock Text="最大并发数" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <TextBox x:Name="MaxConcurrencyTextBox"
+                                   Style="{StaticResource ConfigInputStyle}"
+                                   materialDesign:HintAssist.Hint="请输入最大并发数"
+                                   Text="5" />
+                        </StackPanel>
+
+                        <!-- 批处理大小 -->
+                        <StackPanel Grid.Column="1" Grid.Row="1" Margin="10,12,0,0">
+                            <TextBlock Text="批处理大小" 
+                                     Style="{StaticResource ConfigItemLabelStyle}" />
+                            <TextBox x:Name="BatchSizeTextBox"
+                                   Style="{StaticResource ConfigInputStyle}"
+                                   materialDesign:HintAssist.Hint="请输入批处理大小"
+                                   Text="1000" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 配置组3：自定义配置 -->
+            <Border Style="{StaticResource ConfigGroupStyle}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0"
+                                 Text="自定义配置" 
+                                 Style="{StaticResource ConfigGroupTitleStyle}" />
+                        
+                        <Button Grid.Column="1"
+                              Content="添加配置项"
+                              Style="{StaticResource ConfigButtonStyle}"
+                              Background="{StaticResource SuccessColor}"
+                              Foreground="White" />
+                    </Grid>
+
+                    <!-- 自定义配置项列表 -->
+                    <StackPanel x:Name="CustomConfigPanel">
+                        <!-- 示例配置项 -->
+                        <Border Style="{StaticResource ConfigItemContainerStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                         Text="自定义参数1"
+                                         Style="{StaticResource ConfigItemLabelStyle}" />
+                                
+                                <Button Grid.Row="0" Grid.Column="1"
+                                      Content="删除"
+                                      Style="{StaticResource ConfigButtonStyle}"
+                                      Background="{StaticResource DangerColor}"
+                                      Foreground="White"
+                                      Padding="8,4"
+                                      FontSize="10"
+                                      Height="24" />
+
+                                <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Style="{StaticResource ConfigInputStyle}"
+                                       materialDesign:HintAssist.Hint="参数值"
+                                       Text="custom_value_1" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource ConfigItemContainerStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                         Text="自定义参数2"
+                                         Style="{StaticResource ConfigItemLabelStyle}" />
+                                
+                                <Button Grid.Row="0" Grid.Column="1"
+                                      Content="删除"
+                                      Style="{StaticResource ConfigButtonStyle}"
+                                      Background="{StaticResource DangerColor}"
+                                      Foreground="White"
+                                      Padding="8,4"
+                                      FontSize="10"
+                                      Height="24" />
+
+                                <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Style="{StaticResource ConfigInputStyle}"
+                                       materialDesign:HintAssist.Hint="参数值"
+                                       Text="custom_value_2" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 配置组4：验证规则 -->
+            <Border Style="{StaticResource ConfigGroupStyle}">
+                <StackPanel>
+                    <TextBlock Text="验证规则" 
+                             Style="{StaticResource ConfigGroupTitleStyle}" />
+                    
+                    <StackPanel>
+                        <TextBlock Text="验证规则" 
+                                 Style="{StaticResource ConfigItemLabelStyle}" />
+                        <TextBox x:Name="ValidationRulesTextBox"
+                               Style="{StaticResource ConfigInputStyle}"
+                               materialDesign:HintAssist.Hint="请输入验证规则（JSON格式）"
+                               AcceptsReturn="True"
+                               TextWrapping="Wrap"
+                               Height="80" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl> 

@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="ExcelProcessor.WPF.Controls.ExcelImportConfigContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Background="Transparent">
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Margin="0">
+            
+            <!-- 基本信息配置 -->
+            <Border Background="#1A1A1A"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0,0,0,16"
+                    Effect="{StaticResource MaterialDesignElevationShadow1}">
+                
+                <StackPanel>
+                    <TextBlock Text="基本信息配置" 
+                             FontSize="16" 
+                             FontWeight="SemiBold"
+                             Foreground="{StaticResource CyberBlueBrush}"
+                             Margin="0,0,0,16" />
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- 配置名称 -->
+                        <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,8,0">
+                            <TextBlock Text="配置名称" 
+                                     FontSize="12" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#CCCCCC"
+                                     Margin="0,0,0,6" />
+                            <TextBox x:Name="ConfigNameTextBox"
+                                   Style="{StaticResource CustomTextBoxStyle}"
+                                   materialDesign:HintAssist.Hint="请输入配置名称"
+                                   FontSize="12"
+                                   MinHeight="36" />
+                        </StackPanel>
+
+                        <!-- 目标表名 -->
+                        <StackPanel Grid.Column="1" Grid.Row="0" Margin="8,0,0,0">
+                            <TextBlock Text="目标表名" 
+                                     FontSize="12" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#CCCCCC"
+                                     Margin="0,0,0,6" />
+                            <TextBox x:Name="TargetTableNameTextBox"
+                                   Style="{StaticResource CustomTextBoxStyle}"
+                                   materialDesign:HintAssist.Hint="请输入目标表名"
+                                   FontSize="12"
+                                   MinHeight="36" />
+                        </StackPanel>
+
+                        <!-- Excel文件路径 -->
+                        <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,0,8,0">
+                            <TextBlock Text="Excel文件路径" 
+                                     FontSize="12" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#CCCCCC"
+                                     Margin="0,12,0,6" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                       x:Name="FilePathTextBox"
+                                       Style="{StaticResource CustomTextBoxStyle}"
+                                       materialDesign:HintAssist.Hint="请选择Excel文件"
+                                       FontSize="12"
+                                       MinHeight="36" />
+                                <Button Grid.Column="1"
+                                      x:Name="BrowseButton"
+                                      Content="浏览"
+                                      Style="{StaticResource SecondaryButtonStyle}"
+                                      Padding="12,0"
+                                      FontSize="11"
+                                      MinHeight="36"
+                                      Margin="6,0,0,0"
+                                      Click="BrowseButton_Click" />
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- 目标数据源 -->
+                        <StackPanel Grid.Column="1" Grid.Row="1" Margin="8,12,0,0">
+                            <TextBlock Text="目标数据源" 
+                                     FontSize="12" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#CCCCCC"
+                                     Margin="0,0,0,6" />
+                            <ComboBox x:Name="TargetDataSourceComboBox"
+                                    Style="{StaticResource CustomComboBoxStyle}"
+                                    materialDesign:HintAssist.Hint="请选择目标数据源"
+                                    FontSize="12"
+                                    MinHeight="36"
+                                    DisplayMemberPath="Display"
+                                    SelectedValuePath="Id" />
+                        </StackPanel>
+
+                        <!-- Sheet名称 -->
+                        <StackPanel Grid.Column="0" Grid.Row="2" Margin="0,0,8,0">
+                            <TextBlock Text="Sheet名称" 
+                                     FontSize="12" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#CCCCCC"
+                                     Margin="0,12,0,6" />
+                            <TextBox x:Name="SheetNameTextBox"
+                                   Style="{StaticResource CustomTextBoxStyle}"
+                                   materialDesign:HintAssist.Hint="请输入Sheet名称"
+                                   FontSize="12"
+                                   MinHeight="36" />
+                        </StackPanel>
+
+                        <!-- 标题行 -->
+                        <StackPanel Grid.Column="0" Grid.Row="3" Margin="0,12,0,0">
+                            <TextBlock Text="标题行" 
+                                     FontSize="12" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#CCCCCC"
+                                     Margin="0,0,0,6" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="HeaderRowTextBox"
+                                       Grid.Column="0"
+                                       Style="{StaticResource CustomTextBoxStyle}"
+                                       materialDesign:HintAssist.Hint="请输入标题行号"
+                                       FontSize="12"
+                                       MinHeight="36"
+                                       Margin="0,0,6,0"
+                                       TextChanged="HeaderRowTextBox_TextChanged" />
+                                <Button x:Name="PreviewDataButton"
+                                      Grid.Column="1"
+                                      Content="数据预览"
+                                      Style="{StaticResource SecondaryButtonStyle}"
+                                      Padding="8,0"
+                                      FontSize="10"
+                                       MinHeight="36"
+                                       Click="PreviewDataButton_Click"
+                                       ToolTip="预览已选择标题行及之后的数据" />
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- 执行选项 -->
+                        <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Margin="0,12,0,0">
+                            <TextBlock Text="执行选项" 
+                                     FontSize="12" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#CCCCCC"
+                                     Margin="0,0,0,6" />
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <CheckBox x:Name="SkipEmptyRowsCheckBox"
+                                        Content="跳过空行"
+                                        FontSize="11"
+                                        Foreground="#CCCCCC"
+                                        Margin="0,0,20,0" />
+                                <CheckBox x:Name="SplitEachRowCheckBox"
+                                        Content="拆分每一行"
+                                        FontSize="11"
+                                        Foreground="#CCCCCC"
+                                        Margin="0,0,20,0" />
+                                <CheckBox x:Name="ClearTableDataCheckBox"
+                                        Content="导入前清除表数据"
+                                        FontSize="11"
+                                        Foreground="#CCCCCC" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 字段映射配置 -->
+            <Border Background="#1A1A1A"
+                    CornerRadius="8"
+                    Padding="16"
+                    Effect="{StaticResource MaterialDesignElevationShadow1}">
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0"
+                                   Text="字段映射配置" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource CyberBlueBrush}" />
+                        
+                        <Button Grid.Column="1"
+                                x:Name="TestConfigButton"
+                                Content="测试导入"
+                                Style="{StaticResource WarningButtonStyle}"
+                                Padding="12,6"
+                                FontSize="11"
+                                MinHeight="32"
+                                Margin="0,0,8,0"
+                                Click="TestConfigButton_Click" />
+                        
+                        <Button Grid.Column="2"
+                                x:Name="AddMappingButton"
+                                Content="添加映射"
+                                Style="{StaticResource SuccessButtonStyle}"
+                                Padding="12,6"
+                                FontSize="11"
+                                MinHeight="32"
+                                Click="AddMappingButton_Click" />
+                    </Grid>
+                    
+                    <DataGrid Grid.Row="1"
+                              x:Name="FieldMappingDataGrid"
+                              Style="{StaticResource CustomDataGridStyle}"
+                              ColumnHeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}"
+                              CellStyle="{StaticResource CustomDataGridCellStyle}"
+                              RowStyle="{StaticResource CustomDataGridRowStyle}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="False"
+                              MaxHeight="400"
+                              MinHeight="150"
+                              HorizontalAlignment="Stretch"
+                              GridLinesVisibility="All"
+                              HeadersVisibility="Column"
+                              RowHeaderWidth="0"
+                              CanUserReorderColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True"
+                              HorizontalScrollBarVisibility="Disabled"
+                              MinRowHeight="36">
+                        
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Excel原始列名" 
+                                              Binding="{Binding ExcelOriginalColumn}" 
+                                              Width="80" 
+                                              MinWidth="60" 
+                                              MaxWidth="120">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Padding" Value="4,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="ToolTip" Value="{Binding ExcelOriginalColumn}" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Excel列名" 
+                                              Binding="{Binding ExcelColumn}" 
+                                              Width="Auto" 
+                                              MinWidth="150" 
+                                              MaxWidth="500">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Padding" Value="6,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="ToolTip" Value="{Binding ExcelColumn}" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="数据库字段" 
+                                              Binding="{Binding DatabaseField}" 
+                                              Width="Auto" 
+                                              MinWidth="340" 
+                                              MaxWidth="1000">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Padding" Value="6,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="ToolTip" Value="{Binding DatabaseField}" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridComboBoxColumn Header="数据类型" 
+                                                  SelectedItemBinding="{Binding DataType}" 
+                                                  Width="120"
+                                                  MinWidth="100"
+                                                  MaxWidth="150">
+                                <DataGridComboBoxColumn.ElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Padding" Value="4,2" />
+                                        <Setter Property="FontSize" Value="10" />
+                                    </Style>
+                                </DataGridComboBoxColumn.ElementStyle>
+                                <DataGridComboBoxColumn.ItemsSource>
+                                    <x:Array Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                                        <sys:String>VARCHAR(50)</sys:String>
+                                        <sys:String>VARCHAR(100)</sys:String>
+                                        <sys:String>VARCHAR(200)</sys:String>
+                                        <sys:String>INT</sys:String>
+                                        <sys:String>DECIMAL(10,2)</sys:String>
+                                        <sys:String>DECIMAL(15,2)</sys:String>
+                                        <sys:String>DATE</sys:String>
+                                        <sys:String>DATETIME</sys:String>
+                                        <sys:String>TEXT</sys:String>
+                                    </x:Array>
+                                </DataGridComboBoxColumn.ItemsSource>
+                            </DataGridComboBoxColumn>
+                            <DataGridCheckBoxColumn Header="必填" 
+                                                  Binding="{Binding IsRequired}" 
+                                                  Width="60" 
+                                                  MinWidth="50" 
+                                                  MaxWidth="80">
+                                <DataGridCheckBoxColumn.ElementStyle>
+                                    <Style TargetType="CheckBox">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridCheckBoxColumn.ElementStyle>
+                            </DataGridCheckBoxColumn>
+                            <DataGridTemplateColumn Header="操作" Width="80" MinWidth="60" MaxWidth="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="删除" 
+                                                Style="{StaticResource DangerButtonStyle}"
+                                                Padding="6,3"
+                                                FontSize="9"
+                                                MinHeight="22"
+                                                Click="DeleteMappingButton_Click" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+            </StackPanel>
+        </ScrollViewer>
+</UserControl> 

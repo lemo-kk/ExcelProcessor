@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!-- DataGrid样式 -->
+    <Style x:Key="CustomDataGridStyle" TargetType="DataGrid" BasedOn="{StaticResource MaterialDesignDataGrid}">
+        <Setter Property="Background" Value="{StaticResource DarkGrayBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource CyberBlueBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="GridLinesVisibility" Value="Horizontal" />
+        <Setter Property="HorizontalGridLinesBrush" Value="#333333" />
+        <Setter Property="RowBackground" Value="{StaticResource DarkGrayBrush}" />
+        <Setter Property="AlternatingRowBackground" Value="#1A1A1A" />
+        <Setter Property="SelectionMode" Value="Single" />
+        <Setter Property="CanUserAddRows" Value="False" />
+        <Setter Property="CanUserDeleteRows" Value="False" />
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="RowHeaderWidth" Value="0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="CanUserResizeRows" Value="False" />
+        <Setter Property="CanUserSortColumns" Value="True" />
+        <Setter Property="CanUserResizeColumns" Value="True" />
+        <Setter Property="CanUserReorderColumns" Value="False" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="GridLinesVisibility" Value="All" />
+        <Setter Property="RowHeight" Value="42" />
+        <Setter Property="EnableRowVirtualization" Value="True" />
+        <Setter Property="EnableColumnVirtualization" Value="True" />
+    </Style>
+
+    <!-- DataGrid列头样式 -->
+    <Style x:Key="CustomDataGridColumnHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+        <Setter Property="Background" Value="{StaticResource DarkBlueBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="BorderThickness" Value="0,0,1,0" />
+        <Setter Property="BorderBrush" Value="#333333" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource CyberBlueBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- DataGrid单元格样式 -->
+    <Style x:Key="CustomDataGridCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#1A3DFF92" />
+                <Setter Property="Foreground" Value="{StaticResource NeonGreenBrush}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#1A00E5FF" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- DataGrid行样式 -->
+    <Style x:Key="CustomDataGridRowStyle" TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#1A3DFF92" />
+                <Setter Property="Foreground" Value="{StaticResource NeonGreenBrush}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#1A00E5FF" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- 状态标签样式 -->
+    <Style x:Key="StatusLabelStyle" TargetType="TextBlock">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Background" Value="#333333" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- 成功状态标签 -->
+    <Style x:Key="SuccessStatusLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource StatusLabelStyle}">
+        <Setter Property="Background" Value="{StaticResource SuccessGradient}" />
+    </Style>
+
+    <!-- 失败状态标签 -->
+    <Style x:Key="ErrorStatusLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource StatusLabelStyle}">
+        <Setter Property="Background" Value="{StaticResource ErrorGradient}" />
+    </Style>
+
+    <!-- 运行中状态标签 -->
+    <Style x:Key="RunningStatusLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource StatusLabelStyle}">
+        <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+    </Style>
+
+</ResourceDictionary> 

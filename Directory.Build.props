@@ -1,0 +1,43 @@
+<Project>
+  <PropertyGroup>
+    <!-- 暂时禁用中央包版本管理 -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Microsoft.Extensions 包版本统一 -->
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
+    
+    <!-- 其他常用包版本统一 -->
+    <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageVersion Include="EPPlus" Version="6.2.10" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="3.1.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageVersion Include="Dapper" Version="2.0.123" />
+    <PackageVersion Include="ClosedXML" Version="0.102.2" />
+    <PackageVersion Include="System.Data.SQLite" Version="1.0.118" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="6.0.27" />
+    <PackageVersion Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageVersion Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageVersion Include="MaterialDesignColors" Version="2.1.4" />
+    
+    <!-- 数据库驱动包 -->
+    <PackageVersion Include="MySql.Data" Version="8.3.0" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="5.1.5" />
+    <PackageVersion Include="Npgsql" Version="8.0.2" />
+    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="3.21.130" />
+    <PackageVersion Include="Cronos" Version="0.8.1" />
+    
+    <!-- 测试包 -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
+    <PackageVersion Include="xunit" Version="2.4.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageVersion Include="Moq" Version="4.20.70" />
+  </ItemGroup>
+</Project> 

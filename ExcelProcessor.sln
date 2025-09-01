@@ -1,0 +1,39 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelProcessor.WPF", "ExcelProcessor.WPF\ExcelProcessor.WPF.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelProcessor.Core", "ExcelProcessor.Core\ExcelProcessor.Core.csproj", "{851B0EBF-4CD0-43AF-9471-C0EC1708E7FC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelProcessor.Data", "ExcelProcessor.Data\ExcelProcessor.Data.csproj", "{D49A4EC1-C77E-4BF2-8DB0-E25A0AF257C4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelProcessor.Models", "ExcelProcessor.Models\ExcelProcessor.Models.csproj", "{3A1F4A4D-22A9-4EAA-A334-161B3D13D19F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{851B0EBF-4CD0-43AF-9471-C0EC1708E7FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{851B0EBF-4CD0-43AF-9471-C0EC1708E7FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{851B0EBF-4CD0-43AF-9471-C0EC1708E7FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{851B0EBF-4CD0-43AF-9471-C0EC1708E7FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D49A4EC1-C77E-4BF2-8DB0-E25A0AF257C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D49A4EC1-C77E-4BF2-8DB0-E25A0AF257C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D49A4EC1-C77E-4BF2-8DB0-E25A0AF257C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D49A4EC1-C77E-4BF2-8DB0-E25A0AF257C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A1F4A4D-22A9-4EAA-A334-161B3D13D19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A1F4A4D-22A9-4EAA-A334-161B3D13D19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A1F4A4D-22A9-4EAA-A334-161B3D13D19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A1F4A4D-22A9-4EAA-A334-161B3D13D19F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="ExcelProcessor.WPF.Controls.SqlTestResultDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="SQL查询测试结果" 
+        Height="700" 
+        Width="900"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        Background="{StaticResource MaterialDesignPaper}"
+        BorderBrush="{StaticResource MaterialDesignDivider}"
+        BorderThickness="1"
+        TextElement.Foreground="{StaticResource MaterialDesignBody}">
+    
+    <Window.Resources>
+        <Style x:Key="ResultTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Foreground" Value="{StaticResource MaterialDesignBody}"/>
+        </Style>
+        
+        <Style x:Key="DataRowStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="10,2"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource MaterialDesignBody}"/>
+        </Style>
+        
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Foreground" Value="{StaticResource CyberBlueBrush}"/>
+        </Style>
+        
+        <Style x:Key="InfoTextStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 标题和状态 -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource MaterialDesignCardBackground}"
+                BorderBrush="{StaticResource MaterialDesignDivider}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Margin="0,0,0,15">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                    <TextBlock x:Name="StatusIcon" 
+                               FontSize="28" 
+                               Margin="0,0,15,0" 
+                               VerticalAlignment="Center"/>
+                    <TextBlock x:Name="StatusText" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- 基本信息 -->
+                <StackPanel x:Name="BasicInfoPanel" Orientation="Horizontal" Margin="0,5">
+                    <TextBlock x:Name="RowCountText" 
+                               Style="{StaticResource InfoTextStyle}" 
+                               Margin="0,0,25,0"/>
+                    <TextBlock x:Name="DurationText" 
+                               Style="{StaticResource InfoTextStyle}" 
+                               Margin="0,0,25,0"/>
+                    <TextBlock x:Name="TestTimeText" 
+                               Style="{StaticResource InfoTextStyle}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        
+        <!-- 内容区域 -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- 错误信息 -->
+                <Border x:Name="ErrorPanel" 
+                        Background="{StaticResource MaterialDesignCardBackground}" 
+                        BorderBrush="{StaticResource ErrorRedBrush}" 
+                        BorderThickness="2" 
+                        CornerRadius="8" 
+                        Padding="15" 
+                        Margin="0,0,0,15"
+                        Visibility="Collapsed">
+                    <TextBlock x:Name="ErrorText" 
+                               TextWrapping="Wrap" 
+                               Foreground="{StaticResource ErrorRedBrush}"
+                               FontSize="13"/>
+                </Border>
+                
+                <!-- 查询结果明细 -->
+                <Border x:Name="ResultPanel"
+                        Background="{StaticResource MaterialDesignCardBackground}"
+                        BorderBrush="{StaticResource MaterialDesignDivider}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="15"
+                        Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="查询结果明细数据" 
+                                   Style="{StaticResource HeaderTextStyle}"/>
+                        
+                        <!-- 数据表格 -->
+                        <DataGrid x:Name="ResultDataGrid"
+                                  AutoGenerateColumns="True"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserReorderColumns="True"
+                                  CanUserResizeColumns="True"
+                                  CanUserResizeRows="False"
+                                  CanUserSortColumns="True"
+                                  GridLinesVisibility="Horizontal"
+                                  HeadersVisibility="Column"
+                                  IsReadOnly="True"
+                                  MaxHeight="300"
+                                  Margin="0,10,0,10"
+                                  Background="{StaticResource MaterialDesignPaper}"
+                                  BorderBrush="{StaticResource MaterialDesignDivider}"
+                                  BorderThickness="1"
+                                  RowBackground="{StaticResource MaterialDesignPaper}"
+                                  AlternatingRowBackground="{StaticResource MaterialDesignSelection}"/>
+                        
+                        <!-- 数据统计 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <TextBlock x:Name="TotalRowsText" 
+                                       Style="{StaticResource InfoTextStyle}" 
+                                       Margin="0,0,20,0"/>
+                            <TextBlock x:Name="DisplayedRowsText" 
+                                       Style="{StaticResource InfoTextStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- 按钮区域 -->
+        <Border Grid.Row="2" 
+                Background="{StaticResource MaterialDesignCardBackground}"
+                BorderBrush="{StaticResource MaterialDesignDivider}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="15"
+                Margin="0,15,0,0">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                <Button x:Name="OkButton"
+                        Content="确定"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        Background="{StaticResource CyberBlueBrush}"
+                        Foreground="White"
+                        Click="OkButton_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window> 

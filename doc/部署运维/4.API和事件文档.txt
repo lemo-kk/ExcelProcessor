@@ -1,0 +1,678 @@
+Excel处理器 API和事件文档
+==========================
+
+一、主窗口事件 (MainWindow.xaml.cs)
+--------------------------------
+
+### 1.1 导航事件
+```csharp
+// 首页导航
+private void HomeButton_Click(object sender, RoutedEventArgs e)
+{
+    MainFrame.Navigate(new HomePage());
+    UpdateNavigationState(sender);
+}
+
+// Excel导入配置导航
+private void ExcelConfigButton_Click(object sender, RoutedEventArgs e)
+{
+    MainFrame.Navigate(new ExcelConfigPage());
+    UpdateNavigationState(sender);
+}
+
+// SQL管理导航
+private void SqlManageButton_Click(object sender, RoutedEventArgs e)
+{
+    MainFrame.Navigate(new SqlManagePage());
+    UpdateNavigationState(sender);
+}
+
+// 作业配置导航
+private void JobConfigButton_Click(object sender, RoutedEventArgs e)
+{
+    MainFrame.Navigate(new JobConfigPage());
+    UpdateNavigationState(sender);
+}
+
+// 数据源管理导航
+private void DataSourceButton_Click(object sender, RoutedEventArgs e)
+{
+    MainFrame.Navigate(new DataSourcePage());
+    UpdateNavigationState(sender);
+}
+
+// 导入导出配置导航
+private void ImportExportButton_Click(object sender, RoutedEventArgs e)
+{
+    MainFrame.Navigate(new ImportExportPage());
+    UpdateNavigationState(sender);
+}
+
+// 系统设置导航
+private void SettingsButton_Click(object sender, RoutedEventArgs e)
+{
+    MainFrame.Navigate(new SettingsPage());
+    UpdateNavigationState(sender);
+}
+```
+
+### 1.2 导航状态更新
+```csharp
+private void UpdateNavigationState(object activeButton)
+{
+    // 重置所有按钮状态
+    HomeButton.IsSelected = false;
+    ExcelConfigButton.IsSelected = false;
+    SqlManageButton.IsSelected = false;
+    JobConfigButton.IsSelected = false;
+    DataSourceButton.IsSelected = false;
+    ImportExportButton.IsSelected = false;
+    SettingsButton.IsSelected = false;
+    
+    // 设置当前按钮为选中状态
+    if (activeButton is Button button)
+    {
+        button.IsSelected = true;
+    }
+}
+```
+
+二、首页事件 (HomePage.xaml.cs)
+-----------------------------
+
+### 2.1 快捷操作事件
+```csharp
+// Excel导入快捷操作
+private void ExcelImportCard_Click(object sender, RoutedEventArgs e)
+{
+    NavigationService?.Navigate(new ExcelConfigPage());
+}
+
+// 作业配置快捷操作
+private void JobConfigCard_Click(object sender, RoutedEventArgs e)
+{
+    NavigationService?.Navigate(new JobConfigPage());
+}
+
+// 数据源管理快捷操作
+private void DataSourceCard_Click(object sender, RoutedEventArgs e)
+{
+    NavigationService?.Navigate(new DataSourcePage());
+}
+```
+
+### 2.2 最近任务事件
+```csharp
+// 任务项点击事件
+private void TaskItem_Click(object sender, RoutedEventArgs e)
+{
+    if (sender is Border border && border.DataContext is ExecutionLog log)
+    {
+        // 导航到作业管理页面并显示详细信息
+        NavigationService?.Navigate(new JobManagementPage());
+    }
+}
+```
+
+三、作业管理页面事件 (JobManagementPage.xaml.cs)
+-------------------------------------------
+
+### 3.1 作业操作事件
+```csharp
+// 创建作业
+private void CreateJobButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        NavigationService?.Navigate(new JobConfigPage());
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"创建作业时发生错误：{ex.Message}", "创建失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 编辑作业
+private void EditJobButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        if (sender is Button button && button.Tag is string jobId)
+        {
+            var jobConfigPage = new JobConfigPage();
+            NavigationService?.Navigate(jobConfigPage);
+            MessageBox.Show($"正在编辑作业：{jobId}", "编辑作业", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"编辑作业时发生错误：{ex.Message}", "编辑失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 运行作业
+private void RunJobButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        if (sender is Button button && button.Tag is string jobId)
+        {
+            // TODO: 实现作业执行逻辑
+            MessageBox.Show($"正在运行作业：{jobId}", "运行作业", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"运行作业时发生错误：{ex.Message}", "运行失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 暂停作业
+private void PauseJobButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        if (sender is Button button && button.Tag is string jobId)
+        {
+            // TODO: 实现作业暂停逻辑
+            MessageBox.Show($"正在暂停作业：{jobId}", "暂停作业", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"暂停作业时发生错误：{ex.Message}", "暂停失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 删除作业
+private void DeleteJobButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        if (sender is Button button && button.Tag is string jobId)
+        {
+            var result = MessageBox.Show($"确定要删除作业 {jobId} 吗？", "确认删除", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                // TODO: 实现作业删除逻辑
+                MessageBox.Show($"作业 {jobId} 已删除", "删除成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"删除作业时发生错误：{ex.Message}", "删除失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+```
+
+### 3.2 筛选和搜索事件
+```csharp
+// 状态筛选
+private void StatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    try
+    {
+        if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
+        {
+            string selectedStatus = item.Content.ToString();
+            // TODO: 实现状态筛选逻辑
+            LoadJobsByStatus(selectedStatus);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"筛选作业时发生错误：{ex.Message}", "筛选失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 搜索作业
+private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+{
+    try
+    {
+        if (sender is TextBox textBox)
+        {
+            string searchText = textBox.Text;
+            // TODO: 实现搜索逻辑
+            SearchJobs(searchText);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"搜索作业时发生错误：{ex.Message}", "搜索失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 清除筛选
+private void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        // 重置筛选条件
+        StatusFilter.SelectedIndex = 0;
+        SearchBox.Text = string.Empty;
+        // 重新加载所有作业
+        LoadAllJobs();
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"清除筛选时发生错误：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+```
+
+四、配置页面模板事件 (ConfigPageTemplate.xaml.cs)
+---------------------------------------------
+
+### 4.1 通用配置事件
+```csharp
+// 保存配置
+private void SaveButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        if (ValidateForm())
+        {
+            SaveConfiguration();
+            MessageBox.Show("配置保存成功！", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"保存配置时发生错误：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 取消操作
+private void CancelButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        var result = MessageBox.Show("确定要取消当前操作吗？未保存的更改将丢失。", "确认取消", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (result == MessageBoxResult.Yes)
+        {
+            NavigationService?.GoBack();
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"取消操作时发生错误：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+
+// 测试连接
+private void TestConnectionButton_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        if (TestConnection())
+        {
+            MessageBox.Show("连接测试成功！", "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            MessageBox.Show("连接测试失败，请检查配置。", "测试失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"测试连接时发生错误：{ex.Message}", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
+```
+
+### 4.2 表单验证
+```csharp
+private bool ValidateForm()
+{
+    // 基础验证逻辑
+    if (string.IsNullOrWhiteSpace(ConfigurationName))
+    {
+        MessageBox.Show("请输入配置名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+        return false;
+    }
+    
+    // 具体验证逻辑由子类实现
+    return ValidateSpecificFields();
+}
+
+protected virtual bool ValidateSpecificFields()
+{
+    return true;
+}
+```
+
+五、数据模型接口
+--------------
+
+### 5.1 数据源配置模型
+```csharp
+public class DataSourceConfig
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Type { get; set; } // SQLite, SQLServer, MySQL, Oracle
+    public string ConnectionString { get; set; }
+    public bool IsDefault { get; set; }
+    public DateTime CreatedTime { get; set; }
+    public DateTime UpdatedTime { get; set; }
+}
+```
+
+### 5.2 Excel配置模型
+```csharp
+public class ExcelConfig
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string FilePath { get; set; }
+    public string TargetDataSource { get; set; }
+    public string SheetName { get; set; }
+    public string TableName { get; set; }
+    public bool HasHeader { get; set; }
+    public bool ClearTable { get; set; }
+    public List<FieldMapping> FieldMappings { get; set; }
+    public DateTime CreatedTime { get; set; }
+    public DateTime UpdatedTime { get; set; }
+}
+
+public class FieldMapping
+{
+    public string ExcelColumn { get; set; }
+    public string DatabaseColumn { get; set; }
+    public string DataType { get; set; }
+}
+```
+
+### 5.3 SQL配置模型
+```csharp
+public class SqlConfig
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string SqlScript { get; set; }
+    public string DataSource { get; set; }
+    public List<SqlParameter> Parameters { get; set; }
+    public string OutputType { get; set; } // Database, Excel, CSV
+    public string OutputConfig { get; set; }
+    public DateTime CreatedTime { get; set; }
+    public DateTime UpdatedTime { get; set; }
+}
+
+public class SqlParameter
+{
+    public string Name { get; set; }
+    public string Value { get; set; }
+    public string Type { get; set; }
+}
+```
+
+### 5.4 作业配置模型
+```csharp
+public class JobConfig
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public List<JobStep> Steps { get; set; }
+    public string Schedule { get; set; } // Cron表达式
+    public bool IsEnabled { get; set; }
+    public DateTime CreatedTime { get; set; }
+    public DateTime UpdatedTime { get; set; }
+}
+
+public class JobStep
+{
+    public string Id { get; set; }
+    public string Type { get; set; } // ExcelImport, SqlExecute, DataExport
+    public string ConfigId { get; set; }
+    public int Order { get; set; }
+    public bool IsEnabled { get; set; }
+}
+```
+
+### 5.5 执行日志模型
+```csharp
+public class ExecutionLog
+{
+    public string Id { get; set; }
+    public string JobId { get; set; }
+    public string JobName { get; set; }
+    public string Status { get; set; } // Running, Success, Failed, Paused
+    public DateTime StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
+    public string ErrorMessage { get; set; }
+    public int Progress { get; set; }
+    public string LogDetails { get; set; }
+}
+```
+
+六、服务接口
+----------
+
+### 6.1 数据源服务
+```csharp
+public interface IDataSourceService
+{
+    Task<List<DataSourceConfig>> GetAllDataSourcesAsync();
+    Task<DataSourceConfig> GetDataSourceByIdAsync(string id);
+    Task<bool> AddDataSourceAsync(DataSourceConfig config);
+    Task<bool> UpdateDataSourceAsync(DataSourceConfig config);
+    Task<bool> DeleteDataSourceAsync(string id);
+    Task<bool> TestConnectionAsync(DataSourceConfig config);
+    Task<bool> SetDefaultDataSourceAsync(string id);
+}
+```
+
+### 6.2 Excel处理服务
+```csharp
+public interface IExcelService
+{
+    Task<List<ExcelConfig>> GetAllExcelConfigsAsync();
+    Task<ExcelConfig> GetExcelConfigByIdAsync(string id);
+    Task<bool> AddExcelConfigAsync(ExcelConfig config);
+    Task<bool> UpdateExcelConfigAsync(ExcelConfig config);
+    Task<bool> DeleteExcelConfigAsync(string id);
+    Task<DataTable> PreviewExcelDataAsync(string filePath, string sheetName);
+    Task<bool> ImportExcelDataAsync(ExcelConfig config);
+}
+```
+
+### 6.3 SQL执行服务
+```csharp
+public interface ISqlService
+{
+    Task<List<SqlConfig>> GetAllSqlConfigsAsync();
+    Task<SqlConfig> GetSqlConfigByIdAsync(string id);
+    Task<bool> AddSqlConfigAsync(SqlConfig config);
+    Task<bool> UpdateSqlConfigAsync(SqlConfig config);
+    Task<bool> DeleteSqlConfigAsync(string id);
+    Task<DataTable> ExecuteSqlAsync(SqlConfig config);
+    Task<bool> ValidateSqlAsync(string sqlScript, string dataSource);
+}
+```
+
+### 6.4 作业管理服务
+```csharp
+public interface IJobService
+{
+    Task<List<JobConfig>> GetAllJobsAsync();
+    Task<JobConfig> GetJobByIdAsync(string id);
+    Task<bool> AddJobAsync(JobConfig job);
+    Task<bool> UpdateJobAsync(JobConfig job);
+    Task<bool> DeleteJobAsync(string id);
+    Task<bool> ExecuteJobAsync(string jobId);
+    Task<bool> PauseJobAsync(string jobId);
+    Task<bool> ResumeJobAsync(string jobId);
+    Task<List<ExecutionLog>> GetJobLogsAsync(string jobId);
+}
+```
+
+七、事件总线
+----------
+
+### 7.1 全局事件
+```csharp
+// 作业状态变更事件
+public class JobStatusChangedEventArgs : EventArgs
+{
+    public string JobId { get; set; }
+    public string OldStatus { get; set; }
+    public string NewStatus { get; set; }
+    public int Progress { get; set; }
+}
+
+// 配置变更事件
+public class ConfigChangedEventArgs : EventArgs
+{
+    public string ConfigType { get; set; } // DataSource, Excel, Sql, Job
+    public string ConfigId { get; set; }
+    public string Action { get; set; } // Added, Updated, Deleted
+}
+
+// 系统消息事件
+public class SystemMessageEventArgs : EventArgs
+{
+    public string Message { get; set; }
+    public string Type { get; set; } // Info, Warning, Error
+    public DateTime Timestamp { get; set; }
+}
+```
+
+### 7.2 事件订阅
+```csharp
+// 订阅作业状态变更
+EventBus.Subscribe<JobStatusChangedEventArgs>(OnJobStatusChanged);
+
+// 订阅配置变更
+EventBus.Subscribe<ConfigChangedEventArgs>(OnConfigChanged);
+
+// 订阅系统消息
+EventBus.Subscribe<SystemMessageEventArgs>(OnSystemMessage);
+```
+
+八、错误处理
+----------
+
+### 8.1 异常类型
+```csharp
+// 数据源连接异常
+public class DataSourceConnectionException : Exception
+{
+    public string DataSourceId { get; set; }
+    public string ConnectionString { get; set; }
+}
+
+// Excel处理异常
+public class ExcelProcessingException : Exception
+{
+    public string FilePath { get; set; }
+    public string SheetName { get; set; }
+}
+
+// SQL执行异常
+public class SqlExecutionException : Exception
+{
+    public string SqlScript { get; set; }
+    public string DataSource { get; set; }
+}
+
+// 作业执行异常
+public class JobExecutionException : Exception
+{
+    public string JobId { get; set; }
+    public string StepId { get; set; }
+}
+```
+
+### 8.2 错误处理策略
+```csharp
+// 全局异常处理
+public static void HandleException(Exception ex, string context)
+{
+    // 记录错误日志
+    Logger.LogError(ex, $"Error in {context}: {ex.Message}");
+    
+    // 显示用户友好的错误信息
+    string userMessage = GetUserFriendlyMessage(ex);
+    MessageBox.Show(userMessage, "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+}
+
+// 获取用户友好的错误信息
+private static string GetUserFriendlyMessage(Exception ex)
+{
+    return ex switch
+    {
+        DataSourceConnectionException => "数据源连接失败，请检查连接配置。",
+        ExcelProcessingException => "Excel文件处理失败，请检查文件格式和路径。",
+        SqlExecutionException => "SQL执行失败，请检查SQL语法和数据源。",
+        JobExecutionException => "作业执行失败，请检查作业配置。",
+        _ => "操作失败，请稍后重试。"
+    };
+}
+```
+
+九、日志记录
+----------
+
+### 9.1 日志级别
+- Debug: 详细的调试信息
+- Info: 一般信息，如操作开始、完成
+- Warning: 警告信息，如配置问题
+- Error: 错误信息，如异常发生
+- Fatal: 严重错误，如系统崩溃
+
+### 9.2 日志内容
+```csharp
+// 操作日志
+Logger.LogInformation("用户 {UserId} 创建了作业 {JobId}", userId, jobId);
+
+// 性能日志
+Logger.LogInformation("作业 {JobId} 执行完成，耗时 {Duration}ms", jobId, duration);
+
+// 错误日志
+Logger.LogError(ex, "作业 {JobId} 执行失败", jobId);
+
+// 审计日志
+Logger.LogInformation("用户 {UserId} 修改了配置 {ConfigId}", userId, configId);
+```
+
+十、配置管理
+----------
+
+### 10.1 应用配置
+```json
+{
+  "Database": {
+    "ConnectionString": "Data Source=ExcelProcessor.db",
+    "Provider": "SQLite"
+  },
+  "Logging": {
+    "LogLevel": "Information",
+    "LogPath": "./logs"
+  },
+  "UI": {
+    "Theme": "Dark",
+    "Language": "zh-CN"
+  },
+  "Security": {
+    "EncryptionKey": "your-encryption-key",
+    "EnableAudit": true
+  }
+}
+```
+
+### 10.2 用户配置
+```json
+{
+  "DefaultDataSource": "default-db",
+  "AutoSave": true,
+  "ShowPreview": true,
+  "MaxLogEntries": 1000,
+  "RecentFiles": [
+    "path/to/file1.xlsx",
+    "path/to/file2.xlsx"
+  ]
+}
+``` 

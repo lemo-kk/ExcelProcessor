@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="ExcelProcessor.WPF.Pages.DataSourcePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      Title="数据源管理"
+      Background="Transparent">
+
+    <Page.Resources>
+        <!-- 数据源页面专用输入框样式 -->
+        <Style x:Key="DataSourceTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#555555" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="CaretBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="SelectionBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="SelectionOpacity" Value="0.3" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource CyberBlueBrush}" />
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#00E5FF" BlurRadius="8" ShadowDepth="0" Opacity="0.4" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#777777" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 数据源页面专用下拉框样式 -->
+        <Style x:Key="DataSourceComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#555555" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource CyberBlueBrush}" />
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#00E5FF" BlurRadius="8" ShadowDepth="0" Opacity="0.4" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#777777" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 数据源页面专用密码框样式 -->
+        <Style x:Key="DataSourcePasswordBoxStyle" TargetType="PasswordBox" BasedOn="{StaticResource MaterialDesignOutlinedPasswordBox}">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#555555" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="CaretBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource CyberBlueBrush}" />
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#00E5FF" BlurRadius="8" ShadowDepth="0" Opacity="0.4" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#777777" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 页面标题和操作按钮 -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource DarkBackgroundBrush}" 
+                CornerRadius="8" 
+                Margin="12,12,12,8"
+                Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- 第一行：标题和操作按钮 -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 标题区域 -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="数据源管理" 
+                                 FontSize="18" 
+                                 FontWeight="Bold"
+                                 Foreground="White" />
+                        <TextBlock Text="管理系统中的数据源连接配置，支持多种数据库类型" 
+                                 FontSize="12"
+                                 Foreground="#CCCCCC"
+                                 Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <!-- 操作按钮区域 -->
+                    <StackPanel Grid.Column="1" 
+                              Orientation="Horizontal"
+                              VerticalAlignment="Center">
+                        <Button x:Name="RefreshButton"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Padding="10,6"
+                                Margin="0,0,8,0"
+                                Click="RefreshButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Refresh" 
+                                                       Width="14" 
+                                                       Height="14" 
+                                                       VerticalAlignment="Center" />
+                                <TextBlock Text="刷新" 
+                                         Margin="4,0,0,0" 
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="AddDataSourceButton"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Padding="10,6"
+                                Click="AddDataSourceButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Plus" 
+                                                       Width="14" 
+                                                       Height="14" 
+                                                       VerticalAlignment="Center" />
+                                <TextBlock Text="添加数据源" 
+                                         Margin="4,0,0,0" 
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                
+                <!-- 第二行：搜索框 -->
+                <Border Grid.Row="1" 
+                      Background="{StaticResource DarkerBackgroundBrush}" 
+                      CornerRadius="6" 
+                      Margin="0,12,0,0"
+                      Padding="12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- 搜索图标 -->
+                        <materialDesign:PackIcon Grid.Column="0"
+                                             Kind="Magnify"
+                                             Width="20"
+                                             Height="20"
+                                             Foreground="{StaticResource TextSecondaryBrush}"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,12,0"/>
+                        
+                        <!-- 搜索输入框 -->
+                        <TextBox Grid.Column="1"
+                               x:Name="SearchTextBox"
+                               Style="{StaticResource DataSourceTextBoxStyle}"
+                               Background="Transparent"
+                               BorderThickness="0"
+                               Padding="0"
+                               FontSize="14"
+                               materialDesign:HintAssist.Hint="输入关键词搜索数据源（名称、类型、描述）"
+                               TextChanged="SearchTextBox_TextChanged"/>
+                        
+                        <!-- 清除搜索按钮 -->
+                        <Button Grid.Column="2"
+                              x:Name="ClearSearchButton"
+                              Style="{StaticResource MaterialDesignIconButton}"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              Click="ClearSearchButton_Click"
+                              Visibility="Collapsed"
+                              Margin="8,0,0,0">
+                            <materialDesign:PackIcon Kind="Close"/>
+                            <Button.ToolTip>
+                                <ToolTip Content="清除搜索"/>
+                            </Button.ToolTip>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- 数据源列表 -->
+        <Border Grid.Row="1" 
+                Background="{StaticResource DarkBackgroundBrush}" 
+                CornerRadius="8" 
+                Margin="12,8,12,12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 列表标题 -->
+                <Border Grid.Row="0" 
+                      Background="{StaticResource DarkerBackgroundBrush}" 
+                      CornerRadius="8,8,0,0"
+                      Padding="12,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0" 
+                                 Text="数据源列表" 
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="{StaticResource TextPrimaryBrush}"/>
+                        
+                        <StackPanel Grid.Column="1" 
+                                  Orientation="Horizontal">
+                            <TextBlock Text="共 " 
+                                     Foreground="#CCCCCC"
+                                     FontSize="12"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock x:Name="DataSourceCountTextBlock" 
+                                     Text="0" 
+                                     Foreground="{StaticResource CyberBlueBrush}"
+                                     FontSize="12"
+                                     FontWeight="Bold"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text=" 个数据源" 
+                                     Foreground="#CCCCCC"
+                                     FontSize="12"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock x:Name="FilteredCountTextBlock" 
+                                     Text="" 
+                                     Foreground="{StaticResource CyberGreenBrush}"
+                                     FontSize="12"
+                                     FontWeight="Bold"
+                                     VerticalAlignment="Center"
+                                     Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 数据源列表 -->
+                <ScrollViewer Grid.Row="1" 
+                            VerticalScrollBarVisibility="Auto"
+                            Padding="20">
+                    <ItemsControl x:Name="DataSourceList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource DarkerBackgroundBrush}" 
+                                      CornerRadius="8" 
+                                      Margin="0,0,0,12"
+                                      Padding="20">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- 数据源信息 -->
+                                        <StackPanel Grid.Row="0" Grid.Column="0">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- 数据源图标 -->
+                                                <materialDesign:PackIcon Grid.Column="0"
+                                                                     Kind="Database"
+                                                                     Width="24"
+                                                                     Height="24"
+                                                                     Foreground="{StaticResource CyberBlueBrush}"
+                                                                     VerticalAlignment="Center"
+                                                                     Margin="0,0,12,0"/>
+
+                                                <!-- 数据源名称和类型 -->
+                                                <StackPanel Grid.Column="1">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" 
+                                                               FontSize="16" 
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                        <materialDesign:PackIcon Kind="Star"
+                                                                             Width="16"
+                                                                             Height="16"
+                                                                             Foreground="{StaticResource CyberYellowBrush}"
+                                                                             Margin="8,0,0,0"
+                                                                             VerticalAlignment="Center"
+                                                                             Visibility="{Binding IsDefault, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                        <materialDesign:PackIcon Kind="StarOutline"
+                                                                             Width="16"
+                                                                             Height="16"
+                                                                             Foreground="{StaticResource TextSecondaryBrush}"
+                                                                             Margin="8,0,0,0"
+                                                                             VerticalAlignment="Center"
+                                                                             Visibility="{Binding IsDefault, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}"/>
+                                                        <TextBlock Text="(默认)"
+                                                                 FontSize="12"
+                                                                 Foreground="{StaticResource CyberYellowBrush}"
+                                                                 FontWeight="SemiBold"
+                                                                 Margin="4,0,0,0"
+                                                                 VerticalAlignment="Center"
+                                                                 Visibility="{Binding IsDefault, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Type}" 
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,2,0,0"/>
+                                                </StackPanel>
+
+                                                <!-- 连接状态 -->
+                                                <Border Grid.Column="2"
+                                                      Background="{Binding IsConnected, Converter={StaticResource ConnectionStatusToBackgroundConverter}}"
+                                                      CornerRadius="12"
+                                                      Padding="8,4"
+                                                      Margin="12,0,0,0">
+                                                    <TextBlock Text="{Binding Status}" 
+                                                           FontSize="12"
+                                                           Foreground="White"
+                                                           FontWeight="SemiBold"/>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- 描述 -->
+                                            <TextBlock Text="{Binding Description}" 
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   Margin="0,8,0,0"
+                                                   TextWrapping="Wrap"/>
+                                        </StackPanel>
+
+                                        <!-- 操作按钮 -->
+                                        <StackPanel Grid.Row="0" Grid.Column="1" 
+                                                  Orientation="Horizontal"
+                                                  VerticalAlignment="Top">
+                                            <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                  Foreground="{StaticResource CyberGreenBrush}"
+                                                  Click="TestConnectionButton_Click"
+                                                  Tag="{Binding}"
+                                                  Margin="4,0">
+                                                <materialDesign:PackIcon Kind="Connection"/>
+                                                <Button.ToolTip>
+                                                    <ToolTip Content="测试连接"/>
+                                                </Button.ToolTip>
+                                            </Button>
+                                            
+                                            <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                  Foreground="{StaticResource CyberYellowBrush}"
+                                                  Click="SetDefaultDatabaseButton_Click"
+                                                  Tag="{Binding}"
+                                                  Margin="4,0"
+                                                  Visibility="{Binding IsDefault, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
+                                                <materialDesign:PackIcon Kind="StarOutline"/>
+                                                <Button.ToolTip>
+                                                    <ToolTip Content="设为默认数据库"/>
+                                                </Button.ToolTip>
+                                            </Button>
+                                            
+                                            <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                  Foreground="{StaticResource CyberYellowBrush}"
+                                                  Click="RemoveDefaultDatabaseButton_Click"
+                                                  Tag="{Binding}"
+                                                  Margin="4,0"
+                                                  Visibility="{Binding IsDefault, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <materialDesign:PackIcon Kind="Star"/>
+                                                <Button.ToolTip>
+                                                    <ToolTip Content="取消默认数据库"/>
+                                                </Button.ToolTip>
+                                            </Button>
+                                            
+                                            <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                  Foreground="{StaticResource CyberBlueBrush}"
+                                                  Click="EditDataSourceButton_Click"
+                                                  Tag="{Binding}"
+                                                  Margin="4,0">
+                                                <materialDesign:PackIcon Kind="Edit"/>
+                                                <Button.ToolTip>
+                                                    <ToolTip Content="编辑配置"/>
+                                                </Button.ToolTip>
+                                            </Button>
+                                            
+                                            <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                  Foreground="{StaticResource CyberRedBrush}"
+                                                  Click="DeleteDataSourceButton_Click"
+                                                  Tag="{Binding}"
+                                                  Margin="4,0">
+                                                <materialDesign:PackIcon Kind="Delete"/>
+                                                <Button.ToolTip>
+                                                    <ToolTip Content="删除数据源"/>
+                                                </Button.ToolTip>
+                                            </Button>
+                                        </StackPanel>
+
+                                        <!-- 连接字符串（可展开） -->
+                                        <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                                Header="连接字符串"
+                                                Margin="0,12,0,0"
+                                                Foreground="{StaticResource TextSecondaryBrush}">
+                                            <TextBox Text="{Binding ConnectionString}" 
+                                                   IsReadOnly="True"
+                                                   Background="Transparent"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   FontFamily="Consolas"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,8,0,0"/>
+                                        </Expander>
+
+                                        <!-- 最后测试时间 -->
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                 Text="{Binding LastTestTime, StringFormat='最后测试时间: {0:yyyy-MM-dd HH:mm:ss}'}"
+                                                 FontSize="12"
+                                                 Foreground="{StaticResource TextSecondaryBrush}"
+                                                 Margin="0,8,0,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- 添加/编辑数据源对话框 -->
+        <Popup x:Name="DataSourceDialog" 
+             IsOpen="False" 
+             Placement="Center"
+             PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Page}}"
+             AllowsTransparency="True">
+        <Border Background="{StaticResource DarkBackgroundBrush}" 
+              CornerRadius="12" 
+              BorderBrush="{StaticResource CyberBlueBrush}"
+              BorderThickness="2"
+              Width="600"
+              MaxHeight="700">
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 对话框标题 -->
+                <TextBlock Grid.Row="0" 
+                         x:Name="DialogTitle"
+                         Text="添加数据源" 
+                         FontSize="20" 
+                         FontWeight="Bold"
+                         Foreground="{StaticResource CyberBlueBrush}"
+                         Margin="0,0,0,20"/>
+
+                <!-- 表单内容 -->
+                <ScrollViewer Grid.Row="1" 
+                            VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- 数据源名称 -->
+                        <TextBlock Text="数据源名称 *" 
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox x:Name="DataSourceNameTextBox"
+                               Style="{StaticResource DataSourceTextBoxStyle}"
+                               Margin="0,0,0,16"/>
+
+                        <!-- 数据源类型 -->
+                        <TextBlock Text="数据源类型 *" 
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 Margin="0,0,0,8"/>
+                        <ComboBox x:Name="DataSourceTypeComboBox"
+                                Style="{StaticResource DataSourceComboBoxStyle}"
+                                Margin="0,0,0,16">
+                            <ComboBoxItem Content="SQLite" Tag="SQLite"/>
+                            <ComboBoxItem Content="MySQL" Tag="MySQL"/>
+                            <ComboBoxItem Content="SQL Server" Tag="SQLServer"/>
+                            <ComboBoxItem Content="PostgreSQL" Tag="PostgreSQL"/>
+                            <ComboBoxItem Content="Oracle" Tag="Oracle"/>
+                        </ComboBox>
+
+                        <!-- 描述 -->
+                        <TextBlock Text="描述" 
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox x:Name="DataSourceDescriptionTextBox"
+                               Style="{StaticResource DataSourceTextBoxStyle}"
+                               Height="80"
+                               Margin="0,0,0,16"/>
+
+                        <!-- 连接信息 -->
+                        <TextBlock Text="连接信息 *" 
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 Margin="0,0,0,8"/>
+
+                        <!-- SQLite 连接信息 -->
+                        <StackPanel x:Name="SQLiteConnectionPanel" Visibility="Collapsed">
+                            <TextBlock Text="数据库文件路径" 
+                                     FontSize="12" 
+                                     Foreground="{StaticResource TextSecondaryBrush}"
+                                     Margin="0,0,0,4"/>
+                            <TextBox x:Name="SQLiteFilePathTextBox"
+                                   Style="{StaticResource DataSourceTextBoxStyle}"
+                                   Margin="0,0,0,16"/>
+                        </StackPanel>
+
+                        <!-- MySQL 连接信息 -->
+                        <StackPanel x:Name="MySQLConnectionPanel" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="服务器地址" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="端口" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="1" Grid.Column="0" x:Name="MySQLServerTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="MySQLPortTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Text="3306" Margin="8,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="数据库名称" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="MySQLDatabaseTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="用户名" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="密码" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="5" Grid.Column="0" x:Name="MySQLUsernameTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,16"/>
+                                <PasswordBox Grid.Row="5" Grid.Column="1" x:Name="MySQLPasswordBox"
+                                          Style="{StaticResource DataSourcePasswordBoxStyle}" Margin="8,0,0,16"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- SQL Server 连接信息 -->
+                        <StackPanel x:Name="SQLServerConnectionPanel" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="服务器地址" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="端口" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="1" Grid.Column="0" x:Name="SQLServerServerTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="SQLServerPortTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Text="1433" Margin="8,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="数据库名称" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="SQLServerDatabaseTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="用户名" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="密码" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="5" Grid.Column="0" x:Name="SQLServerUsernameTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,16"/>
+                                <PasswordBox Grid.Row="5" Grid.Column="1" x:Name="SQLServerPasswordBox"
+                                          Style="{StaticResource DataSourcePasswordBoxStyle}" Margin="8,0,0,16"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- PostgreSQL 连接信息 -->
+                        <StackPanel x:Name="PostgreSQLConnectionPanel" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="服务器地址" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="端口" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="1" Grid.Column="0" x:Name="PostgreSQLServerTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="PostgreSQLPortTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Text="5432" Margin="8,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="数据库名称" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="PostgreSQLDatabaseTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="用户名" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="密码" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="5" Grid.Column="0" x:Name="PostgreSQLUsernameTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,16"/>
+                                <PasswordBox Grid.Row="5" Grid.Column="1" x:Name="PostgreSQLPasswordBox"
+                                          Style="{StaticResource DataSourcePasswordBoxStyle}" Margin="8,0,0,16"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Oracle 连接信息 -->
+                        <StackPanel x:Name="OracleConnectionPanel" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="服务器地址" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="端口" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="1" Grid.Column="0" x:Name="OracleServerTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="OraclePortTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Text="1521" Margin="8,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="服务名/实例名" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="OracleServiceNameTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,0,8"/>
+                                
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="用户名" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="密码" 
+                                         FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                
+                                <TextBox Grid.Row="5" Grid.Column="0" x:Name="OracleUsernameTextBox"
+                                       Style="{StaticResource DataSourceTextBoxStyle}" Margin="0,0,8,16"/>
+                                <PasswordBox Grid.Row="5" Grid.Column="1" x:Name="OraclePasswordBox"
+                                          Style="{StaticResource DataSourcePasswordBoxStyle}" Margin="8,0,0,16"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- 按钮 -->
+                <StackPanel Grid.Row="2" 
+                          Orientation="Horizontal" 
+                          HorizontalAlignment="Right"
+                          Margin="0,20,0,0">
+                    <Button x:Name="TestConnectionDialogButton"
+                          Style="{StaticResource MaterialDesignOutlinedButton}"
+                          BorderBrush="{StaticResource CyberGreenBrush}"
+                          Foreground="{StaticResource CyberGreenBrush}"
+                          Content="测试连接"
+                          Click="TestConnectionDialogButton_Click"
+                          Margin="0,0,8,0"/>
+                    
+                    <Button x:Name="SaveDataSourceButton"
+                          Style="{StaticResource MaterialDesignRaisedButton}"
+                          Background="{StaticResource CyberBlueBrush}"
+                          Foreground="White"
+                          Content="保存"
+                          Click="SaveDataSourceButton_Click"
+                          Margin="0,0,8,0"/>
+                    
+                    <Button x:Name="CancelDataSourceButton"
+                          Style="{StaticResource MaterialDesignOutlinedButton}"
+                          BorderBrush="{StaticResource TextSecondaryBrush}"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Content="取消"
+                          Click="CancelDataSourceButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Popup>
+    </Grid>
+</Page> 

@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="ExcelProcessor.WPF.Pages.JobManagementPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:converters="clr-namespace:ExcelProcessor.WPF.Converters"
+      Title="作业管理"
+      Background="Transparent">
+
+    <Page.Resources>
+        <!-- 转换器资源 -->
+        <converters:JobStatusToColorConverter x:Key="JobStatusToColorConverter" />
+        <converters:JobStatusToTextConverter x:Key="JobStatusToTextConverter" />
+        <converters:JobPriorityToTextConverter x:Key="JobPriorityToTextConverter" />
+        <converters:JobPriorityToColorConverter x:Key="JobPriorityToColorConverter" />
+        <converters:JobStatusToProgressColorConverter x:Key="JobStatusToProgressColorConverter" />
+        <converters:JobStatusToRunButtonVisibilityConverter x:Key="JobStatusToRunButtonVisibilityConverter" />
+        <converters:JobStatusToPauseButtonVisibilityConverter x:Key="JobStatusToPauseButtonVisibilityConverter" />
+        <converters:JobStatusToResumeButtonVisibilityConverter x:Key="JobStatusToResumeButtonVisibilityConverter" />
+        <converters:JobStatusToRetryButtonVisibilityConverter x:Key="JobStatusToRetryButtonVisibilityConverter" />
+        <converters:BoolToEnabledTextConverter x:Key="BoolToEnabledTextConverter" />
+        <converters:BoolToEnabledColorConverter x:Key="BoolToEnabledColorConverter" />
+        <converters:ExecutionModeToTextConverter x:Key="ExecutionModeToTextConverter" />
+        <converters:ManualExecutionModeToVisibilityConverter x:Key="ManualExecutionModeToVisibilityConverter" />
+        <converters:SimpleManualExecutionToVisibilityConverter x:Key="SimpleManualExecutionToVisibilityConverter" />
+
+        <!-- 作业管理页面样式 -->
+        <Style x:Key="JobManagementStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1A1A1A" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,20" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="2" Opacity="0.3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 页面标题样式 -->
+        <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Margin" Value="0,0,0,20" />
+        </Style>
+
+        <!-- 搜索框样式 -->
+        <Style x:Key="SearchBoxStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="CaretBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="MinWidth" Value="250" />
+            <Setter Property="MaxWidth" Value="400" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="NoWrap" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="AcceptsReturn" Value="False" />
+            <Setter Property="AcceptsTab" Value="False" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+
+        <!-- 按钮样式 -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- 状态标签样式 -->
+        <Style x:Key="StatusTagStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- 状态标签文本样式 -->
+        <Style x:Key="StatusTagTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- 作业卡片样式 -->
+        <Style x:Key="JobCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="2" Opacity="0.2" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 统计卡片样式 -->
+        <Style x:Key="StatCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="2" Opacity="0.2" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 筛选器样式 -->
+        <Style x:Key="FilterComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="Width" Value="120" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="8,6" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+            <!-- 页面头部 -->
+            <Grid Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="作业管理" Style="{StaticResource PageTitleStyle}" />
+                    <TextBlock Text="管理和监控所有数据处理作业的执行状态" 
+                             FontSize="12" 
+                             Foreground="#AAAAAA" 
+                             Margin="0,-15,0,0" />
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="RefreshButton"
+                          Content="刷新"
+                          Style="{StaticResource ActionButtonStyle}"
+                          Background="#2A2A2A"
+                          Foreground="#CCCCCC"
+                          Click="RefreshButton_Click" />
+                    
+                    <Button x:Name="CreateJobButton"
+                          Content="新建作业"
+                          Style="{StaticResource ActionButtonStyle}"
+                          Background="{StaticResource SuccessColor}"
+                          Foreground="White"
+                          Click="CreateJobButton_Click" />
+                </StackPanel>
+            </Grid>
+
+            <!-- 统计概览 -->
+            <Border Style="{StaticResource JobManagementStyle}">
+                <StackPanel>
+                    <TextBlock Text="统计概览" 
+                             FontSize="16" 
+                             FontWeight="SemiBold" 
+                             Foreground="{StaticResource CyberBlueBrush}" 
+                             Margin="0,0,0,16" />
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- 总作业数 -->
+                        <Border Grid.Column="0" Style="{StaticResource StatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="总作业数" 
+                                         FontSize="12" 
+                                         Foreground="#AAAAAA" />
+                                <TextBlock Text="{Binding TotalJobs}" 
+                                         FontSize="24" 
+                                         FontWeight="Bold" 
+                                         Foreground="#E0E0E0" 
+                                         Margin="0,4,0,0" />
+                                <TextBlock Text="所有作业配置" 
+                                         FontSize="10" 
+                                         Foreground="#4CAF50" 
+                                         Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- 运行中 -->
+                        <Border Grid.Column="1" Style="{StaticResource StatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="运行中" 
+                                         FontSize="12" 
+                                         Foreground="#AAAAAA" />
+                                <TextBlock Text="{Binding RunningJobs}" 
+                                         FontSize="24" 
+                                         FontWeight="Bold" 
+                                         Foreground="#2196F3" 
+                                         Margin="0,4,0,0" />
+                                <TextBlock Text="正在执行" 
+                                         FontSize="10" 
+                                         Foreground="#2196F3" 
+                                         Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- 成功完成 -->
+                        <Border Grid.Column="2" Style="{StaticResource StatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="成功完成" 
+                                         FontSize="12" 
+                                         Foreground="#AAAAAA" />
+                                <TextBlock Text="{Binding CompletedJobs}" 
+                                         FontSize="24" 
+                                         FontWeight="Bold" 
+                                         Foreground="#4CAF50" 
+                                         Margin="0,4,0,0" />
+                                <TextBlock Text="执行成功" 
+                                         FontSize="10" 
+                                         Foreground="#4CAF50" 
+                                         Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- 失败 -->
+                        <Border Grid.Column="3" Style="{StaticResource StatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="执行失败" 
+                                         FontSize="12" 
+                                         Foreground="#AAAAAA" />
+                                <TextBlock Text="{Binding FailedJobs}" 
+                                         FontSize="24" 
+                                         FontWeight="Bold" 
+                                         Foreground="#FF6B6B" 
+                                         Margin="0,4,0,0" />
+                                <TextBlock Text="需要处理" 
+                                         FontSize="10" 
+                                         Foreground="#FF6B6B" 
+                                         Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 搜索和筛选 -->
+            <Border Style="{StaticResource JobManagementStyle}">
+                <StackPanel>
+                    <TextBlock Text="搜索和筛选" 
+                             FontSize="16" 
+                             FontWeight="SemiBold" 
+                             Foreground="{StaticResource CyberBlueBrush}" 
+                             Margin="0,0,0,16" />
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- 搜索框 -->
+                        <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,16,0">
+                            <TextBlock Text="搜索作业" 
+                                     FontSize="12" 
+                                     Foreground="#CCCCCC" 
+                                     Margin="0,0,0,6" />
+                            <TextBox x:Name="SearchTextBox"
+                                   Style="{StaticResource SearchBoxStyle}"
+                                   materialDesign:HintAssist.Hint="输入作业名称或描述"
+                                   TextChanged="SearchTextBox_TextChanged" />
+                        </StackPanel>
+                        
+                        <!-- 状态筛选 -->
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                            <TextBlock Text="状态" 
+                                     FontSize="12" 
+                                     Foreground="#CCCCCC" 
+                                     Margin="0,0,0,6" />
+                            <ComboBox x:Name="StatusFilterComboBox"
+                                    Style="{StaticResource FilterComboBoxStyle}"
+                                    SelectionChanged="StatusFilterComboBox_SelectionChanged">
+                                <ComboBoxItem Content="全部" IsSelected="True" />
+                                <ComboBoxItem Content="运行中" />
+                                <ComboBoxItem Content="已完成" />
+                                <ComboBoxItem Content="失败" />
+                                <ComboBoxItem Content="暂停" />
+                            </ComboBox>
+                        </StackPanel>
+                        
+                        <!-- 类型筛选 -->
+                        <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                            <TextBlock Text="类型" 
+                                     FontSize="12" 
+                                     Foreground="#CCCCCC" 
+                                     Margin="0,0,0,6" />
+                            <ComboBox x:Name="TypeFilterComboBox"
+                                    Style="{StaticResource FilterComboBoxStyle}"
+                                    SelectionChanged="TypeFilterComboBox_SelectionChanged">
+                                <ComboBoxItem Content="全部" IsSelected="True" />
+                                <ComboBoxItem Content="数据导入" />
+                                <ComboBoxItem Content="数据处理" />
+                                <ComboBoxItem Content="数据导出" />
+                                <ComboBoxItem Content="报表生成" />
+                            </ComboBox>
+                        </StackPanel>
+                        
+                        <!-- 优先级筛选 -->
+                        <StackPanel Grid.Column="3" Margin="8,0,0,0">
+                            <TextBlock Text="优先级" 
+                                     FontSize="12" 
+                                     Foreground="#CCCCCC" 
+                                     Margin="0,0,0,6" />
+                            <ComboBox x:Name="PriorityFilterComboBox"
+                                    Style="{StaticResource FilterComboBoxStyle}"
+                                    SelectionChanged="PriorityFilterComboBox_SelectionChanged">
+                                <ComboBoxItem Content="全部" IsSelected="True" />
+                                <ComboBoxItem Content="低" />
+                                <ComboBoxItem Content="普通" />
+                                <ComboBoxItem Content="高" />
+                                <ComboBoxItem Content="紧急" />
+                            </ComboBox>
+                        </StackPanel>
+                        
+                        <!-- 执行模式筛选 -->
+                        <StackPanel Grid.Column="4" Margin="8,0,0,0">
+                            <TextBlock Text="执行模式" 
+                                     FontSize="12" 
+                                     Foreground="#CCCCCC" 
+                                     Margin="0,0,0,6" />
+                            <ComboBox x:Name="ExecutionModeFilterComboBox"
+                                    Style="{StaticResource FilterComboBoxStyle}"
+                                    SelectionChanged="ExecutionModeFilterComboBox_SelectionChanged">
+                                <ComboBoxItem Content="全部" IsSelected="True" />
+                                <ComboBoxItem Content="手动执行" />
+                                <ComboBoxItem Content="调度执行" />
+                            </ComboBox>
+                        </StackPanel>
+                        
+                        <!-- 清除筛选 -->
+                        <StackPanel Grid.Column="5" Margin="8,0,0,0" VerticalAlignment="Bottom">
+                            <Button Content="清除筛选"
+                                  Style="{StaticResource ActionButtonStyle}"
+                                  Background="#2A2A2A"
+                                  Foreground="#CCCCCC"
+                                  Height="36"
+                                  Click="ClearFiltersButton_Click" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 作业列表 -->
+            <Border Style="{StaticResource JobManagementStyle}">
+                <StackPanel>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0"
+                                 Text="作业列表" 
+                                 FontSize="16" 
+                                 FontWeight="SemiBold" 
+                                 Foreground="{StaticResource CyberBlueBrush}" />
+                        
+                        <TextBlock Grid.Column="1"
+                                 Text="{Binding FilteredJobs.Count, StringFormat='共 {0} 个作业'}" 
+                                 FontSize="12" 
+                                 Foreground="#AAAAAA" />
+                    </Grid>
+
+                    <!-- 作业列表内容 -->
+                    <ScrollViewer Height="500" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="JobsListControl" ItemsSource="{Binding FilteredJobs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                            <Border Style="{StaticResource JobCardStyle}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 作业标题和状态 -->
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}" 
+                                                 FontSize="14" 
+                                                 FontWeight="SemiBold" 
+                                                 Foreground="#E0E0E0" />
+                                        <Border Style="{StaticResource StatusTagStyle}" 
+                                                      Background="{Binding Status, Converter={StaticResource JobStatusToColorConverter}}" 
+                                              Margin="12,0,0,0">
+                                                    <TextBlock Text="{Binding Status, Converter={StaticResource JobStatusToTextConverter}}" 
+                                                     Style="{StaticResource StatusTagTextStyle}" 
+                                                     Foreground="White" />
+                                        </Border>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                        <Button Content="编辑"
+                                              Style="{StaticResource ActionButtonStyle}"
+                                              Background="#2A2A2A"
+                                              Foreground="#CCCCCC"
+                                              Height="28"
+                                              Padding="8,2"
+                                              Click="EditJobButton_Click"
+                                                      Tag="{Binding Id}" />
+                                                
+                                        <!-- 手动执行按钮（仅简单模式的手动执行显示） -->
+                                        <Button Content="手动执行"
+                                              Style="{StaticResource ActionButtonStyle}"
+                                              Background="#4CAF50"
+                                              Foreground="White"
+                                              Height="28"
+                                                      Padding="8,2"
+                                                      Click="ExecuteJob_Click"
+                                                      Visibility="{Binding ., Converter={StaticResource SimpleManualExecutionToVisibilityConverter}}" />
+                                                
+                                        <Button Content="暂停"
+                                              Style="{StaticResource ActionButtonStyle}"
+                                              Background="#FF9800"
+                                              Foreground="White"
+                                              Height="28"
+                                                      Padding="8,2"
+                                                      Click="PauseJob_Click"
+                                                      Visibility="{Binding Status, Converter={StaticResource JobStatusToPauseButtonVisibilityConverter}}" />
+                                                
+                                                <Button Content="恢复"
+                                              Style="{StaticResource ActionButtonStyle}"
+                                                      Background="#4CAF50"
+                                                      Foreground="White"
+                                              Height="28"
+                                                      Padding="8,2"
+                                                      Click="ResumeJob_Click"
+                                                      Visibility="{Binding Status, Converter={StaticResource JobStatusToResumeButtonVisibilityConverter}}" />
+                                                
+                                        <Button Content="重试"
+                                              Style="{StaticResource ActionButtonStyle}"
+                                              Background="#FF6B6B"
+                                              Foreground="White"
+                                              Height="28"
+                                                      Padding="8,2"
+                                                      Click="ExecuteJob_Click"
+                                                      Visibility="{Binding Status, Converter={StaticResource JobStatusToRetryButtonVisibilityConverter}}" />
+                                                
+                                        <Button Content="查看"
+                                              Style="{StaticResource ActionButtonStyle}"
+                                              Background="#2A2A2A"
+                                              Foreground="#CCCCCC"
+                                              Height="28"
+                                                      Padding="8,2"
+                                                      Click="ViewJobDetails_Click" />
+                                                
+                                                <Button Content="删除"
+                                                      Style="{StaticResource ActionButtonStyle}"
+                                                      Background="#FF6B6B"
+                                                      Foreground="White"
+                                                      Height="28"
+                                                      Padding="8,2"
+                                                      Click="DeleteJob_Click" />
+                                    </StackPanel>
+
+                                    <!-- 作业信息 -->
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0">
+                                                <TextBlock Text="{Binding Description}" 
+                                                 FontSize="12" 
+                                                 Foreground="#CCCCCC" 
+                                                 Margin="0,0,0,8" />
+                                        
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="类型" FontSize="10" Foreground="#AAAAAA" />
+                                                        <TextBlock Text="{Binding Type}" FontSize="11" Foreground="#E0E0E0" />
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="优先级" FontSize="10" Foreground="#AAAAAA" />
+                                                        <TextBlock Text="{Binding Priority, Converter={StaticResource JobPriorityToTextConverter}}" 
+                                                                 FontSize="11" 
+                                                                 Foreground="{Binding Priority, Converter={StaticResource JobPriorityToColorConverter}}" />
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="创建时间" FontSize="10" Foreground="#AAAAAA" />
+                                                        <TextBlock Text="{Binding CreatedAt, StringFormat='yyyy-MM-dd HH:mm'}" FontSize="11" Foreground="#E0E0E0" />
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="3">
+                                                        <TextBlock Text="状态" FontSize="10" Foreground="#AAAAAA" />
+                                                        <TextBlock Text="{Binding IsEnabled, Converter={StaticResource BoolToEnabledTextConverter}}" 
+                                                                 FontSize="11" 
+                                                                 Foreground="{Binding IsEnabled, Converter={StaticResource BoolToEnabledColorConverter}}" />
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="4">
+                                                <TextBlock Text="执行模式" FontSize="10" Foreground="#AAAAAA" />
+                                                <TextBlock Text="{Binding ExecutionMode, Converter={StaticResource ExecutionModeToTextConverter}}" 
+                                                         FontSize="11" 
+                                                         Foreground="#E0E0E0" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <!-- 进度条 -->
+                                    <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <ProgressBar Grid.Column="0"
+                                                               Value="{Binding Progress, FallbackValue=0}"
+                                                       Height="4"
+                                                       Background="#404040"
+                                                               Foreground="{Binding Status, Converter={StaticResource JobStatusToProgressColorConverter}}" />
+                                            
+                                            <TextBlock Grid.Column="1"
+                                                             Text="{Binding Progress, StringFormat='{}{0}%'}" 
+                                                     FontSize="10" 
+                                                             Foreground="{Binding Status, Converter={StaticResource JobStatusToProgressColorConverter}}" 
+                                                     Margin="8,0,0,0" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page> 

@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="ExcelProcessor.WPF.Dialogs.JobEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="作业编辑"
+        Width="800"
+        Height="600"
+        WindowStartupLocation="CenterOwner"
+        Background="#1A1A1A"
+        Foreground="#E0E0E0"
+        ResizeMode="CanResize">
+
+    <Window.Resources>
+        <!-- 对话框样式 -->
+        <Style x:Key="DialogStyle" TargetType="Border">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <!-- 输入框样式 -->
+        <Style x:Key="InputStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="CaretBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+
+        <!-- 多行输入框样式 -->
+        <Style x:Key="MultilineInputStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Height" Value="80" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="CaretBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+            <Setter Property="Padding" Value="8,12" />
+        </Style>
+
+        <!-- 下拉框样式 -->
+        <Style x:Key="ComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="8,8" />
+        </Style>
+
+        <!-- 按钮样式 -->
+        <Style x:Key="ButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- 标签样式 -->
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#CCCCCC" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
+        <!-- 日期选择器样式 -->
+        <Style x:Key="DatePickerStyle" TargetType="DatePicker" BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 主要内容 -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- 基本信息 -->
+                <Border Style="{StaticResource DialogStyle}">
+                    <StackPanel>
+                        <TextBlock Text="基本信息" 
+                                 FontSize="16" 
+                                 FontWeight="SemiBold" 
+                                 Foreground="{StaticResource CyberBlueBrush}" 
+                                 Margin="0,0,0,16" />
+
+                        <TextBlock Text="作业名称 *" Style="{StaticResource LabelStyle}" />
+                        <TextBox x:Name="NameTextBox"
+                               Style="{StaticResource InputStyle}"
+                               materialDesign:HintAssist.Hint="输入作业名称"
+                               Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="作业描述" Style="{StaticResource LabelStyle}" />
+                        <TextBox x:Name="DescriptionTextBox"
+                               Style="{StaticResource MultilineInputStyle}"
+                               materialDesign:HintAssist.Hint="输入作业描述"
+                               Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <StackPanel>
+                            <TextBlock Text="作业类型 *" Style="{StaticResource LabelStyle}" />
+                            <ComboBox x:Name="TypeComboBox"
+                                    Style="{StaticResource ComboBoxStyle}"
+                                    materialDesign:HintAssist.Hint="选择作业类型"
+                                    SelectedItem="{Binding Type, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBoxItem Content="数据导入" />
+                                <ComboBoxItem Content="数据处理" />
+                                <ComboBoxItem Content="数据导出" />
+                                <ComboBoxItem Content="报表生成" />
+                                <ComboBoxItem Content="数据清洗" />
+                                <ComboBoxItem Content="自定义脚本" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- 执行模式配置 -->
+                        <TextBlock Text="执行模式 *" Style="{StaticResource LabelStyle}" />
+                        
+                        <!-- 执行模式选择 -->
+                        <Border Background="#1A1A1A" CornerRadius="4" Padding="12" Margin="0,0,0,16">
+                            <StackPanel>
+                                <!-- 模式选择 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <RadioButton x:Name="ManualModeRadio" 
+                                               Content="手动执行" 
+                                               IsChecked="True"
+                                               Foreground="#E0E0E0"
+                                               Margin="0,0,16,0"
+                                               Checked="ManualModeRadio_Checked" />
+                                    <RadioButton x:Name="ScheduledModeRadio" 
+                                               Content="调度执行" 
+                                               Foreground="#E0E0E0"
+                                               Checked="ScheduledModeRadio_Checked" />
+                                </StackPanel>
+                                
+                                <!-- 执行模式说明 -->
+                                <Border Background="#2A2A2A" CornerRadius="4" Padding="8" Margin="0,8,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="执行模式说明:" FontSize="11" Foreground="#888888" Margin="0,0,0,4" />
+                                        <TextBlock Text="手动执行：需要手动触发执行，无调度配置" FontSize="11" Foreground="#00FF88" />
+                                        <TextBlock Text="调度执行：按配置的频次自动执行" FontSize="11" Foreground="#00FF88" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                <TextBlock Text="超时时间 (秒)" Style="{StaticResource LabelStyle}" />
+                                <TextBox x:Name="TimeoutTextBox"
+                                       Style="{StaticResource InputStyle}"
+                                       materialDesign:HintAssist.Hint="输入超时时间"
+                                       Text="{Binding TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                <TextBlock Text="最大重试次数" Style="{StaticResource LabelStyle}" />
+                                <TextBox x:Name="MaxRetryTextBox"
+                                       Style="{StaticResource InputStyle}"
+                                       materialDesign:HintAssist.Hint="输入最大重试次数"
+                                       Text="{Binding MaxRetryCount, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <CheckBox x:Name="IsEnabledCheckBox"
+                                Content="启用作业"
+                                IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                Foreground="#E0E0E0"
+                                Margin="0,0,0,16" />
+
+                        <CheckBox x:Name="AllowParallelCheckBox"
+                                Content="允许并行执行"
+                                IsChecked="{Binding AllowParallelExecution, UpdateSourceTrigger=PropertyChanged}"
+                                Foreground="#E0E0E0"
+                                Margin="0,0,0,16" />
+                    </StackPanel>
+                </Border>
+
+                <!-- 调度配置（仅调度执行模式显示） -->
+                <Border x:Name="SchedulingConfigBorder" Style="{StaticResource DialogStyle}" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="调度配置" 
+                                 FontSize="16" 
+                                 FontWeight="SemiBold" 
+                                 Foreground="{StaticResource CyberBlueBrush}" 
+                                 Margin="0,0,0,16" />
+
+                        <!-- 1. 执行周期选择 -->
+                        <TextBlock Text="执行周期" Style="{StaticResource LabelStyle}" />
+                        
+                        <!-- 执行周期模式选择 -->
+                        <Border Background="#1A1A1A" CornerRadius="4" Padding="12" Margin="0,0,0,16">
+                            <StackPanel>
+                                <!-- 模式选择 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <RadioButton x:Name="SimpleCycleModeRadio" 
+                                               Content="简单模式" 
+                                               IsChecked="True"
+                                               Foreground="#E0E0E0"
+                                               Margin="0,0,16,0"
+                                               Checked="SimpleCycleModeRadio_Checked" />
+                                    <RadioButton x:Name="CronCycleModeRadio" 
+                                               Content="Cron表达式模式" 
+                                               Foreground="#E0E0E0"
+                                               Checked="CronCycleModeRadio_Checked" />
+                                </StackPanel>
+                                
+                                <!-- 简单模式配置 -->
+                                <StackPanel x:Name="SimpleCycleModePanel" Visibility="Visible">
+                                    <TextBlock Text="执行周期（秒）" FontSize="12" Foreground="#CCCCCC" Margin="0,0,0,4" />
+                                    <TextBox x:Name="ExecutionCycleSecondsTextBox"
+                                           Style="{StaticResource InputStyle}"
+                                           materialDesign:HintAssist.Hint="建议设置120秒以上"
+                                           Text="120"
+                                           TextChanged="ExecutionCycleSecondsTextBox_TextChanged" />
+                                    
+                                    <!-- 简单模式对应的Cron表达式显示 -->
+                                    <Border Background="#2A2A2A" CornerRadius="4" Padding="8" Margin="0,8,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="对应的Cron表达式:" FontSize="11" Foreground="#888888" Margin="0,0,0,4" />
+                                            <TextBox x:Name="SimpleCycleModeCronExpressionTextBox"
+                                                   Style="{StaticResource InputStyle}"
+                                                   IsReadOnly="True"
+                                                   Background="#1A1A1A"
+                                                   Foreground="#00FF88"
+                                                   FontFamily="Consolas"
+                                                   FontSize="11"
+                                                   Text="0 */2 * * * ?"
+                                                   materialDesign:HintAssist.Hint="自动生成的Cron表达式（只读）" />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                                
+                                <!-- Cron表达式模式配置 -->
+                                <StackPanel x:Name="CronCycleModePanel" Visibility="Collapsed">
+                                    <TextBlock Text="Cron表达式" FontSize="12" Foreground="#CCCCCC" Margin="0,0,0,4" />
+                                    <TextBox x:Name="CronCycleExpressionTextBox"
+                                           Style="{StaticResource InputStyle}"
+                                           materialDesign:HintAssist.Hint="输入Cron表达式，格式：秒 分 时 日 月 年"
+                                           TextChanged="CronCycleExpressionTextBox_TextChanged" />
+                                    
+                                    <!-- Cron表达式说明 -->
+                                    <Border Background="#2A2A2A" CornerRadius="4" Padding="8" Margin="0,8,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="Cron表达式格式说明:" FontSize="11" Foreground="#888888" Margin="0,0,0,4" />
+                                            <TextBlock Text="秒 分 时 日 月 年" FontSize="11" Foreground="#00FF88" />
+                                            <TextBlock Text="示例：0 0 12 * * ? (每天中午12点执行)" FontSize="11" Foreground="#00FF88" />
+                                            <TextBlock Text="示例：0 30 9 * * 1-5 (工作日早上9:30执行)" FontSize="11" Foreground="#00FF88" />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                                
+                                <!-- 业务执行周期说明 -->
+                                <Border Background="#2A2A2A" CornerRadius="4" Padding="8" Margin="0,8,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="调度执行说明:" FontSize="11" Foreground="#888888" Margin="0,0,0,4" />
+                                        <TextBlock x:Name="BusinessExecutionCycleDescriptionText" 
+                                                 Text="执行周期：控制作业每多少秒执行一次；时间间隔：控制每次执行的业务时间范围；业务数据时间：控制业务的总体开始和结束时间" 
+                                                 FontSize="11" 
+                                                 Foreground="#00FF88" 
+                                                 TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 2. 业务数据时间配置 -->
+                        <TextBlock Text="业务数据时间范围" Style="{StaticResource LabelStyle}" />
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                <TextBlock Text="开始时间" FontSize="12" Foreground="#CCCCCC" Margin="0,0,0,4" />
+                                <DatePicker x:Name="BusinessDataStartDatePicker"
+                                         Style="{StaticResource DatePickerStyle}"
+                                         materialDesign:HintAssist.Hint="选择业务数据开始时间"
+                                         SelectedDate="{Binding BusinessStartDate, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                <TextBlock Text="结束时间（可选）" FontSize="12" Foreground="#CCCCCC" Margin="0,0,0,4" />
+                                <DatePicker x:Name="BusinessDataEndDatePicker"
+                                         Style="{StaticResource DatePickerStyle}"
+                                         materialDesign:HintAssist.Hint="选择业务数据结束时间（留空表示无结束时间）"
+                                         SelectedDate="{Binding BusinessEndDate, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 4. 时间间隔配置 -->
+                        <TextBlock Text="时间间隔" Style="{StaticResource LabelStyle}" />
+                        
+                        <Border Background="#1A1A1A" CornerRadius="4" Padding="12" Margin="0,0,0,16">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="120" />
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <!-- 时间间隔数值输入框 -->
+                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                        <TextBlock Text="时间间隔数值" FontSize="12" Foreground="#CCCCCC" Margin="0,0,0,4" />
+                                        <TextBox x:Name="TimeIntervalValueTextBox"
+                                               Style="{StaticResource InputStyle}"
+                                               materialDesign:HintAssist.Hint="输入时间间隔数值"
+                                               Text="1"
+                                               TextChanged="TimeIntervalValueTextBox_TextChanged" />
+                                    </StackPanel>
+                                    
+                                    <!-- 分隔符 -->
+                                    <TextBlock Grid.Column="1" 
+                                             Text="每" 
+                                             FontSize="16" 
+                                             Foreground="#CCCCCC" 
+                                             VerticalAlignment="Center"
+                                             Margin="8,0" />
+                                    
+                                    <!-- 时间单位下拉框 -->
+                                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                                        <TextBlock Text="时间单位" FontSize="12" Foreground="#CCCCCC" Margin="0,0,0,4" />
+                                        <ComboBox x:Name="TimeIntervalUnitComboBox" 
+                                                Style="{StaticResource ComboBoxStyle}"
+                                                SelectionChanged="TimeIntervalUnitComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="秒" Tag="Seconds" />
+                                            <ComboBoxItem Content="分钟" Tag="Minutes" />
+                                            <ComboBoxItem Content="小时" Tag="Hours" />
+                                            <ComboBoxItem Content="天" Tag="Days" IsSelected="True" />
+                                            <ComboBoxItem Content="周" Tag="Weeks" />
+                                            <ComboBoxItem Content="月" Tag="Months" />
+                                            <ComboBoxItem Content="年" Tag="Years" />
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+                                
+                                <!-- 时间间隔说明 -->
+                                <Border Background="#2A2A2A" CornerRadius="4" Padding="8" Margin="0,8,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="时间间隔说明:" FontSize="11" Foreground="#888888" Margin="0,0,0,4" />
+                                        <TextBlock x:Name="TimeIntervalDescriptionText" 
+                                                 Text="时间间隔控制每次业务执行的开始和结束时间范围，作为@begin_date和@end_date参数传递给SQL" 
+                                                 FontSize="11" 
+                                                 Foreground="#00FF88" 
+                                                 TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- 步骤配置 -->
+                <Border Style="{StaticResource DialogStyle}">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                     Text="步骤配置" 
+                                     FontSize="16" 
+                                     FontWeight="SemiBold" 
+                                     Foreground="{StaticResource CyberBlueBrush}" />
+
+                            <Button Grid.Column="1"
+                                  x:Name="AddStepButton"
+                                  Content="添加步骤"
+                                  Style="{StaticResource ButtonStyle}"
+                                  Background="{StaticResource SuccessColor}"
+                                  Foreground="White"
+                                  Padding="12,6"
+                                  Click="AddStepButton_Click" />
+                        </Grid>
+
+                        <!-- 步骤列表 -->
+                        <Border Background="#1A1A1A" 
+                              CornerRadius="8" 
+                              Padding="16" 
+                              Margin="0,0,0,16"
+                              BorderBrush="#333333"
+                              BorderThickness="1">
+                            <StackPanel x:Name="StepsPanel">
+                                <TextBlock x:Name="NoStepsText"
+                                         Text="暂无步骤，点击'添加步骤'按钮开始配置" 
+                                         FontSize="12" 
+                                         Foreground="#AAAAAA" 
+                                         HorizontalAlignment="Center"
+                                         Margin="0,20" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 步骤统计和操作提示 -->
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0"
+                                     x:Name="StepsCountText"
+                                     Text="已添加 0 个步骤" 
+                                     FontSize="11" 
+                                     Foreground="#888888" />
+                                     
+                            <TextBlock Grid.Column="1"
+                                     Text="💡 提示：使用上移下移按钮调整步骤执行顺序" 
+                                     FontSize="10" 
+                                     Foreground="#666666" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 按钮区域 -->
+        <Border Grid.Row="1" 
+              Background="#2A2A2A" 
+              CornerRadius="8" 
+              Padding="20">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="CancelButton"
+                      Content="取消"
+                      Style="{StaticResource ButtonStyle}"
+                      Background="#2A2A2A"
+                      Foreground="#CCCCCC"
+                      Click="CancelButton_Click" />
+
+                <Button x:Name="SaveButton"
+                      Content="保存"
+                      Style="{StaticResource ButtonStyle}"
+                      Background="{StaticResource CyberBlueBrush}"
+                      Foreground="White"
+                      Click="SaveButton_Click" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window> 

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="ExcelProcessor.WPF.Dialogs.RoleEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="{Binding DialogTitle}"
+        Width="800"
+        Height="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        Background="{StaticResource MaterialDesignPaper}"
+        TextElement.Foreground="{StaticResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        FontFamily="{StaticResource MaterialDesignFont}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource MaterialDesignToolBarBackground}"
+                Padding="24,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="AccountMultiple" 
+                                           Width="24" 
+                                           Height="24" 
+                                           Foreground="{StaticResource MaterialDesignBody}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0" />
+                    <TextBlock Text="{Binding DialogTitle}" 
+                             FontSize="18" 
+                             FontWeight="Medium"
+                             VerticalAlignment="Center" />
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                      Style="{StaticResource MaterialDesignIconButton}"
+                      materialDesign:ButtonAssist.CornerRadius="4"
+                      Click="CloseButton_Click">
+                    <materialDesign:PackIcon Kind="Close" />
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- 内容区域 -->
+        <Grid Grid.Row="1" Margin="24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 角色基本信息 -->
+            <Border Grid.Column="0" 
+                    Background="{StaticResource MaterialDesignCardBackground}"
+                    CornerRadius="8"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="基本信息" 
+                             FontSize="16" 
+                             FontWeight="Medium"
+                             Margin="0,0,0,20" />
+
+                    <!-- 角色代码 -->
+                    <TextBlock Text="角色代码 *" 
+                             Style="{StaticResource MaterialDesignBody2TextBlock}"
+                             Margin="0,0,0,8" />
+                    <TextBox x:Name="RoleCodeTextBox"
+                           Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                           materialDesign:HintAssist.Hint="输入角色代码"
+                           Text="{Binding Role.Code, UpdateSourceTrigger=PropertyChanged}"
+                           Margin="0,0,0,16" />
+
+                    <!-- 角色名称 -->
+                    <TextBlock Text="角色名称 *" 
+                             Style="{StaticResource MaterialDesignBody2TextBlock}"
+                             Margin="0,0,0,8" />
+                    <TextBox x:Name="RoleNameTextBox"
+                           Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                           materialDesign:HintAssist.Hint="输入角色名称"
+                           Text="{Binding Role.Name, UpdateSourceTrigger=PropertyChanged}"
+                           Margin="0,0,0,16" />
+
+                    <!-- 角色描述 -->
+                    <TextBlock Text="角色描述" 
+                             Style="{StaticResource MaterialDesignBody2TextBlock}"
+                             Margin="0,0,0,8" />
+                    <TextBox x:Name="RoleDescriptionTextBox"
+                           Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                           materialDesign:HintAssist.Hint="输入角色描述"
+                           Text="{Binding Role.Description, UpdateSourceTrigger=PropertyChanged}"
+                           TextWrapping="Wrap"
+                           AcceptsReturn="True"
+                           VerticalScrollBarVisibility="Auto"
+                           Height="80"
+                           Margin="0,0,0,16" />
+
+                    <!-- 角色类型 -->
+                    <TextBlock Text="角色类型 *" 
+                             Style="{StaticResource MaterialDesignBody2TextBlock}"
+                             Margin="0,0,0,8" />
+                    <ComboBox x:Name="RoleTypeComboBox"
+                            Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            materialDesign:HintAssist.Hint="选择角色类型"
+                            SelectedItem="{Binding Role.Type}"
+                            ItemsSource="{Binding RoleTypes}"
+                            Margin="0,0,0,16" />
+
+                    <!-- 是否启用 -->
+                    <CheckBox x:Name="IsEnabledCheckBox"
+                            Content="启用角色"
+                            IsChecked="{Binding Role.IsEnabled}"
+                            Style="{StaticResource MaterialDesignCheckBox}"
+                            Margin="0,0,0,16" />
+
+                    <!-- 排序顺序 -->
+                    <TextBlock Text="排序顺序" 
+                             Style="{StaticResource MaterialDesignBody2TextBlock}"
+                             Margin="0,0,0,8" />
+                    <TextBox x:Name="SortOrderTextBox"
+                           Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                           materialDesign:HintAssist.Hint="输入排序顺序"
+                           Text="{Binding Role.SortOrder}"
+                           Margin="0,0,0,16" />
+                </StackPanel>
+            </Border>
+
+            <!-- 权限分配 -->
+            <Border Grid.Column="2" 
+                    Background="{StaticResource MaterialDesignCardBackground}"
+                    CornerRadius="8"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- 权限标题 -->
+                    <TextBlock Grid.Row="0" 
+                             Text="权限分配" 
+                             FontSize="16" 
+                             FontWeight="Medium"
+                             Margin="0,0,0,20" />
+
+                    <!-- 权限操作按钮 -->
+                    <StackPanel Grid.Row="1" 
+                              Orientation="Horizontal" 
+                              Margin="0,0,0,16">
+                        <Button x:Name="SelectAllButton"
+                              Content="全选"
+                              Style="{StaticResource MaterialDesignOutlinedButton}"
+                              Click="SelectAllButton_Click"
+                              Margin="0,0,8,0" />
+                        
+                        <Button x:Name="ClearAllButton"
+                              Content="清空"
+                              Style="{StaticResource MaterialDesignOutlinedButton}"
+                              Click="ClearAllButton_Click"
+                              Margin="0,0,8,0" />
+                        
+                        <Button x:Name="ExpandAllButton"
+                              Content="展开"
+                              Style="{StaticResource MaterialDesignOutlinedButton}"
+                              Click="ExpandAllButton_Click"
+                              Margin="0,0,8,0" />
+                        
+                        <Button x:Name="CollapseAllButton"
+                              Content="折叠"
+                              Style="{StaticResource MaterialDesignOutlinedButton}"
+                              Click="CollapseAllButton_Click" />
+                    </StackPanel>
+
+                    <!-- 权限树形视图 -->
+                    <TreeView x:Name="PermissionsTreeView"
+                            Grid.Row="2"
+                            Background="Transparent"
+                            BorderThickness="0">
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <CheckBox Grid.Column="0"
+                                            IsChecked="{Binding IsGranted}"
+                                            IsThreeState="True"
+                                            Margin="0,0,8,0" />
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="{Binding Icon}"
+                                                               Width="16"
+                                                               Height="16"
+                                                               Margin="0,0,8,0"
+                                                               VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Name}"
+                                                 VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- 底部按钮 -->
+        <Border Grid.Row="2" 
+                Background="{StaticResource MaterialDesignToolBarBackground}"
+                Padding="24,16">
+            <StackPanel Orientation="Horizontal" 
+                      HorizontalAlignment="Right">
+                <Button x:Name="CancelButton"
+                      Content="取消"
+                      Style="{StaticResource MaterialDesignOutlinedButton}"
+                      Click="CancelButton_Click"
+                      Margin="0,0,12,0" />
+                
+                <Button x:Name="SaveButton"
+                      Content="保存"
+                      Style="{StaticResource MaterialDesignRaisedButton}"
+                      Click="SaveButton_Click" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window> 

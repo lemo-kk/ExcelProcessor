@@ -1,0 +1,5 @@
+E:\code\code demo\EXCEL_V1.0\obj\Debug\net6.0\DebugDataSource.csproj.AssemblyReference.cache
+E:\code\code demo\EXCEL_V1.0\obj\Debug\net6.0\DebugDataSource.GeneratedMSBuildEditorConfig.editorconfig
+E:\code\code demo\EXCEL_V1.0\obj\Debug\net6.0\DebugDataSource.AssemblyInfoInputs.cache
+E:\code\code demo\EXCEL_V1.0\obj\Debug\net6.0\DebugDataSource.AssemblyInfo.cs
+E:\code\code demo\EXCEL_V1.0\obj\Debug\net6.0\DebugDataSource.csproj.CoreCompileInputs.cache

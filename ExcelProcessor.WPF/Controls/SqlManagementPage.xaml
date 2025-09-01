@@ -1,0 +1,810 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="ExcelProcessor.WPF.Controls.SqlManagementPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:ExcelProcessor.WPF.Controls">
+
+    <UserControl.Resources>
+        <!-- SQL管理页面样式 -->
+        <Style x:Key="SqlPageStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1A1A1A" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,20" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="2" Opacity="0.3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 页面标题样式 -->
+        <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Margin" Value="0,0,0,20" />
+        </Style>
+
+        <!-- 分组标题样式 -->
+        <Style x:Key="GroupTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <!-- 标签样式 -->
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="MinWidth" Value="120" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <!-- 输入框样式 -->
+        <Style x:Key="InputStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="CaretBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+
+        <!-- 多行输入框样式 -->
+        <Style x:Key="MultiLineInputStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="MinWidth" Value="300" />
+            <Setter Property="MinHeight" Value="100" />
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="MaxHeight" Value="900" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="CaretBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="Padding" Value="8,12" />
+        </Style>
+
+        <!-- 下拉框样式 -->
+        <Style x:Key="ComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontFamily" Value="Microsoft YaHei" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="MaxDropDownHeight" Value="200" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="Padding" Value="8,8" />
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Padding" Value="8,8" />
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="FontFamily" Value="Microsoft YaHei" />
+                        <Setter Property="FontWeight" Value="Normal" />
+                        <Setter Property="Foreground" Value="#E0E0E0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border Background="{TemplateBinding Background}"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Left" 
+                                                        VerticalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsHighlighted" Value="True">
+                                            <Setter Property="Background" Value="#404040" />
+                                            <Setter Property="Foreground" Value="#E0E0E0" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#505050" />
+                                            <Setter Property="Foreground" Value="#E0E0E0" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 按钮样式 -->
+        <Style x:Key="ButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="MinWidth" Value="80" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- 数据网格样式 -->
+        <Style x:Key="DataGridStyle" TargetType="DataGrid">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="GridLinesVisibility" Value="Horizontal" />
+            <Setter Property="HorizontalGridLinesBrush" Value="#404040" />
+            <Setter Property="RowBackground" Value="#2A2A2A" />
+            <Setter Property="AlternatingRowBackground" Value="#252525" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="CanUserAddRows" Value="False" />
+            <Setter Property="CanUserDeleteRows" Value="False" />
+            <Setter Property="SelectionMode" Value="Single" />
+            <Setter Property="SelectionUnit" Value="FullRow" />
+        </Style>
+
+        <!-- 配置复选框样式 -->
+        <Style x:Key="ConfigCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <!-- 参数项样式 -->
+        <Style x:Key="ParameterItemStyle" TargetType="Border">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="2" Opacity="0.3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 参数标题样式 -->
+        <Style x:Key="ParameterTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <!-- 参数标签样式 -->
+        <Style x:Key="ParameterLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="#CCCCCC" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- 参数输入框样式 -->
+        <Style x:Key="ParameterInputStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="MaxHeight" Value="80" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="Background" Value="#1A1A1A" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- 危险按钮样式 -->
+        <Style x:Key="DangerButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Foreground" Value="#FF6B6B" />
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="BorderBrush" Value="#FF6B6B" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF6B6B" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 分类标签样式 -->
+        <Style x:Key="CategoryTagStyle" TargetType="Border">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="Margin" Value="0,0,8,8" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <!-- 分类标签文本样式 -->
+        <Style x:Key="CategoryTagTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="#CCCCCC" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="320" MinWidth="280" MaxWidth="400" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧：SQL分类和列表 -->
+        <Border Grid.Column="0" Style="{StaticResource SqlPageStyle}" Margin="0,0,10,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <!-- 标题 -->
+                <TextBlock Grid.Row="0" Text="SQL管理" Style="{StaticResource PageTitleStyle}" />
+                
+                <!-- SQL分类 -->
+                <Border Grid.Row="1" Style="{StaticResource SqlPageStyle}">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0"
+                                     Text="SQL分类" 
+                                     Style="{StaticResource GroupTitleStyle}" />
+                            
+                            <Button Grid.Column="1"
+                                  x:Name="AddCategoryButton"
+                                  Content="+"
+                                  Style="{StaticResource ButtonStyle}"
+                                  Background="{StaticResource SuccessColor}"
+                                  Foreground="White"
+                                  Padding="8,4"
+                                  FontSize="12"
+                                  FontWeight="Bold"
+                                  Height="36"
+                                  Width="36"
+                                  Margin="8,0,0,0"
+                                  ToolTip="添加新分类" />
+                        </Grid>
+
+                        <!-- 分类标签 -->
+                        <WrapPanel x:Name="CategoryTagsPanel">
+                            <Border Style="{StaticResource CategoryTagStyle}" 
+                                  Background="{StaticResource CyberBlueBrush}">
+                                <TextBlock Text="全部" Style="{StaticResource CategoryTagTextStyle}" 
+                                         Foreground="White" />
+                            </Border>
+                            <Border Style="{StaticResource CategoryTagStyle}">
+                                <TextBlock Text="数据查询" Style="{StaticResource CategoryTagTextStyle}" />
+                            </Border>
+                            <Border Style="{StaticResource CategoryTagStyle}">
+                                <TextBlock Text="数据统计" Style="{StaticResource CategoryTagTextStyle}" />
+                            </Border>
+                            <Border Style="{StaticResource CategoryTagStyle}">
+                                <TextBlock Text="报表生成" Style="{StaticResource CategoryTagTextStyle}" />
+                            </Border>
+                            <Border Style="{StaticResource CategoryTagStyle}">
+                                <TextBlock Text="数据清洗" Style="{StaticResource CategoryTagTextStyle}" />
+                            </Border>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 搜索框 -->
+                <TextBox Grid.Row="2" x:Name="SearchTextBox"
+                       Style="{StaticResource InputStyle}"
+                       materialDesign:HintAssist.Hint="搜索SQL..."
+                       Margin="0,0,0,16" />
+
+                <!-- SQL列表 -->
+                <DataGrid Grid.Row="3" x:Name="SqlListDataGrid"
+                        Style="{StaticResource DataGridStyle}"
+                        MinHeight="200"
+                        MaxHeight="400"
+                        Margin="0,0,0,16"
+                        SelectionChanged="SqlListDataGrid_SelectionChanged">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="SQL名称" Binding="{Binding Name}" Width="*" />
+                        <DataGridTextColumn Header="分类" Binding="{Binding Category}" Width="60" />
+                        <DataGridTextColumn Header="类型" Binding="{Binding OutputType}" Width="60" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- 操作按钮 -->
+                <StackPanel Grid.Row="4" Orientation="Horizontal">
+                    <Button x:Name="AddSqlButton"
+                          Content="新增SQL"
+                          Style="{StaticResource ButtonStyle}"
+                          Background="{StaticResource SuccessColor}"
+                          Foreground="White"
+                          Click="AddSqlButton_Click" />
+                    
+                    <Button x:Name="DeleteSqlButton"
+                          Content="删除SQL"
+                          Style="{StaticResource ButtonStyle}"
+                          Background="{StaticResource DangerColor}"
+                          Foreground="White"
+                          Click="DeleteSqlButton_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 右侧：SQL详情和配置 -->
+        <Border Grid.Column="1" Style="{StaticResource SqlPageStyle}" Margin="10,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- 页面头部 -->
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="SQL详情与配置" Style="{StaticResource PageTitleStyle}" />
+                            <TextBlock Text="配置和管理SQL查询语句及其执行参数" 
+                                     FontSize="12" 
+                                     Foreground="#AAAAAA" 
+                                     Margin="0,-15,0,0" />
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button x:Name="SaveSqlButton"
+                                  Content="保存SQL"
+                                  Style="{StaticResource ButtonStyle}"
+                                  Background="{StaticResource SuccessColor}"
+                                  Foreground="White"
+                                  Click="SaveSqlButton_Click" />
+                        </StackPanel>
+                    </Grid>
+                    
+                    <!-- 主要内容区域 -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- 左侧：主要配置 -->
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <!-- SQL基本信息卡片 -->
+                            <Border Style="{StaticResource SqlPageStyle}" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Column="0"
+                                                 Text="基本信息" 
+                                                 Style="{StaticResource GroupTitleStyle}" />
+                                        
+                                        <Border Grid.Column="1" 
+                                              Background="#2A2A2A" 
+                                              CornerRadius="4" 
+                                              Padding="6,2">
+                                            <TextBlock Text="必填" 
+                                                     FontSize="10" 
+                                                     Foreground="#FF6B6B" 
+                                                     FontWeight="Bold" />
+                                        </Border>
+                                    </Grid>
+                                    
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- SQL名称 -->
+                                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,0">
+                                            <TextBlock Text="SQL名称" Style="{StaticResource LabelStyle}" />
+                                            <TextBox x:Name="SqlNameTextBox"
+                                                   Style="{StaticResource InputStyle}"
+                                                   materialDesign:HintAssist.Hint="请输入SQL名称" />
+                                        </StackPanel>
+
+                                        <!-- SQL分类 -->
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,8,0">
+                                            <TextBlock Text="SQL分类" Style="{StaticResource LabelStyle}" />
+                                            <ComboBox x:Name="CategoryComboBox"
+                                                    Style="{StaticResource ComboBoxStyle}"
+                                                    FontFamily="Microsoft YaHei"
+                                                    materialDesign:HintAssist.Hint="请选择分类">
+                                                <ComboBoxItem Content="数据查询" />
+                                                <ComboBoxItem Content="数据统计" />
+                                                <ComboBoxItem Content="报表生成" />
+                                                <ComboBoxItem Content="数据清洗" />
+                                            </ComboBox>
+                                        </StackPanel>
+
+                                        <!-- 查询数据源 -->
+                                        <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,0">
+                                            <TextBlock Text="查询数据源" Style="{StaticResource LabelStyle}" />
+                                            <ComboBox x:Name="QueryDataSourceComboBox"
+                                                    Style="{StaticResource ComboBoxStyle}"
+                                                    FontFamily="Microsoft YaHei"
+                                                    materialDesign:HintAssist.Hint="请选择查询数据源"
+                                                    SelectionChanged="QueryDataSourceComboBox_SelectionChanged" />
+                                        </StackPanel>
+
+                                        <!-- 输出数据源 - 已隐藏，不再需要 -->
+                                        <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,16,0,0" x:Name="OutputDataSourcePanel" Visibility="Collapsed">
+                                            <!-- 此面板已隐藏，不再显示输出数据源字段 -->
+                                        </StackPanel>
+
+                                        <!-- 输出类型 -->
+                                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,16,8,0">
+                                            <TextBlock Text="输出类型" Style="{StaticResource LabelStyle}" />
+                                            <ComboBox x:Name="OutputTypeComboBox"
+                                                    Style="{StaticResource ComboBoxStyle}"
+                                                    FontFamily="Microsoft YaHei"
+                                                    materialDesign:HintAssist.Hint="请选择输出类型"
+                                                    SelectionChanged="OutputTypeComboBox_SelectionChanged">
+                                                <ComboBoxItem Content="数据表" />
+                                                <ComboBoxItem Content="Excel工作表" />
+                                            </ComboBox>
+                                        </StackPanel>
+
+                                        <!-- 数据表配置面板 -->
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="8,16,0,0" x:Name="DataTablePanel">
+                                            <TextBlock Text="目标数据源" Style="{StaticResource LabelStyle}" />
+                                            <ComboBox x:Name="DataSourceComboBox"
+                                                    Style="{StaticResource ComboBoxStyle}"
+                                                    FontFamily="Microsoft YaHei"
+                                                    materialDesign:HintAssist.Hint="请选择数据源" />
+                                        </StackPanel>
+
+                                        <!-- 数据表名称 -->
+                                        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" x:Name="DataTableNamePanel">
+                                            <TextBlock Text="数据表名称" Style="{StaticResource LabelStyle}" />
+                                            <ComboBox x:Name="DataTableNameComboBox"
+                                                    Style="{StaticResource ComboBoxStyle}"
+                                                    FontFamily="Microsoft YaHei"
+                                                    materialDesign:HintAssist.Hint="请选择或搜索数据表名称"
+                                                    IsEditable="True"
+                                                    IsTextSearchEnabled="True"
+                                                    TextSearch.TextPath="."
+                                                    SelectionChanged="DataTableNameComboBox_SelectionChanged" />
+                                        </StackPanel>
+
+                                        <!-- 清空表选项 -->
+                                        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" x:Name="ClearTablePanel">
+                                            <CheckBox x:Name="ClearTableCheckBox"
+                                                    Content="插入前清空表"
+                                                    Style="{StaticResource ConfigCheckBoxStyle}"
+                                                    ToolTip="选中后将在插入数据前清空目标表的所有数据"
+                                                    Checked="ClearTableCheckBox_Checked"
+                                                    Unchecked="ClearTableCheckBox_Unchecked" />
+                                        </StackPanel>
+
+                                        <!-- 清空Sheet页选项 -->
+                                        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" x:Name="ClearSheetPanel" Visibility="Collapsed">
+                                            <CheckBox x:Name="ClearSheetCheckBox"
+                                                    Content="输出前清空Sheet页"
+                                                    Style="{StaticResource ConfigCheckBoxStyle}"
+                                                    ToolTip="选中后将在输出数据前清空目标Sheet页的所有数据"
+                                                    Checked="ClearSheetCheckBox_Checked"
+                                                    Unchecked="ClearSheetCheckBox_Unchecked" />
+                                        </StackPanel>
+
+                                        <!-- Excel输出路径 -->
+                                        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" x:Name="ExcelPathPanel" Visibility="Collapsed">
+                                            <TextBlock Text="输出路径" Style="{StaticResource LabelStyle}" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="OutputPathTextBox"
+                                                       Grid.Column="0"
+                                                       Style="{StaticResource InputStyle}"
+                                                       materialDesign:HintAssist.Hint="Excel文件输出路径"
+                                                       Text="Output/Excel"
+                                                       TextChanged="OutputPathTextBox_TextChanged" />
+                                                <Button Grid.Column="1"
+                                                      x:Name="PathSelectButton"
+                                                      Content="选择路径"
+                                                      Style="{StaticResource ButtonStyle}"
+                                                      Background="#2A2A2A"
+                                                      Foreground="#CCCCCC"
+                                                      Padding="8,4"
+                                                      FontSize="10"
+                                                      Height="36"
+                                                      Margin="8,0,0,0" />
+                                            </Grid>
+                                        </StackPanel>
+
+                                        <!-- Excel文件名 -->
+                                        <StackPanel Grid.Row="6" Grid.Column="0" Margin="0,16,8,0" x:Name="ExcelFileNamePanel" Visibility="Collapsed">
+                                            <TextBlock Text="Excel文件名" Style="{StaticResource LabelStyle}" />
+                                            <TextBox x:Name="ExcelFileNameTextBox"
+                                                   Style="{StaticResource InputStyle}"
+                                                   materialDesign:HintAssist.Hint="请输入Excel文件名（不含扩展名）"
+                                                   TextChanged="ExcelFileNameTextBox_TextChanged" />
+                                        </StackPanel>
+
+                                        <!-- Sheet名称 -->
+                                        <StackPanel Grid.Row="6" Grid.Column="1" Margin="8,16,0,0" x:Name="SheetNamePanel" Visibility="Collapsed">
+                                            <TextBlock Text="Sheet名称" Style="{StaticResource LabelStyle}" />
+                                            <TextBox x:Name="SheetNameTextBox"
+                                                   Style="{StaticResource InputStyle}"
+                                                   materialDesign:HintAssist.Hint="请输入Sheet名称"
+                                                   TextChanged="SheetNameTextBox_TextChanged" />
+                                        </StackPanel>
+
+                                        <!-- 输出目标 -->
+                                        <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" x:Name="OutputTargetPanel" Visibility="Collapsed">
+                                            <TextBlock Text="输出目标" Style="{StaticResource LabelStyle}" />
+                                            <TextBox x:Name="OutputTargetTextBox"
+                                                   Style="{StaticResource InputStyle}"
+                                                   IsReadOnly="True"
+                                                   Background="#1A1A1A"
+                                                   materialDesign:HintAssist.Hint="自动生成的输出目标路径" />
+                                        </StackPanel>
+
+                                        <!-- 描述 -->
+                                        <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0">
+                                            <TextBlock Text="SQL描述信息" Style="{StaticResource LabelStyle}" />
+                                            <TextBox x:Name="DescriptionTextBox"
+                                                   Style="{StaticResource MultiLineInputStyle}"
+                                                   MinHeight="80"
+                                                   materialDesign:HintAssist.Hint="请输入SQL描述信息" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SQL语句卡片 -->
+                            <Border Style="{StaticResource SqlPageStyle}" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Column="0"
+                                                 Text="SQL语句编辑器" 
+                                                 Style="{StaticResource GroupTitleStyle}" />
+                                    </Grid>
+                                    
+                                    <!-- 使用新的SQL编辑器 -->
+                                    <local:SqlEditor x:Name="SqlEditor"
+                                                   Height="400"
+                                                   SqlTextChanged="SqlEditor_TextChanged"
+                                                   FormatRequested="SqlEditor_FormatRequested"
+                                                   ValidateRequested="SqlEditor_ValidateRequested" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        
+                        <!-- 右侧：辅助配置和测试 -->
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            <!-- 执行配置卡片 -->
+                            <Border Style="{StaticResource SqlPageStyle}" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <TextBlock Text="执行配置" Style="{StaticResource GroupTitleStyle}" />
+
+                                    <StackPanel Margin="0,0,0,12">
+                                        <TextBlock Text="查询超时(秒)" Style="{StaticResource LabelStyle}" />
+                                        <TextBox x:Name="TimeoutTextBox"
+                                               Style="{StaticResource InputStyle}"
+                                               materialDesign:HintAssist.Hint="默认30秒"
+                                               Text="30" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,12">
+                                        <TextBlock Text="最大返回行数" Style="{StaticResource LabelStyle}" />
+                                        <TextBox x:Name="MaxRowsTextBox"
+                                               Style="{StaticResource InputStyle}"
+                                               materialDesign:HintAssist.Hint="默认1000行"
+                                               Text="1000" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,12">
+                                        <TextBlock Text="执行模式" Style="{StaticResource LabelStyle}" />
+                                        <ComboBox x:Name="ExecutionModeComboBox"
+                                                Style="{StaticResource ComboBoxStyle}"
+                                                FontFamily="Microsoft YaHei"
+                                                materialDesign:HintAssist.Hint="请选择执行模式" />
+                                    </StackPanel>
+
+                                    <TextBlock Text="执行选项" Style="{StaticResource LabelStyle}" />
+                                    <StackPanel Margin="0,8,0,0">
+                                        <CheckBox x:Name="EnableLoggingCheckBox"
+                                                Content="启用详细日志"
+                                                Style="{StaticResource ConfigCheckBoxStyle}"
+                                                IsChecked="True" />
+                                        <CheckBox x:Name="CacheResultsCheckBox"
+                                                Content="缓存查询结果"
+                                                Style="{StaticResource ConfigCheckBoxStyle}" />
+                                        <CheckBox x:Name="ValidateParametersCheckBox"
+                                                Content="参数验证"
+                                                Style="{StaticResource ConfigCheckBoxStyle}"
+                                                IsChecked="True" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 测试操作卡片 -->
+                            <Border Style="{StaticResource SqlPageStyle}" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <TextBlock Text="测试与验证" Style="{StaticResource GroupTitleStyle}" />
+                                    
+                                    <StackPanel Margin="0,0,0,12">
+                                        <Button x:Name="TestSqlButton"
+                                              Content="执行SQL查询数据"
+                                              Style="{StaticResource ButtonStyle}"
+                                              Background="{StaticResource InfoColor}"
+                                              Foreground="White"
+                                              Click="TestSqlButton_Click" />
+                                    </StackPanel>
+                                    
+
+                                    
+                                    <StackPanel Margin="0,0,0,12">
+                                        <Button x:Name="TestOutputButton"
+                                              Content="测试输出格式"
+                                              Style="{StaticResource ButtonStyle}"
+                                              Background="{StaticResource WarningColor}"
+                                              Foreground="White"
+                                              Click="TestOutputButton_Click" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 参数配置卡片 -->
+                            <Border Style="{StaticResource SqlPageStyle}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Column="0"
+                                                 Text="参数配置" 
+                                                 Style="{StaticResource GroupTitleStyle}" />
+                                        
+                                        <Button Grid.Column="1"
+                                              x:Name="AddParameterButton"
+                                              Content="添加参数"
+                                              Style="{StaticResource ButtonStyle}"
+                                              Background="{StaticResource SuccessColor}"
+                                              Foreground="White"
+                                              Click="AddParameterButton_Click" />
+                                    </Grid>
+
+                                    <!-- 参数配置提示 -->
+                                    <TextBlock Text="💡 提示：参数名称以@开头，如@startDate、@endDate等"
+                                             FontSize="10"
+                                             Foreground="#888888"
+                                             Margin="0,0,0,8"
+                                             TextWrapping="Wrap" />
+                                    
+                                    <!-- 参数列表 -->
+                                    <ScrollViewer Height="280" 
+                                                VerticalScrollBarVisibility="Auto">
+                                        <StackPanel x:Name="ParametersPanel">
+                                            <!-- 示例参数项 -->
+                                            <Border Style="{StaticResource ParameterItemStyle}">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Row="0" Grid.Column="0" 
+                                                              Orientation="Horizontal">
+                                                        <TextBlock Text="⚙️" 
+                                                                 FontSize="14" 
+                                                                 VerticalAlignment="Center" 
+                                                                 Margin="0,0,6,0" />
+                                                        <TextBlock Text="参数配置"
+                                                                 Style="{StaticResource ParameterTitleStyle}" />
+                                                    </StackPanel>
+                                                    
+                                                    <Button Grid.Row="0" Grid.Column="1"
+                                                          Content="删除"
+                                                          Style="{StaticResource DangerButtonStyle}" />
+
+                                                    <!-- 参数名称和默认值 -->
+                                                    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        
+                                                        <TextBlock Grid.Column="0"
+                                                                 Text="参数名称:"
+                                                                 Style="{StaticResource ParameterLabelStyle}" />
+                                                        
+                                                        <TextBox Grid.Column="1"
+                                                               Style="{StaticResource ParameterInputStyle}"
+                                                               materialDesign:HintAssist.Hint="参数名称"
+                                                               Text="@parameter"
+                                                               Margin="0,0,16,0" />
+                                                        
+                                                        <TextBlock Grid.Column="2"
+                                                                 Text="默认值:"
+                                                                 Style="{StaticResource ParameterLabelStyle}" />
+                                                        
+                                                        <TextBox Grid.Column="3"
+                                                               Style="{StaticResource ParameterInputStyle}"
+                                                               materialDesign:HintAssist.Hint="默认值"
+                                                               Text="" />
+                                                    </Grid>
+                                                </Grid>
+                                            </Border>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl> 

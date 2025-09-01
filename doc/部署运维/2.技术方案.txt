@@ -1,0 +1,204 @@
+一、总体架构
+
+采用 WPF + .NET 6/7（向下兼容 .NET Framework 4.6.2+ 可选） 桌面应用，UI 使用 Material Design in XAML Toolkit。
+系统由以下核心部分组成：
+
+UI层：WPF + Material Design（MVVM模式）
+- 主窗口：MainWindow.xaml，采用顶部导航栏设计
+- 页面导航：使用Frame控件实现页面切换
+- 统一主题：暗色主题，提升用户体验
+
+业务逻辑层：C#，模块化设计（Pipeline流水线模式）
+- 数据源管理：DataSourceManager
+- Excel处理：ExcelProcessor
+- SQL执行：SqlExecutor
+- 作业调度：JobScheduler
+
+数据访问层：SQLite（系统自身库），外部数据源通过配置管理加载
+- 系统数据库：ExcelProcessor.db
+- 数据源连接：支持SQLite、SQL Server、MySQL、Oracle
+- 配置存储：JSON格式，支持导入导出
+
+作业执行层：支持手动执行、一键执行、定时调度（Quartz.NET）
+- 作业状态管理：运行中、成功、失败、暂停
+- 执行日志：详细记录执行过程和错误信息
+- 进度显示：实时更新执行进度
+
+导入导出模块：Excel（ClosedXML / EPPlus），CSV（CsvHelper）
+- Excel读取：支持.xlsx和.xls格式
+- 数据预览：显示Excel数据内容
+- 批量导入：优化大数据量处理性能
+
+二、功能模块 & 技术点
+1. 首页（Dashboard）
+
+功能：展示近期执行的作业日志、执行状态（成功/失败）、下一次定时执行时间、展示作业可以点击执行
+
+技术点：
+
+日志存储在 SQLite 系统库中
+
+使用 DataGrid（Material 风格）统一展示
+
+状态颜色规范：成功绿色、失败红色、执行中蓝色
+
+2. 数据源管理
+
+功能：
+
+配置不同类型数据源（Excel/CSV/SQLite/SQL Server/MySQL/Oracle）
+
+支持设置一个“默认数据库”
+
+技术点：
+
+IDataSourceProvider 接口，具体实现 ExcelProvider、SQLiteProvider...
+
+数据源配置存储在系统 SQLite 库中（表 DataSourceConfig），支持oracle、mysql、sqlserver
+
+加密存储数据库连接字符串（AES）
+
+3. Excel 导入配置
+
+功能：
+
+选择 Excel 文件的相对路径（如 ./data/input/xxx.xlsx）
+
+选择导入目标数据源（默认 SQLite），选择标题行，选择单元格拆分方式：原格式存储、拆分成每一行
+
+定义表映射（Sheet → Table）,定义字段映射，定义每次执行时是否清空表
+
+技术点：
+
+使用 ClosedXML 读取 Excel
+
+批量插入 SQLite（System.Data.SQLite 或 Dapper）
+
+映射规则 在表里 存储，支持复用
+
+4. SQL 处理配置
+
+功能：
+
+配置一条或多条 SQL 脚本，在作业配置里按顺序执行
+
+支持参数化（如 {{Date}} 自动替换为执行日期）
+支持不同数据源类型的SQL执行
+支持SQL导出到不同数据源的表或者EXCEL的指定sheet页
+
+技术点：
+
+SQL 存储在 SQLite 系统库
+
+SQL 执行通过 Dapper 封装
+
+错误日志捕获并写入日志表
+
+5. 作业配置
+
+功能：
+
+配置一个完整的处理流程（数据源选择 → Excel 导入 → 多个SQL 执行 →）
+
+支持 一键执行 和 定时执行
+
+技术点：
+
+作业模型（Job）包含多个步骤（Step）
+
+流程存储 JSON 格式，存储到表里，类似 ETL Pipeline
+
+Quartz.NET 定时任务框架（Windows Service / 任务调度）
+
+6. 导入导出配置
+
+功能：
+将配置好的作业导出到其他客户端再进行导入
+导出指定作业的所有相关配置从EXCEL配置到sql到作业，导出成json文件
+
+可设置导出路径（），
+可以将作业json导入到其他客户端里，导入后存储对应的EXCEL模版配置和SQL以及规则配置
+导入sql文件
+
+技术点：
+
+
+导出配置 JSON 存储
+
+7. 系统设置
+
+功能：
+
+系统默认路径配置（输入路径、输出路径、日志路径）
+
+用户权限管理（管理员/业务用户）
+
+日志保留策略
+
+技术点：
+
+配置文件（appsettings.json）+ 数据库存储
+
+用户表 Users，支持简单的账号/密码登录
+支持配置是否需要登录
+
+三、关键设计点
+1. 复用性 & 移植性
+
+每个作业配置可导入/导出为 JSON
+
+客户间只需复制配置文件和模板 Excel，即可快速部署
+
+数据源配置脱敏导出（避免泄露密码）
+
+2. UI 规范
+
+一级菜单（顶部 Tab）：首页 / 数据源管理 / Excel导入 / SQL处理 / 作业配置 / 导入导出 / 系统设置
+
+表格样式：统一使用 Material Design DataGrid，列头灰色背景，内容左对齐，数字右对齐
+
+按钮规范：
+
+主按钮（蓝色，圆角 6px，含图标）
+
+次按钮（灰色，边框圆角 6px）
+
+批量操作按钮统一在表格上方右侧
+
+3. 扩展性
+
+插件化 SQL 执行：未来可接入 Spark SQL / Hive SQL
+
+插件化数据源：新加一个数据源实现 IDataSourceProvider 即可
+
+Quartz.NET 可替换为 Windows Task Scheduler
+
+四、执行流程示例
+
+配置数据源（Excel → SQLite）
+
+定义 SQL 脚本（清洗数据 / 聚合统计）
+
+定义导出配置（结果导出到 output/result.xlsx 的 Sheet2）
+
+创建作业：串联步骤
+
+业务人员放置新 Excel → 点击“一键执行” → 系统自动跑完整个流程 → 输出结果
+
+五、技术栈清单
+
+前端/UI：WPF + Material Design in XAML Toolkit
+
+后端逻辑：.NET 6/7 C#（MVVM架构）
+
+数据库：SQLite（系统库），支持扩展 SQL Server/MySQL/Oracle
+
+ORM/数据访问：Dapper / EF Core
+
+Excel 读写：ClosedXML / EPPlus
+
+定时任务：Quartz.NET
+
+配置文件：JSON（支持导入导出）
+
+日志：Serilog + SQLite sink

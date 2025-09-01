@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="ExcelProcessor.WPF.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Excel Processor - 数据处理工具" 
+        Height="1000" Width="1200"
+        MinHeight="600" MinWidth="900"
+        MaxHeight="{x:Static SystemParameters.PrimaryScreenHeight}"
+        MaxWidth="{x:Static SystemParameters.PrimaryScreenWidth}"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="{StaticResource DarkGrayBrush}"
+        TextElement.Foreground="White"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <!-- 导航按钮样式 -->
+        <Style x:Key="NavigationButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Setter Property="Foreground" Value="#CCCCCC" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="20,15" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="MinWidth" Value="50" />
+            <Setter Property="MinHeight" Value="50" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalAlignment="Center" />
+                                <Border x:Name="Underline" 
+                                        Height="2" 
+                                        Background="{StaticResource CyberBlueBrush}"
+                                        VerticalAlignment="Bottom"
+                                        Opacity="0" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="Background" Value="#2A2A2A" />
+                                <Setter TargetName="Underline" Property="Opacity" Value="0.6" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#3A3A3A" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 激活的导航按钮样式 -->
+        <Style x:Key="ActiveNavigationButtonStyle" TargetType="Button" BasedOn="{StaticResource NavigationButtonStyle}">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="{StaticResource CyberBlue}" BlurRadius="8" ShadowDepth="0" Opacity="0.4" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 紧凑导航按钮样式 -->
+        <Style x:Key="CompactNavigationButtonStyle" TargetType="Button" BasedOn="{StaticResource NavigationButtonStyle}">
+            <Setter Property="Padding" Value="3,3" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="MinWidth" Value="30" />
+            <Setter Property="MinHeight" Value="32" />
+        </Style>
+
+        <!-- 紧凑激活导航按钮样式 -->
+        <Style x:Key="CompactActiveNavigationButtonStyle" TargetType="Button" BasedOn="{StaticResource CompactNavigationButtonStyle}">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinWidth" Value="30" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="{StaticResource CyberBlue}" BlurRadius="6" ShadowDepth="0" Opacity="0.4" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="65" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 顶部导航栏 -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource DarkBlueBrush}"
+                BorderBrush="{StaticResource CyberBlueBrush}"
+                BorderThickness="0,0,0,1"
+                Effect="{StaticResource MaterialDesignElevationShadow2}">
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" MinWidth="600" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo和标题 -->
+                <StackPanel Grid.Column="0" 
+                            Orientation="Horizontal" 
+                            Margin="12,6">
+                    <materialDesign:PackIcon Kind="TableLarge" 
+                                           Width="28" 
+                                           Height="28"
+                                           Foreground="{StaticResource CyberBlueBrush}"
+                                           VerticalAlignment="Center" />
+                    <TextBlock Text="Excel Processor" 
+                             FontSize="18" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"
+                             Margin="10,0,0,0" />
+                </StackPanel>
+
+                <!-- 导航菜单 -->
+                <ScrollViewer Grid.Column="1" 
+                             HorizontalScrollBarVisibility="Disabled" 
+                             VerticalScrollBarVisibility="Disabled"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0">
+                    
+                    <Button x:Name="HomeButton" 
+                            Content="首页" 
+                            Style="{StaticResource CompactActiveNavigationButtonStyle}"
+                            Click="NavigationButton_Click"
+                            Tag="Home" 
+                            Margin="2,0" />
+                    
+                    <Button x:Name="ExcelImportButton" 
+                            Content="Excel配置" 
+                            Style="{StaticResource CompactNavigationButtonStyle}"
+                            Click="NavigationButton_Click"
+                            Tag="ExcelImport"
+                            Margin="2,0" />
+                    
+                    <Button x:Name="SqlManagementButton" 
+                            Content="SQL管理" 
+                            Style="{StaticResource CompactNavigationButtonStyle}"
+                            Click="NavigationButton_Click"
+                            Tag="SqlManagement"
+                            Margin="2,0" />
+                    
+                    <Button x:Name="JobManagementButton" 
+                            Content="作业管理" 
+                            Style="{StaticResource CompactNavigationButtonStyle}"
+                            Click="NavigationButton_Click"
+                            Tag="JobManagement"
+                            Margin="2,0" />
+                    
+                    <Button x:Name="DataSourceButton" 
+                            Content="数据源" 
+                            Style="{StaticResource CompactNavigationButtonStyle}"
+                            Click="NavigationButton_Click"
+                            Tag="DataSource"
+                            Margin="2,0" />
+                    
+                    <Button x:Name="ImportExportButton" 
+                            Content="导入导出" 
+                            Style="{StaticResource CompactNavigationButtonStyle}"
+                            Click="NavigationButton_Click"
+                            Tag="ImportExport"
+                            Margin="2,0" />
+                    
+                    <Button x:Name="SystemSettingsButton" 
+                            Content="系统设置" 
+                            Style="{StaticResource CompactNavigationButtonStyle}"
+                            Click="NavigationButton_Click"
+                            Tag="SystemSettings"
+                            Margin="2,0" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- 右侧状态信息 -->
+                <StackPanel Grid.Column="2" 
+                            Orientation="Horizontal" 
+                            Margin="12,6">
+                    <!-- 登录状态 -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                        <materialDesign:PackIcon Kind="Account" 
+                                               Width="16" 
+                                               Height="16"
+                                               Foreground="{StaticResource CyberBlueBrush}"
+                                               VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding CurrentUserDisplayName}" 
+                                 FontSize="12"
+                                 Foreground="White"
+                                 VerticalAlignment="Center"
+                                 Margin="4,0,0,0" />
+                        <TextBlock Text=" | " 
+                                 FontSize="12"
+                                 Foreground="#CCCCCC"
+                                 VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding CurrentUserRole}" 
+                                 FontSize="12"
+                                 Foreground="{StaticResource CyberBlueBrush}"
+                                 VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- 退出按钮 -->
+                    <Button x:Name="LogoutButton"
+                          Style="{StaticResource MaterialDesignIconButton}"
+                          Foreground="#FF6B6B"
+                          ToolTip="退出登录"
+                          Click="LogoutButton_Click">
+                        <materialDesign:PackIcon Kind="Logout" 
+                                               Width="18" 
+                                               Height="18" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 主内容区域 -->
+        <Border Grid.Row="1" 
+                Background="{StaticResource DarkGrayBrush}"
+                Margin="8">
+            <Frame x:Name="MainContentFrame" 
+                   NavigationUIVisibility="Hidden"
+                   Background="Transparent" />
+        </Border>
+
+        <!-- 弹出窗遮罩层 -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                x:Name="DialogOverlay"
+                Background="#80000000"
+                Visibility="Collapsed">
+            <Grid x:Name="DialogContainer" />
+        </Border>
+    </Grid>
+</Window> 
