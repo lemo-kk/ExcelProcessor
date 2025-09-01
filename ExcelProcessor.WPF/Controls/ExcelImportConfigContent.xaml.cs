@@ -138,7 +138,7 @@ namespace ExcelProcessor.WPF.Controls
             {
                 // 如果能拿到配置ID，优先使用ID查询映射
                 var configToLoad = config;
-                if (configToLoad.Id <= 0)
+                if (string.IsNullOrEmpty(configToLoad.Id))
                 {
                     var configService = App.Services.GetService(typeof(ExcelProcessor.Core.Services.IExcelConfigService)) as ExcelProcessor.Core.Services.IExcelConfigService;
                     if (configService != null)
@@ -149,7 +149,7 @@ namespace ExcelProcessor.WPF.Controls
                 }
 
                 var excelService = App.Services.GetService(typeof(ExcelProcessor.Core.Services.IExcelService)) as ExcelProcessor.Core.Services.IExcelService;
-                if (excelService != null && configToLoad != null && configToLoad.Id > 0)
+                if (excelService != null && configToLoad != null && !string.IsNullOrEmpty(configToLoad.Id))
                 {
                     var dbMappings = await excelService.GetFieldMappingsAsync(configToLoad.Id);
                     var uiMappings = dbMappings.Select(m => new FieldMapping

@@ -28,12 +28,16 @@ namespace ExcelProcessor.Data.Services
                 _logger.LogInformation($"开始保存配置: {config.ConfigName}");
                 _logger.LogInformation($"配置详情: FilePath={config.FilePath}, TargetDataSource={config.TargetDataSource}, SheetName={config.SheetName}, HeaderRow={config.HeaderRow}");
 
+                // 生成GUID格式的ID
+                config.Id = Guid.NewGuid().ToString();
+
                 var sql = @"
-                    INSERT INTO ExcelConfigs (ConfigName, Description, FilePath, TargetDataSourceId, TargetDataSourceName, TargetTableName, SheetName, HeaderRow, DataStartRow, MaxRows, SkipEmptyRows, SplitEachRow, ClearTableDataBeforeImport, EnableValidation, EnableTransaction, ErrorHandlingStrategy, Status, CreatedAt, UpdatedAt)
-                    VALUES (@ConfigName, @Description, @FilePath, @TargetDataSourceId, @TargetDataSourceName, @TargetTableName, @SheetName, @HeaderRow, @DataStartRow, @MaxRows, @SkipEmptyRows, @SplitEachRow, @ClearTableDataBeforeImport, @EnableValidation, @EnableTransaction, @ErrorHandlingStrategy, @Status, @CreatedAt, @UpdatedAt)";
+                    INSERT INTO ExcelConfigs (Id, ConfigName, Description, FilePath, TargetDataSourceId, TargetDataSourceName, TargetTableName, SheetName, HeaderRow, DataStartRow, MaxRows, SkipEmptyRows, SplitEachRow, ClearTableDataBeforeImport, EnableValidation, EnableTransaction, ErrorHandlingStrategy, Status, CreatedAt, UpdatedAt)
+                    VALUES (@Id, @ConfigName, @Description, @FilePath, @TargetDataSourceId, @TargetDataSourceName, @TargetTableName, @SheetName, @HeaderRow, @DataStartRow, @MaxRows, @SkipEmptyRows, @SplitEachRow, @ClearTableDataBeforeImport, @EnableValidation, @EnableTransaction, @ErrorHandlingStrategy, @Status, @CreatedAt, @UpdatedAt)";
 
                 var parameters = new
                 {
+                    config.Id,
                     config.ConfigName,
                     Description = config.Description ?? "",
                     config.FilePath,
@@ -89,7 +93,25 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        public async Task<ExcelConfig> GetConfigByIdAsync(string configName)
+        public async Task<ExcelConfig> GetConfigByIdAsync(string id)
+        {
+            try
+            {
+                var sql = "SELECT Id, ConfigName, Description, FilePath, TargetDataSourceId, TargetDataSourceName, TargetTableName, SheetName, HeaderRow, DataStartRow, MaxRows, SkipEmptyRows, SplitEachRow, ClearTableDataBeforeImport, EnableValidation, EnableTransaction, ErrorHandlingStrategy, Status, CreatedAt, UpdatedAt, Remarks FROM ExcelConfigs WHERE Id = @Id";
+                
+                using var connection = _dbContext.GetConnection();
+                var config = await connection.QueryFirstOrDefaultAsync<ExcelConfig>(sql, new { Id = id });
+                
+                return config;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"获取配置 ID '{id}' 时出错");
+                return null;
+            }
+        }
+
+        public async Task<ExcelConfig> GetConfigByNameAsync(string configName)
         {
             try
             {
@@ -102,7 +124,7 @@ namespace ExcelProcessor.Data.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"获取配置 '{configName}' 时出错");
+                _logger.LogError(ex, $"获取配置名称 '{configName}' 时出错");
                 return null;
             }
         }

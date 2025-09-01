@@ -85,7 +85,7 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        public async Task<ExcelConfig> GetExcelConfigAsync(int id)
+        public async Task<ExcelConfig> GetExcelConfigAsync(string id)
         {
             try
             {
@@ -163,7 +163,7 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        public async Task<ExcelConfig> GetConfigByIdAsync(int id)
+        public async Task<ExcelConfig> GetConfigByIdAsync(string id)
         {
             try
             {
@@ -252,7 +252,7 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        public async Task<IEnumerable<ExcelFieldMapping>> GetFieldMappingsAsync(int configId)
+        public async Task<IEnumerable<ExcelFieldMapping>> GetFieldMappingsAsync(string configId)
         {
             try
             {
@@ -267,7 +267,7 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        public async Task<bool> SaveFieldMappingsAsync(int configId, IEnumerable<ExcelFieldMapping> mappings)
+        public async Task<bool> SaveFieldMappingsAsync(string configId, IEnumerable<ExcelFieldMapping> mappings)
         {
             try
             {
@@ -423,7 +423,7 @@ namespace ExcelProcessor.Data.Services
 
         #region 数据导入
 
-        public async Task<ExcelImportResult> ImportExcelDataAsync(int configId, int? userId = null)
+        public async Task<ExcelImportResult> ImportExcelDataAsync(string configId, int? userId = null)
         {
             try
             {
@@ -437,7 +437,7 @@ namespace ExcelProcessor.Data.Services
                 // 创建导入结果记录
                 var importResult = new ExcelImportResult
                 {
-                    ExcelConfigId = configId,
+                    ExcelConfigId = configId.ToString(),
                     BatchNumber = GenerateBatchNumber(),
                     StartTime = DateTime.Now,
                     Status = "Running",
@@ -486,7 +486,7 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        public async Task<IEnumerable<ExcelImportResult>> GetImportHistoryAsync(int configId, int limit = 10)
+        public async Task<IEnumerable<ExcelImportResult>> GetImportHistoryAsync(string configId, int limit = 10)
         {
             try
             {

@@ -7,7 +7,7 @@ namespace ExcelProcessor.Models
     /// </summary>
     public class ExcelConfig
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public string ConfigName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string FilePath { get; set; } = string.Empty;

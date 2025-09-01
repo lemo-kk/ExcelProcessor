@@ -317,7 +317,7 @@ namespace ExcelProcessor.Data.Database
         {
             var sql = @"
                 CREATE TABLE IF NOT EXISTS ExcelConfigs (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Id TEXT PRIMARY KEY,
                     ConfigName TEXT NOT NULL,
                     Description TEXT,
                     FilePath TEXT NOT NULL,
@@ -354,7 +354,7 @@ namespace ExcelProcessor.Data.Database
             var sql = @"
                 CREATE TABLE IF NOT EXISTS ExcelFieldMappings (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ExcelConfigId INTEGER NOT NULL,
+                    ExcelConfigId TEXT NOT NULL,
                     ExcelColumnName TEXT NOT NULL,
                     ExcelColumnIndex INTEGER NOT NULL,
                     TargetFieldName TEXT NOT NULL,
@@ -384,7 +384,7 @@ namespace ExcelProcessor.Data.Database
             var sql = @"
                 CREATE TABLE IF NOT EXISTS ExcelImportResults (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ExcelConfigId INTEGER NOT NULL,
+                    ExcelConfigId TEXT NOT NULL,
                     BatchNumber TEXT NOT NULL,
                     StartTime TEXT NOT NULL,
                     EndTime TEXT,

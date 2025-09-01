@@ -8,7 +8,8 @@ namespace ExcelProcessor.Core.Services
     {
         Task<bool> SaveConfigAsync(ExcelConfig config);
         Task<List<ExcelConfig>> GetAllConfigsAsync();
-        Task<ExcelConfig> GetConfigByIdAsync(string configName);
+        Task<ExcelConfig> GetConfigByIdAsync(string id);
+        Task<ExcelConfig> GetConfigByNameAsync(string configName);
         Task<bool> DeleteConfigAsync(string configName);
         Task<bool> UpdateConfigAsync(ExcelConfig config);
     }

@@ -38,7 +38,7 @@ namespace ExcelProcessor.Core.Services
         /// </summary>
         /// <param name="id">配置ID</param>
         /// <returns>Excel配置</returns>
-        Task<ExcelConfig> GetExcelConfigAsync(int id);
+        Task<ExcelConfig> GetExcelConfigAsync(string id);
 
         /// <summary>
         /// 获取所有Excel配置
@@ -83,7 +83,7 @@ namespace ExcelProcessor.Core.Services
         /// </summary>
         /// <param name="configId">配置ID</param>
         /// <returns>字段映射列表</returns>
-        Task<IEnumerable<ExcelFieldMapping>> GetFieldMappingsAsync(int configId);
+        Task<IEnumerable<ExcelFieldMapping>> GetFieldMappingsAsync(string configId);
 
         /// <summary>
         /// 批量保存字段映射
@@ -91,7 +91,7 @@ namespace ExcelProcessor.Core.Services
         /// <param name="configId">配置ID</param>
         /// <param name="mappings">字段映射列表</param>
         /// <returns>是否保存成功</returns>
-        Task<bool> SaveFieldMappingsAsync(int configId, IEnumerable<ExcelFieldMapping> mappings);
+        Task<bool> SaveFieldMappingsAsync(string configId, IEnumerable<ExcelFieldMapping> mappings);
 
         #endregion
 
@@ -131,7 +131,7 @@ namespace ExcelProcessor.Core.Services
         /// <param name="configId">配置ID</param>
         /// <param name="userId">执行用户ID</param>
         /// <returns>导入结果</returns>
-        Task<ExcelImportResult> ImportExcelDataAsync(int configId, int? userId = null);
+        Task<ExcelImportResult> ImportExcelDataAsync(string configId, int? userId = null);
 
         /// <summary>
         /// 获取导入结果
@@ -146,7 +146,7 @@ namespace ExcelProcessor.Core.Services
         /// <param name="configId">配置ID</param>
         /// <param name="limit">限制数量</param>
         /// <returns>导入历史</returns>
-        Task<IEnumerable<ExcelImportResult>> GetImportHistoryAsync(int configId, int limit = 10);
+        Task<IEnumerable<ExcelImportResult>> GetImportHistoryAsync(string configId, int limit = 10);
 
         /// <summary>
         /// 取消正在进行的导入

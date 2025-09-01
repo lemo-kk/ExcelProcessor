@@ -18,7 +18,7 @@ namespace ExcelProcessor.Models
         /// Excel配置ID
         /// </summary>
         [Required]
-        public int ExcelConfigId { get; set; }
+        public string ExcelConfigId { get; set; } = string.Empty;
 
         /// <summary>
         /// 导入批次号

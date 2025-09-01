@@ -407,7 +407,7 @@ namespace ExcelProcessor.WPF.Pages
                     ClearTableDataBeforeImport = content.ClearTableDataBeforeImport,
                     Status = "正常",
                     CreatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    Id = isEdit ? _currentEditingConfig.Id : 0
+                    Id = isEdit ? _currentEditingConfig.Id : string.Empty
                 };
                 
                 // 添加调试信息
@@ -443,18 +443,18 @@ namespace ExcelProcessor.WPF.Pages
                     // 保存字段映射
                     if (_excelService != null && content.FieldMappings != null)
                     {
-                        int configId = 0;
-                        if (isEdit && _currentEditingConfig != null && _currentEditingConfig.Id > 0)
+                        string configId = string.Empty;
+                        if (isEdit && _currentEditingConfig != null && !string.IsNullOrEmpty(_currentEditingConfig.Id))
                         {
                             configId = _currentEditingConfig.Id;
                         }
                         else
                         {
-                            var savedConfig = await _excelConfigService.GetConfigByIdAsync(config.ConfigName);
+                            var savedConfig = await _excelConfigService.GetConfigByNameAsync(config.ConfigName);
                             if (savedConfig != null) configId = savedConfig.Id;
                         }
                         
-                        if (configId > 0)
+                        if (!string.IsNullOrEmpty(configId))
                         {
                             var mappings = content.FieldMappings.Select((m, idx) => new ExcelFieldMapping
                             {

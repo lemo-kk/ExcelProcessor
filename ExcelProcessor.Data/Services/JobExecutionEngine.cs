@@ -787,21 +787,18 @@ namespace ExcelProcessor.Data.Services
                 context.AddLog($"开始查找Excel配置，ID: {excelConfigId}");
                 
                 // 首先尝试直接使用原始ID查找
-                if (int.TryParse(excelConfigId, out int configId))
+                var excelConfig = await _excelService.GetExcelConfigAsync(excelConfigId);
+                if (excelConfig != null)
                 {
-                    var excelConfig = await _excelService.GetExcelConfigAsync(configId);
-                    if (excelConfig != null)
-                    {
-                        context.AddLog($"根据ID {configId} 找到Excel配置: {excelConfig.ConfigName}");
-                        return excelConfig;
-                    }
-                    context.AddLog($"根据ID {configId} 未找到Excel配置");
+                    context.AddLog($"根据ID {excelConfigId} 找到Excel配置: {excelConfig.ConfigName}");
+                    return excelConfig;
                 }
+                context.AddLog($"根据ID {excelConfigId} 未找到Excel配置");
 
                 // 尝试作为配置名称查找
                 try
                 {
-                    var config = await _excelConfigService.GetConfigByIdAsync(excelConfigId);
+                    var config = await _excelConfigService.GetConfigByNameAsync(excelConfigId);
                     if (config != null)
                     {
                         context.AddLog($"根据名称 {excelConfigId} 找到Excel配置: {config.ConfigName}");
@@ -867,7 +864,7 @@ namespace ExcelProcessor.Data.Services
 
                 // 获取字段映射
                 List<FieldMapping> fieldMappings = new List<FieldMapping>();
-                if (excelConfig.Id > 0)
+                if (!string.IsNullOrEmpty(excelConfig.Id))
                 {
                     try
                     {
