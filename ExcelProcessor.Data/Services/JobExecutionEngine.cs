@@ -859,12 +859,12 @@ namespace ExcelProcessor.Data.Services
                     context.AddLog(errorMessage);
                     throw new ArgumentException(errorMessage);
                 }
-
+                
                 // 根据SQL配置的输出类型，调用相应的SQL管理功能
                 if (string.IsNullOrWhiteSpace(sqlConfig.OutputType))
                 {
                     // 如果没有配置输出类型，执行普通SQL查询
-                    await ExecuteSqlWithConfig(sqlConfig, step, context, result);
+                await ExecuteSqlWithConfig(sqlConfig, step, context, result);
                 }
                 else if (sqlConfig.OutputType == "数据表")
                 {
@@ -1373,7 +1373,7 @@ namespace ExcelProcessor.Data.Services
             try
             {
                 context.AddLog($"执行数据导出步骤: {step.Name}");
-                
+
                 // 检查SqlConfigId
                 if (string.IsNullOrWhiteSpace(step.SqlConfigId))
                 {
@@ -1553,15 +1553,15 @@ namespace ExcelProcessor.Data.Services
                 {
                     result.IsSuccess = true;
                     result.OutputData["ExportedRows"] = outputResult.AffectedRows;
-                    result.OutputData["ExportFormat"] = "Excel";
+                result.OutputData["ExportFormat"] = "Excel";
                     result.OutputData["ExportPath"] = outputPath;
                     result.OutputData["SheetName"] = sheetName;
                     result.OutputData["OperationType"] = "DATA_EXPORT_TO_EXCEL";
                     result.OutputData["SqlConfigName"] = sqlConfig.Name;
                     result.OutputData["DataSourceId"] = sqlConfig.DataSourceId;
                     result.OutputData["ExecutionTime"] = outputResult.ExecutionTimeMs / 1000.0; // 转换为秒
-                    
-                    context.SetVariable("ExportResult", result.OutputData);
+                
+                context.SetVariable("ExportResult", result.OutputData);
                     context.AddLog($"数据导出到Excel完成: 影响行数 {outputResult.AffectedRows}, 执行时间 {outputResult.ExecutionTimeMs / 1000.0:F2}秒");
                     
                     _logger.LogInformation("数据导出到Excel步骤执行成功: {StepName}, 影响行数: {AffectedRows}", 
