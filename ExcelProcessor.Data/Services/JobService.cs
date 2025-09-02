@@ -1166,6 +1166,21 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
+        public async Task<JobExecution?> GetLatestJobExecutionAsync(string jobId)
+        {
+            try
+            {
+                _logger.LogInformation("获取作业最新执行记录: {JobId}", jobId);
+                var latestExecution = await _jobExecutionRepository.GetLatestByJobIdAsync(jobId);
+                return latestExecution;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取作业最新执行记录失败: {JobId}", jobId);
+                throw;
+            }
+        }
+
         public async Task<(int progress, string currentStep, DateTime startTime, DateTime? estimatedEndTime)> GetJobProgressAsync(string executionId)
         {
             try

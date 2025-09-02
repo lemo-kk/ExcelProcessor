@@ -280,6 +280,13 @@ namespace ExcelProcessor.Core.Services
         Task<List<JobExecution>> GetRunningJobsAsync();
 
         /// <summary>
+        /// 获取作业的最新执行记录
+        /// </summary>
+        /// <param name="jobId">作业ID</param>
+        /// <returns>最新的执行记录</returns>
+        Task<JobExecution?> GetLatestJobExecutionAsync(string jobId);
+
+        /// <summary>
         /// 获取作业执行进度
         /// </summary>
         /// <param name="executionId">执行ID</param>

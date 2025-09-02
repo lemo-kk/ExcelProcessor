@@ -154,6 +154,9 @@ namespace ExcelProcessor.Data.Services
                 jobExecution.Duration = result.EndTime.Value - jobExecution.StartTime;
                 jobExecution.UpdatedAt = DateTime.Now;
                 
+                // 保存执行记录状态到数据库
+                await _jobExecutionRepository.UpdateAsync(jobExecution);
+                
                 context.AddLog($"作业执行完成: {jobConfig.Name}");
                 _logger.LogInformation("作业执行成功: {JobName} ({JobId}), 执行ID: {ExecutionId}", jobConfig.Name, jobConfig.Id, executionId);
                 

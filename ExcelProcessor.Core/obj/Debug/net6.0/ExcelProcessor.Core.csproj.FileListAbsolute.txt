@@ -1,0 +1,15 @@
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\bin\Debug\net6.0\ExcelProcessor.Core.deps.json
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\bin\Debug\net6.0\ExcelProcessor.Core.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\bin\Debug\net6.0\ExcelProcessor.Core.pdb
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\bin\Debug\net6.0\ExcelProcessor.Models.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\bin\Debug\net6.0\ExcelProcessor.Models.pdb
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.csproj.AssemblyReference.cache
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.AssemblyInfoInputs.cache
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.AssemblyInfo.cs
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.csproj.CoreCompileInputs.cache
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.csproj.CopyComplete
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\refint\ExcelProcessor.Core.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ExcelProcessor.Core.pdb
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.Core\obj\Debug\net6.0\ref\ExcelProcessor.Core.dll

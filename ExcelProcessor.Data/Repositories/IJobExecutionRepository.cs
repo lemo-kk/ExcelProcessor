@@ -40,6 +40,13 @@ namespace ExcelProcessor.Data.Repositories
         Task<List<JobExecution>> GetAllByJobIdAsync(string jobId);
 
         /// <summary>
+        /// 根据作业ID获取最新的执行记录
+        /// </summary>
+        /// <param name="jobId">作业ID</param>
+        /// <returns>最新的执行记录</returns>
+        Task<JobExecution?> GetLatestByJobIdAsync(string jobId);
+
+        /// <summary>
         /// 获取正在运行的执行记录
         /// </summary>
         /// <returns>执行记录列表</returns>

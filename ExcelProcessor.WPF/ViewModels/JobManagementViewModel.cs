@@ -544,33 +544,78 @@ namespace ExcelProcessor.WPF.ViewModels
 
 		private async Task UpdateRunningJobsProgressAsync()
 		{
-			// 获取运行中的执行记录并更新映射
-			var runningExecutions = await _jobService.GetRunningJobsAsync();
-			var map = runningExecutions
-				.GroupBy(e => e.JobId)
-				.ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.StartTime).First().Id);
-
-			lock (_jobIdToExecutionId)
+			try
 			{
-				_jobIdToExecutionId.Clear();
-				foreach (var kv in map)
+				// 获取运行中的执行记录并更新映射
+				var runningExecutions = await _jobService.GetRunningJobsAsync();
+				var map = runningExecutions
+					.GroupBy(e => e.JobId)
+					.ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.StartTime).First().Id);
+
+				lock (_jobIdToExecutionId)
 				{
-					_jobIdToExecutionId[kv.Key] = kv.Value;
+					_jobIdToExecutionId.Clear();
+					foreach (var kv in map)
+					{
+						_jobIdToExecutionId[kv.Key] = kv.Value;
+					}
+				}
+
+				// 更新每个运行中作业的进度
+				foreach (var exec in runningExecutions)
+				{
+					var job = _allJobs.FirstOrDefault(j => j.Id == exec.JobId);
+					if (job == null) continue;
+					var progress = await _jobService.GetJobProgressAsync(exec.Id);
+					Application.Current.Dispatcher.Invoke(() =>
+					{
+						job.Status = JobStatus.Running;
+						job.Progress = progress.progress;
+						RefreshJobInCollections(job);
+					});
+				}
+
+				// 检查并更新已完成或失败的作业状态
+				await UpdateCompletedJobsStatusAsync();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "更新作业进度失败");
+			}
+		}
+
+		private async Task UpdateCompletedJobsStatusAsync()
+		{
+			try
+			{
+				// 获取所有作业的最新执行状态
+				foreach (var job in _allJobs)
+				{
+					// 获取作业的最新执行记录
+					var latestExecution = await _jobService.GetLatestJobExecutionAsync(job.Id);
+					if (latestExecution != null)
+					{
+						// 如果作业状态与最新执行状态不一致，则更新
+						if (job.Status != latestExecution.Status)
+						{
+							Application.Current.Dispatcher.Invoke(() =>
+							{
+								job.Status = latestExecution.Status;
+								// 如果作业已完成或失败，重置进度
+								if (latestExecution.Status == JobStatus.Completed || 
+									latestExecution.Status == JobStatus.Failed)
+								{
+									job.Progress = 100;
+								}
+								RefreshJobInCollections(job);
+							});
+						}
+					}
 				}
 			}
-
-			// 更新每个运行中作业的进度
-			foreach (var exec in runningExecutions)
+			catch (Exception ex)
 			{
-				var job = _allJobs.FirstOrDefault(j => j.Id == exec.JobId);
-				if (job == null) continue;
-				var progress = await _jobService.GetJobProgressAsync(exec.Id);
-				Application.Current.Dispatcher.Invoke(() =>
-				{
-					job.Status = JobStatus.Running;
-					job.Progress = progress.progress;
-					RefreshJobInCollections(job);
-				});
+				_logger.LogError(ex, "更新已完成作业状态失败");
 			}
 		}
 

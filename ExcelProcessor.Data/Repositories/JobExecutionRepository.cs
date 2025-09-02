@@ -221,6 +221,30 @@ namespace ExcelProcessor.Data.Repositories
             }
         }
 
+        public async Task<JobExecution?> GetLatestByJobIdAsync(string jobId)
+        {
+            try
+            {
+                const string sql = @"
+                    SELECT Id, JobId, JobName, Status, StartTime, EndTime, Duration, 
+                           ExecutedBy, Parameters, Results, ErrorMessage, ErrorDetails,
+                           CreatedAt, UpdatedAt
+                    FROM JobExecutions 
+                    WHERE JobId = @JobId
+                    ORDER BY StartTime DESC
+                    LIMIT 1";
+
+                var parameters = new { JobId = jobId };
+                var execution = await _connection.QueryFirstOrDefaultAsync<dynamic>(sql, parameters);
+                return execution != null ? MapToJobExecution(execution) : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "根据作业ID获取最新执行记录失败: {JobId}", jobId);
+                throw;
+            }
+        }
+
         public async Task<List<JobExecution>> GetRunningAsync()
         {
             try
