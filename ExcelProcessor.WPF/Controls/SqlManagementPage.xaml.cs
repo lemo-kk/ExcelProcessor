@@ -3116,12 +3116,12 @@ namespace ExcelProcessor.WPF.Controls
         private async Task TestQueryAsync()
         {
             var sqlStatement = SqlEditor?.SqlText?.Trim();
-                            if (string.IsNullOrWhiteSpace(sqlStatement))
-                {
+            if (string.IsNullOrWhiteSpace(sqlStatement))
+            {
                     var errorDialog = new ErrorDialog("提示", "请先输入SQL语句", "确定");
                     errorDialog.ShowDialog();
-                    return;
-                }
+                return;
+            }
 
             // 获取当前选中的数据源ID
             string dataSourceId = null;

@@ -177,4 +177,68 @@ namespace ExcelProcessor.WPF.Converters
             return null;
         }
     }
+
+
+
+    /// <summary>
+    /// 卡片宽度转换器 - 根据可用宽度动态计算卡片宽度
+    /// </summary>
+    public class CardWidthConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double availableWidth && availableWidth > 0)
+            {
+                // 计算每行能放置的卡片数量
+                // 考虑边距：左右各8px（主窗体）+ 20px（HomePage）+ 6px（卡片间距）
+                double totalMargin = 8 + 20 + 6;
+                double effectiveWidth = availableWidth - totalMargin;
+                
+                // 最小卡片宽度240px，最大320px
+                double minCardWidth = 240;
+                double maxCardWidth = 320;
+                
+                // 计算每行能放置的卡片数量
+                int cardsPerRow = Math.Max(1, (int)(effectiveWidth / (minCardWidth + 6))); // 6px是卡片间距
+                
+                // 计算实际卡片宽度
+                double cardWidth = (effectiveWidth - (cardsPerRow - 1) * 6) / cardsPerRow;
+                
+                // 确保卡片宽度在合理范围内
+                cardWidth = Math.Max(minCardWidth, Math.Min(maxCardWidth, cardWidth));
+                
+                return cardWidth;
+            }
+            return 280.0; // 默认宽度
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 文本宽度转换器 - 根据卡片宽度计算文本最大宽度
+    /// </summary>
+    public class TextWidthConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double cardWidth && cardWidth > 0)
+            {
+                // 文本宽度 = 卡片宽度 - 左右边距 - 额外安全边距
+                // 卡片左右边距：18px
+                // 额外安全边距：16px（确保文本不会贴边）
+                double textWidth = cardWidth - 18 * 2 - 16;
+                return Math.Max(100, textWidth); // 最小文本宽度100px
+            }
+            return 244.0; // 默认文本宽度
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 } 

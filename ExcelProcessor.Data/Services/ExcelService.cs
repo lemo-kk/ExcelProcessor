@@ -297,7 +297,7 @@ namespace ExcelProcessor.Data.Services
 
                 // 使用批量保存方法
                 var result = await _fieldMappingRepository.SaveMappingsAsync(mappingsList);
-                
+
                 _logger.LogInformation("保存字段映射成功: ConfigID={ConfigId}, 映射数量={Count}", 
                     configId, mappingsList.Count);
                 

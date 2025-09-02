@@ -1420,10 +1420,10 @@ namespace ExcelProcessor.Data.Services
                 jobConfig.Steps = steps ?? new List<JobStep>();
                 
                 _logger.LogInformation("从JobSteps表加载步骤数据，共 {Count} 个步骤", jobConfig.Steps.Count);
-                
-                // 输出每个步骤的详细信息
-                foreach (var step in jobConfig.Steps)
-                {
+                        
+                        // 输出每个步骤的详细信息
+                        foreach (var step in jobConfig.Steps)
+                        {
                     _logger.LogInformation("步骤: {StepName} ({StepType}), 顺序: {OrderIndex}", step.Name, step.Type, step.OrderIndex);
                 }
 
@@ -1459,9 +1459,9 @@ namespace ExcelProcessor.Data.Services
                         _logger.LogWarning(jsonEx, "直接反序列化输入参数失败，错误位置: {LineNumber}, {Position}, 尝试清理JSON字符串: {JobId}", 
                             jsonEx.LineNumber, jsonEx.BytePositionInLine, jobConfig.Id);
                         
-                        // 尝试清理可能的编码问题
+                    // 尝试清理可能的编码问题
                         var cleanedParams = CleanJsonString(jobConfig.InputParameters, "输入参数");
-                        jobConfig.Parameters = JsonSerializer.Deserialize<List<JobParameter>>(cleanedParams, options) ?? new List<JobParameter>();
+                    jobConfig.Parameters = JsonSerializer.Deserialize<List<JobParameter>>(cleanedParams, options) ?? new List<JobParameter>();
                         _logger.LogInformation("清理后的输入参数反序列化成功，共 {Count} 个参数", jobConfig.Parameters.Count);
                     }
                 }

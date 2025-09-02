@@ -13,26 +13,26 @@
         <converters:CardWidthConverter x:Key="CardWidthConverter" />
         <converters:TextWidthConverter x:Key="TextWidthConverter" />
     </Page.Resources>
-
+            
     <!-- 主布局容器 -->
     <Grid>
         <!-- 主内容区域 -->
         <ScrollViewer VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Disabled"
                       Margin="20">
-            <StackPanel>
+                <StackPanel>
                 <!-- 欢迎信息 -->
                 <TextBlock Text="欢迎使用 Excel 处理系统"
-                         FontSize="24"
-                         FontWeight="Bold"
-                         Foreground="White"
+                             FontSize="24" 
+                             FontWeight="Bold"
+                             Foreground="White"
                          HorizontalAlignment="Center"
                          Margin="0,0,0,8" />
                 
                 <TextBlock Text="高效、智能的Excel数据处理解决方案"
-                         FontSize="14"
-                         Foreground="#CCCCCC"
-                         HorizontalAlignment="Center"
+                             FontSize="14"
+                             Foreground="#CCCCCC"
+                             HorizontalAlignment="Center"
                          Margin="0,0,0,32" />
 
                 <!-- 手动执行作业标题行 -->
@@ -41,9 +41,9 @@
                            Margin="0,0,0,16"
                            VerticalAlignment="Center">
                     <TextBlock Text="手动执行作业" 
-                             FontSize="18" 
-                             FontWeight="SemiBold"
-                             Foreground="{StaticResource CyberBlueBrush}"
+                     FontSize="18" 
+                     FontWeight="SemiBold"
+                     Foreground="{StaticResource CyberBlueBrush}"
                              VerticalAlignment="Center" />
                     <TextBlock Text="{Binding ManualJobsCount, StringFormat='共 {0} 个'}"
                              FontSize="12"
@@ -72,25 +72,25 @@
                                     MinWidth="240"
                                     MaxWidth="320"
                                     Height="170"
-                                    Cursor="Hand"
+                        Cursor="Hand"
                                     Effect="{StaticResource MaterialDesignElevationShadow1}"
                                     MouseLeftButtonDown="ManualJobCard_Click"
                                     Tag="{Binding Id}">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#3A3A3A" />
-                                                <Setter Property="Effect">
-                                                    <Setter.Value>
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#3A3A3A" />
+                                    <Setter Property="Effect">
+                                        <Setter.Value>
                                                         <DropShadowEffect Color="{StaticResource CyberBlue}" BlurRadius="15" ShadowDepth="2" Opacity="0.4" />
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    
                                 <Grid Margin="18">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -104,12 +104,12 @@
                                                                Width="32" 
                                                                Height="32"
                                                                Foreground="{StaticResource HighlightPurpleBrush}"
-                                                               HorizontalAlignment="Center" />
+                                               HorizontalAlignment="Center" />
                                         <TextBlock Text="{Binding Name}" 
                                                  FontSize="14" 
-                                                 FontWeight="SemiBold"
-                                                 Foreground="White"
-                                                 HorizontalAlignment="Center"
+                                 FontWeight="SemiBold"
+                                 Foreground="White"
+                                 HorizontalAlignment="Center"
                                                  Margin="0,8,0,0"
                                                  TextWrapping="Wrap"
                                                  MaxWidth="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType=Border}, Converter={StaticResource TextWidthConverter}}"
@@ -121,8 +121,8 @@
                                     <TextBlock Grid.Row="1" 
                                              Text="{Binding Description}" 
                                              FontSize="11"
-                                             Foreground="#CCCCCC"
-                                             HorizontalAlignment="Center"
+                                 Foreground="#CCCCCC"
+                                 HorizontalAlignment="Center"
                                              VerticalAlignment="Center"
                                              TextWrapping="Wrap"
                                              MaxWidth="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType=Border}, Converter={StaticResource TextWidthConverter}}"
@@ -151,9 +151,9 @@
                                                      FontWeight="Medium"
                                                      Foreground="#CCCCCC" />
                                         </Border>
-                                    </StackPanel>
+                    </StackPanel>
                                 </Grid>
-                            </Border>
+                </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -189,158 +189,158 @@
                     </StackPanel>
                 </Border>
 
-                <!-- 最近执行任务 -->
-                <TextBlock Text="最近执行任务" 
-                         FontSize="18" 
-                         FontWeight="SemiBold"
-                         Foreground="{StaticResource CyberBlueBrush}"
-                         Margin="0,0,0,16" />
+            <!-- 最近执行任务 -->
+            <TextBlock Text="最近执行任务" 
+                     FontSize="18" 
+                     FontWeight="SemiBold"
+                     Foreground="{StaticResource CyberBlueBrush}"
+                     Margin="0,0,0,16" />
 
-                <Border Background="#2A2A2A"
-                        CornerRadius="8"
-                        Padding="20"
-                        Margin="0,0,0,20"
-                        Effect="{StaticResource MaterialDesignElevationShadow1}">
+            <Border Background="#2A2A2A"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="0,0,0,20"
+                    Effect="{StaticResource MaterialDesignElevationShadow1}">
+                
+                <DataGrid x:Name="RecentTasksDataGrid"
+                         Style="{StaticResource CustomDataGridStyle}"
+                         ColumnHeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}"
+                         CellStyle="{StaticResource CustomDataGridCellStyle}"
+                         RowStyle="{StaticResource CustomDataGridRowStyle}"
+                         Height="200"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="True">
                     
-                    <DataGrid x:Name="RecentTasksDataGrid"
-                             Style="{StaticResource CustomDataGridStyle}"
-                             ColumnHeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}"
-                             CellStyle="{StaticResource CustomDataGridCellStyle}"
-                             RowStyle="{StaticResource CustomDataGridRowStyle}"
-                             Height="200"
-                             AutoGenerateColumns="False"
-                             IsReadOnly="True">
-                        
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="作业名称" Binding="{Binding JobName}" Width="*" />
-                            <DataGridTextColumn Header="执行时间" Binding="{Binding ExecuteTime}" Width="150" />
-                            <DataGridTextColumn Header="状态" Binding="{Binding Status}" Width="100">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="HorizontalAlignment" Value="Center" />
-                                        <Setter Property="VerticalAlignment" Value="Center" />
-                                        <Setter Property="Padding" Value="8,4" />
-                                        <Setter Property="Background" Value="#333333" />
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
-                            <DataGridTemplateColumn Header="操作" Width="120">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="查看" 
-                                                    Style="{StaticResource SecondaryButtonStyle}"
-                                                    Padding="8,4"
-                                                    FontSize="11" />
-                                            <Button Content="重新执行" 
-                                                    Style="{StaticResource PrimaryButtonStyle}"
-                                                    Padding="8,4"
-                                                    FontSize="11"
-                                                    Margin="4,0,0,0" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="作业名称" Binding="{Binding JobName}" Width="*" />
+                        <DataGridTextColumn Header="执行时间" Binding="{Binding ExecuteTime}" Width="150" />
+                        <DataGridTextColumn Header="状态" Binding="{Binding Status}" Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Padding" Value="8,4" />
+                                    <Setter Property="Background" Value="#333333" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTemplateColumn Header="操作" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="查看" 
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                Padding="8,4"
+                                                FontSize="11" />
+                                        <Button Content="重新执行" 
+                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                Padding="8,4"
+                                                FontSize="11"
+                                                Margin="4,0,0,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
 
-                <!-- 系统资源统计 -->
-                <TextBlock Text="系统资源" 
-                         FontSize="18" 
-                         FontWeight="SemiBold"
-                         Foreground="{StaticResource CyberBlueBrush}"
-                         Margin="0,0,0,16" />
+            <!-- 系统资源统计 -->
+            <TextBlock Text="系统资源" 
+                     FontSize="18" 
+                     FontWeight="SemiBold"
+                     Foreground="{StaticResource CyberBlueBrush}"
+                     Margin="0,0,0,16" />
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
                     <!-- CPU使用率 -->
-                    <Border Grid.Column="0" 
-                            Background="#2A2A2A" 
-                            CornerRadius="8" 
+                <Border Grid.Column="0" 
+                        Background="#2A2A2A"
+                        CornerRadius="8"
                             Padding="20" 
-                            Margin="0,0,8,0"
-                            Effect="{StaticResource MaterialDesignElevationShadow1}">
+                        Margin="0,0,8,0"
+                        Effect="{StaticResource MaterialDesignElevationShadow1}">
                         <StackPanel HorizontalAlignment="Center">
                             <materialDesign:PackIcon Kind="Cpu64Bit" 
-                                                   Width="32" 
-                                                   Height="32"
+                                               Width="32" 
+                                               Height="32"
                                                    Foreground="{StaticResource HighlightPurpleBrush}"
-                                                   HorizontalAlignment="Center" />
+                                               HorizontalAlignment="Center" />
                             <TextBlock Text="CPU使用率" 
-                                     FontSize="14" 
-                                     FontWeight="SemiBold"
-                                     Foreground="White"
-                                     HorizontalAlignment="Center"
-                                     Margin="0,8,0,4" />
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="White"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,8,0,4" />
                             <TextBlock Text="45%" 
                                      FontSize="24" 
-                                     FontWeight="Bold"
+                                 FontWeight="Bold"
                                      Foreground="{StaticResource CyberBlueBrush}"
-                                     HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-                    
+                                 HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
                     <!-- 内存使用率 -->
-                    <Border Grid.Column="1" 
-                            Background="#2A2A2A" 
-                            CornerRadius="8" 
+                <Border Grid.Column="1" 
+                        Background="#2A2A2A"
+                        CornerRadius="8"
                             Padding="20" 
                             Margin="4,0"
-                            Effect="{StaticResource MaterialDesignElevationShadow1}">
+                        Effect="{StaticResource MaterialDesignElevationShadow1}">
                         <StackPanel HorizontalAlignment="Center">
                             <materialDesign:PackIcon Kind="Memory" 
-                                                   Width="32" 
-                                                   Height="32"
-                                                   Foreground="{StaticResource HighlightPurpleBrush}"
-                                                   HorizontalAlignment="Center" />
+                                               Width="32" 
+                                               Height="32"
+                                               Foreground="{StaticResource HighlightPurpleBrush}"
+                                               HorizontalAlignment="Center" />
                             <TextBlock Text="内存使用率" 
-                                     FontSize="14" 
-                                     FontWeight="SemiBold"
-                                     Foreground="White"
-                                     HorizontalAlignment="Center"
-                                     Margin="0,8,0,4" />
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="White"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,8,0,4" />
                             <TextBlock Text="62%" 
                                      FontSize="24" 
-                                     FontWeight="Bold"
+                                 FontWeight="Bold"
                                      Foreground="{StaticResource CyberBlueBrush}"
-                                     HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-                    
+                                 HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
                     <!-- 磁盘使用率 -->
-                    <Border Grid.Column="2" 
-                            Background="#2A2A2A" 
-                            CornerRadius="8" 
+                <Border Grid.Column="2" 
+                        Background="#2A2A2A"
+                        CornerRadius="8"
                             Padding="20" 
-                            Margin="8,0,0,0"
-                            Effect="{StaticResource MaterialDesignElevationShadow1}">
+                        Margin="8,0,0,0"
+                        Effect="{StaticResource MaterialDesignElevationShadow1}">
                         <StackPanel HorizontalAlignment="Center">
                             <materialDesign:PackIcon Kind="Harddisk" 
-                                                   Width="32" 
-                                                   Height="32"
+                                               Width="32" 
+                                               Height="32"
                                                    Foreground="{StaticResource HighlightPurpleBrush}"
-                                                   HorizontalAlignment="Center" />
+                                               HorizontalAlignment="Center" />
                             <TextBlock Text="磁盘使用率" 
-                                     FontSize="14" 
-                                     FontWeight="SemiBold"
-                                     Foreground="White"
-                                     HorizontalAlignment="Center"
-                                     Margin="0,8,0,4" />
+                                 FontSize="14" 
+                                 FontWeight="SemiBold"
+                                 Foreground="White"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,8,0,4" />
                             <TextBlock Text="78%" 
                                      FontSize="24" 
-                                     FontWeight="Bold"
-                                     Foreground="{StaticResource CyberBlueBrush}"
+                                 FontWeight="Bold"
+                                 Foreground="{StaticResource CyberBlueBrush}"
                                      HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-                </Grid>
-            </StackPanel>
-        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
     </Grid>
 </Page> 
