@@ -122,6 +122,36 @@ namespace ExcelProcessor.Data.Services
                     if (!step.IsEnabled)
                     {
                         context.AddLog($"跳过禁用的步骤: {step.Name}");
+                        
+                        // 为禁用的步骤创建执行记录
+                        var disabledStepExecution = new JobStepExecution
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            ExecutionId = executionId,
+                            StepId = step.Id,
+                            StepName = step.Name,
+                            StepType = ConvertStepType(step.Type),
+                            Status = JobStatus.Disabled,
+                            StartTime = DateTime.Now,
+                            EndTime = DateTime.Now,
+                            Duration = TimeSpan.Zero,
+                            ErrorMessage = "步骤被禁用",
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now
+                        };
+                        
+                        // 保存禁用的步骤执行记录到数据库
+                        try
+                        {
+                            await _jobExecutionRepository.CreateStepExecutionAsync(disabledStepExecution);
+                            context.AddLog($"禁用的步骤执行记录已保存: {step.Name}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "保存禁用的步骤执行记录失败: {StepName}, 执行ID: {ExecutionId}", step.Name, executionId);
+                            context.AddLog($"警告: 保存禁用的步骤执行记录失败: {ex.Message}");
+                        }
+                        
                         continue;
                     }
 
@@ -129,6 +159,36 @@ namespace ExcelProcessor.Data.Services
                     if (hasStepFailed)
                     {
                         context.AddLog($"跳过步骤 {step.OrderIndex}: {step.Name}，因为前面的步骤已失败");
+                        
+                        // 为被跳过的步骤创建执行记录
+                        var skippedStepExecution = new JobStepExecution
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            ExecutionId = executionId,
+                            StepId = step.Id,
+                            StepName = step.Name,
+                            StepType = ConvertStepType(step.Type),
+                            Status = JobStatus.Skipped,
+                            StartTime = DateTime.Now,
+                            EndTime = DateTime.Now,
+                            Duration = TimeSpan.Zero,
+                            ErrorMessage = "步骤被跳过：前面的步骤执行失败",
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now
+                        };
+                        
+                        // 保存跳过的步骤执行记录到数据库
+                        try
+                        {
+                            await _jobExecutionRepository.CreateStepExecutionAsync(skippedStepExecution);
+                            context.AddLog($"跳过的步骤执行记录已保存: {step.Name}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "保存跳过的步骤执行记录失败: {StepName}, 执行ID: {ExecutionId}", step.Name, executionId);
+                            context.AddLog($"警告: 保存跳过的步骤执行记录失败: {ex.Message}");
+                        }
+                        
                         continue;
                     }
 
@@ -137,6 +197,35 @@ namespace ExcelProcessor.Data.Services
                     context.AddLog($"步骤配置: ExcelConfigId={step.ExcelConfigId}, SqlConfigId={step.SqlConfigId}");
                     
                     var stepResult = await ExecuteStepAsync(step, context, cancellationToken);
+                    
+                    // 创建步骤执行记录
+                    var stepExecution = new JobStepExecution
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ExecutionId = executionId,
+                        StepId = step.Id,
+                        StepName = step.Name,
+                        StepType = ConvertStepType(step.Type),
+                        Status = stepResult.IsSuccess ? JobStatus.Completed : JobStatus.Failed,
+                        StartTime = stepResult.StartTime,
+                        EndTime = stepResult.EndTime,
+                        Duration = stepResult.DurationSeconds > 0 ? TimeSpan.FromSeconds(stepResult.DurationSeconds) : null,
+                        ErrorMessage = stepResult.ErrorMessage,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    };
+                    
+                    // 保存步骤执行记录到数据库
+                    try
+                    {
+                        await _jobExecutionRepository.CreateStepExecutionAsync(stepExecution);
+                        context.AddLog($"步骤执行记录已保存: {step.Name}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "保存步骤执行记录失败: {StepName}, 执行ID: {ExecutionId}", step.Name, executionId);
+                        context.AddLog($"警告: 保存步骤执行记录失败: {ex.Message}");
+                    }
                     
                     if (!stepResult.IsSuccess)
                     {
@@ -186,26 +275,26 @@ namespace ExcelProcessor.Data.Services
                 }
                 else
                 {
-                    // 作业执行完成
-                    result.IsSuccess = true;
-                    result.ExecutionId = executionId;
-                    result.StartTime = jobExecution.StartTime;
-                    result.EndTime = DateTime.Now;
-                    result.DurationSeconds = (result.EndTime.Value - result.StartTime).TotalSeconds;
-                    result.ExecutionLogs = context.Logs.ToList();
-                    
-                    jobExecution.Status = JobStatus.Completed;
-                    jobExecution.EndTime = result.EndTime;
-                    jobExecution.Duration = result.EndTime.Value - jobExecution.StartTime;
-                    jobExecution.UpdatedAt = DateTime.Now;
+                // 作业执行完成
+                result.IsSuccess = true;
+                result.ExecutionId = executionId;
+                result.StartTime = jobExecution.StartTime;
+                result.EndTime = DateTime.Now;
+                result.DurationSeconds = (result.EndTime.Value - result.StartTime).TotalSeconds;
+                result.ExecutionLogs = context.Logs.ToList();
+                
+                jobExecution.Status = JobStatus.Completed;
+                jobExecution.EndTime = result.EndTime;
+                jobExecution.Duration = result.EndTime.Value - jobExecution.StartTime;
+                jobExecution.UpdatedAt = DateTime.Now;
                     
                     // 保存执行记录状态到数据库
                     await _jobExecutionRepository.UpdateAsync(jobExecution);
-                    
-                    context.AddLog($"作业执行完成: {jobConfig.Name}");
-                    _logger.LogInformation("作业执行成功: {JobName} ({JobId}), 执行ID: {ExecutionId}", jobConfig.Name, jobConfig.Id, executionId);
-                    
-                    TriggerExecutionEvent(executionId, ExecutionEventType.JobCompleted, "作业执行完成");
+                
+                context.AddLog($"作业执行完成: {jobConfig.Name}");
+                _logger.LogInformation("作业执行成功: {JobName} ({JobId}), 执行ID: {ExecutionId}", jobConfig.Name, jobConfig.Id, executionId);
+                
+                TriggerExecutionEvent(executionId, ExecutionEventType.JobCompleted, "作业执行完成");
                 }
             }
             catch (Exception ex)

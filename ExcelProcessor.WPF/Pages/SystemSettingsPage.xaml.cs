@@ -14,7 +14,7 @@ using ExcelProcessor.Data.Services;
 
 namespace ExcelProcessor.WPF.Pages
 {
-    public partial class SystemSettingsPage : Page, INotifyPropertyChanged
+    	public partial class SystemSettingsPage : Page, INotifyPropertyChanged, IDisposable
     {
         // 系统设置属性
         private bool _autoSaveEnabled = true;
@@ -884,6 +884,47 @@ namespace ExcelProcessor.WPF.Pages
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
+
+        #region IDisposable Implementation
+
+        private bool _disposed = false;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed && disposing)
+            {
+                try
+                {
+                    // 停止性能监控定时器
+                    if (_performanceTimer != null)
+                    {
+                        _performanceTimer.Stop();
+                        _performanceTimer.Tick -= PerformanceTimer_Tick;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"释放SystemSettingsPage资源时发生错误：{ex.Message}");
+                }
+                finally
+                {
+                    _disposed = true;
+                }
+            }
+        }
+
+        ~SystemSettingsPage()
+        {
+            Dispose(false);
         }
 
         #endregion

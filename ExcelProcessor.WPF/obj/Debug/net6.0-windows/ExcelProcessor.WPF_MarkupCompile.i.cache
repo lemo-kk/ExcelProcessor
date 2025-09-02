@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\App.xaml
-38-669254532
+391841126458
 
-461385873169
+47-86906925
 300-76041826
-Controls\ConfigDetailDialog.xaml;Controls\ConfigPageTemplate.xaml;Controls\ConfigurationReferencePage.xaml;Controls\DataPreviewDialog.xaml;Controls\ExcelImportConfigContent.xaml;Controls\FilePathConfigControl.xaml;Controls\ImportProgressDialog.xaml;Controls\ImportResultDialog.xaml;Controls\ProgressDialog.xaml;Controls\SqlEditor.xaml;Controls\SqlManagementPage.xaml;Controls\SqlTestResultDialog.xaml;Controls\TestOutputResultDialog.xaml;Dialogs\CreateTemplateDialog.xaml;Dialogs\JobEditDialog.xaml;Dialogs\JobExecutionHistoryDialog.xaml;Dialogs\ProgressDialog.xaml;Dialogs\RoleEditDialog.xaml;Dialogs\StepSelectionDialog.xaml;Dialogs\SuccessDialog.xaml;Dialogs\UserEditDialog.xaml;Pages\DataSourcePage.xaml;Pages\ExcelImportPage.xaml;Pages\HomePage.xaml;Pages\JobManagementPage.xaml;Pages\RoleManagementPage.xaml;Pages\SystemSettingsPage.xaml;Pages\UserManagementPage.xaml;Styles\Buttons.xaml;Styles\Colors.xaml;Styles\DataGrid.xaml;Styles\Inputs.xaml;Themes\CompactStyles.xaml;Views\MainWindow.xaml;Windows\LoginWindow.xaml;Windows\PermissionEditWindow.xaml;Windows\SplashScreen.xaml;Windows\UserEditWindow.xaml;
+Controls\ConfigDetailDialog.xaml;Controls\ConfigPageTemplate.xaml;Controls\ConfigurationReferencePage.xaml;Controls\DataPreviewDialog.xaml;Controls\ExcelImportConfigContent.xaml;Controls\FilePathConfigControl.xaml;Controls\ImportProgressDialog.xaml;Controls\ImportResultDialog.xaml;Controls\ProgressDialog.xaml;Controls\SqlEditor.xaml;Controls\SqlManagementPage.xaml;Controls\SqlTestResultDialog.xaml;Controls\TestOutputResultDialog.xaml;Dialogs\CreateTemplateDialog.xaml;Dialogs\ErrorDialog.xaml;Dialogs\JobEditDialog.xaml;Dialogs\JobExecutionHistoryDialog.xaml;Dialogs\ProgressDialog.xaml;Dialogs\RoleEditDialog.xaml;Dialogs\StepSelectionDialog.xaml;Dialogs\SuccessDialog.xaml;Dialogs\UserEditDialog.xaml;Pages\DataSourcePage.xaml;Pages\ExcelImportPage.xaml;Pages\HomePage.xaml;Pages\JobManagementPage.xaml;Pages\RoleManagementPage.xaml;Pages\SystemSettingsPage.xaml;Pages\UserManagementPage.xaml;Styles\Buttons.xaml;Styles\Colors.xaml;Styles\DataGrid.xaml;Styles\Inputs.xaml;Themes\CompactStyles.xaml;Views\MainWindow.xaml;Windows\LoginWindow.xaml;Windows\PermissionEditWindow.xaml;Windows\SplashScreen.xaml;Windows\UserEditWindow.xaml;
 
-True
+False
 

@@ -422,7 +422,8 @@ namespace ExcelProcessor.WPF.Controls
                     newCategory = textBox.Text?.Trim();
                     if (string.IsNullOrEmpty(newCategory))
                     {
-                        MessageBox.Show("请输入分类名称", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        var errorDialog = new ErrorDialog("提示", "请输入分类名称", "确定");
+                errorDialog.ShowDialog();
                         return;
                     }
 
@@ -430,7 +431,8 @@ namespace ExcelProcessor.WPF.Controls
                     var existingCategories = GetExistingCategories();
                     if (existingCategories.Contains(newCategory))
                     {
-                        MessageBox.Show("该分类已存在", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        var errorDialog = new ErrorDialog("提示", "该分类已存在", "确定");
+                errorDialog.ShowDialog();
                         return;
                     }
 
@@ -464,13 +466,16 @@ namespace ExcelProcessor.WPF.Controls
                     AddCategoryToComboBox(newCategory);
                     
                     _logger.LogInformation("成功添加新分类: {Category}", newCategory);
-                    MessageBox.Show($"成功添加分类：{newCategory}", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var successDialog = new SuccessDialog("成功", $"成功添加分类：{newCategory}", "确定");
+                    successDialog.Owner = Window.GetWindow(this);
+                    successDialog.ShowDialog();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "添加新分类失败");
-                MessageBox.Show($"添加新分类失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"添加新分类失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -1373,7 +1378,8 @@ namespace ExcelProcessor.WPF.Controls
             {
                 if (_currentSqlItem == null || string.IsNullOrEmpty(_currentSqlItem.Id))
                 {
-                    MessageBox.Show("请先选择要删除的SQL配置", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择要删除的SQL配置", "确定");
+                errorDialog.ShowDialog();
                     return;
                 }
 
@@ -1405,17 +1411,21 @@ namespace ExcelProcessor.WPF.Controls
                     _currentSqlItem = null;
                     
                     _logger.LogInformation("SQL配置删除成功: {SqlName}", sqlName);
-                    MessageBox.Show("SQL配置删除成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var successDialog = new SuccessDialog("成功", "SQL配置删除成功！", "确定");
+                    successDialog.Owner = Window.GetWindow(this);
+                    successDialog.ShowDialog();
                 }
                 else
                 {
-                    MessageBox.Show("删除SQL配置失败", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var errorDialog = new ErrorDialog("错误", "删除SQL配置失败", "确定");
+                errorDialog.ShowDialog();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除SQL配置失败");
-                MessageBox.Show($"删除SQL配置失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"删除SQL配置失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -1431,19 +1441,22 @@ namespace ExcelProcessor.WPF.Controls
                 // 验证必填字段
                 if (string.IsNullOrWhiteSpace(SqlNameTextBox?.Text))
                 {
-                    MessageBox.Show("请输入SQL名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("验证失败", "请输入SQL名称", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(SqlEditor?.SqlText))
                 {
-                    MessageBox.Show("请输入SQL语句", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("验证失败", "请输入SQL语句", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(CategoryComboBox?.Text))
                 {
-                    MessageBox.Show("请选择SQL分类", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("验证失败", "请选择SQL分类", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -1452,7 +1465,8 @@ namespace ExcelProcessor.WPF.Controls
                 var validationResult = ValidateParameters(sqlParameters);
                 if (!validationResult.IsValid)
                 {
-                    MessageBox.Show(validationResult.ErrorMessage, "参数验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("参数验证失败", validationResult.ErrorMessage, "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -1471,7 +1485,8 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("请先选择查询数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择查询数据源", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -1554,7 +1569,9 @@ namespace ExcelProcessor.WPF.Controls
                     }
                     
                     _logger.LogInformation("SQL配置更新成功: {SqlName}", sqlConfig.Name);
-                    MessageBox.Show($"SQL配置 '{sqlConfig.Name}' 更新成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var successDialog = new SuccessDialog("成功", $"SQL配置 '{sqlConfig.Name}' 更新成功！", "确定");
+                    successDialog.Owner = Window.GetWindow(this);
+                    successDialog.ShowDialog();
                 }
                 else
                 {
@@ -1579,7 +1596,9 @@ namespace ExcelProcessor.WPF.Controls
                     _currentSqlItem = newSqlItem;
                     
                     _logger.LogInformation("SQL配置创建成功: {SqlName}", sqlConfig.Name);
-                    MessageBox.Show($"SQL配置 '{sqlConfig.Name}' 创建成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var successDialog = new SuccessDialog("成功", $"SQL配置 '{sqlConfig.Name}' 创建成功！", "确定");
+                    successDialog.Owner = Window.GetWindow(this);
+                    successDialog.ShowDialog();
                 }
 
                 // 刷新列表显示
@@ -1588,7 +1607,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "保存SQL配置失败");
-                MessageBox.Show($"保存SQL配置失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"保存SQL配置失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -1784,7 +1804,8 @@ namespace ExcelProcessor.WPF.Controls
             {
                 if (_currentSqlItem == null || string.IsNullOrEmpty(_currentSqlItem.Id))
                 {
-                    MessageBox.Show("请先选择要执行的SQL配置", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择要执行的SQL配置", "确定");
+                errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2074,7 +2095,8 @@ namespace ExcelProcessor.WPF.Controls
                 var sqlStatement = SqlEditor?.SqlText?.Trim();
                 if (string.IsNullOrWhiteSpace(sqlStatement))
                 {
-                    MessageBox.Show("请先输入SQL语句", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先输入SQL语句", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2093,7 +2115,8 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("请先选择查询数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择查询数据源", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2155,7 +2178,8 @@ namespace ExcelProcessor.WPF.Controls
                 var sqlStatement = SqlEditor?.SqlText?.Trim();
                 if (string.IsNullOrWhiteSpace(sqlStatement))
                 {
-                    MessageBox.Show("请先输入SQL语句", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先输入SQL语句", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2163,7 +2187,8 @@ namespace ExcelProcessor.WPF.Controls
                 var queryDataSource = QueryDataSourceComboBox?.SelectedItem as string;
                 if (string.IsNullOrWhiteSpace(queryDataSource))
                 {
-                    MessageBox.Show("请先选择查询数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择查询数据源", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2171,7 +2196,8 @@ namespace ExcelProcessor.WPF.Controls
                 var outputType = GetSelectedOutputType();
                 if (string.IsNullOrWhiteSpace(outputType))
                 {
-                    MessageBox.Show("请先选择输出类型", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择输出类型", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2212,7 +2238,8 @@ namespace ExcelProcessor.WPF.Controls
                 var targetTable = DataTableNameComboBox?.Text?.Trim();
                 if (string.IsNullOrWhiteSpace(targetTable))
                 {
-                    MessageBox.Show("请先配置目标数据表", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先配置目标数据表", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2286,7 +2313,8 @@ namespace ExcelProcessor.WPF.Controls
                     }
                     else
                     {
-                        MessageBox.Show($"SQL执行失败：{result.ErrorMessage}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        var errorDialog = new ErrorDialog("错误", $"SQL执行失败：{result.ErrorMessage}", "确定");
+                        errorDialog.ShowDialog();
                     }
 
                     _logger.LogInformation("SQL输出到数据表完成: {SqlStatement}, 目标表: {TargetTable}, 成功: {IsSuccess}, 参数数量: {ParameterCount}", 
@@ -2302,7 +2330,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "执行SQL输出到数据表失败");
-                MessageBox.Show($"执行SQL输出到数据表失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"执行SQL输出到数据表失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -2316,19 +2345,22 @@ namespace ExcelProcessor.WPF.Controls
 
                 if (string.IsNullOrWhiteSpace(outputPath))
                 {
-                    MessageBox.Show("请先配置输出路径", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先配置输出路径", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
-                    MessageBox.Show("请先配置Excel文件名", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先配置Excel文件名", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(sheetName))
                 {
-                    MessageBox.Show("请先配置Sheet名称", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先配置Sheet名称", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2374,8 +2406,9 @@ namespace ExcelProcessor.WPF.Controls
                 
                 if (result.IsSuccess)
                 {
-                    MessageBox.Show($"SQL执行成功！\n输出到Excel: {outputPath}\\{fileName}.xlsx\nSheet名称: {sheetName}\n影响行数: {result.AffectedRows:N0}行", 
-                        "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var successDialog = new SuccessDialog("成功", $"SQL执行成功！\n输出到Excel: {outputPath}\\{fileName}.xlsx\nSheet名称: {sheetName}\n影响行数: {result.AffectedRows:N0}行", "确定");
+                    successDialog.Owner = Window.GetWindow(this);
+                    successDialog.ShowDialog();
                 }
                 else
                 {
@@ -2388,7 +2421,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "执行SQL输出到Excel失败");
-                MessageBox.Show($"执行SQL输出到Excel失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"执行SQL输出到Excel失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -2404,7 +2438,8 @@ namespace ExcelProcessor.WPF.Controls
                 var sqlStatement = SqlEditor?.SqlText?.Trim();
                 if (string.IsNullOrWhiteSpace(sqlStatement))
                 {
-                    MessageBox.Show("请先输入SQL语句", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先输入SQL语句", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2420,7 +2455,8 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("请先选择输出类型", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择输出类型", "确定");
+                    errorDialog.ShowDialog();
                 }
             }
             catch (Exception ex)
@@ -2437,7 +2473,8 @@ namespace ExcelProcessor.WPF.Controls
                 var targetTable = DataTableNameComboBox?.Text?.Trim();
                 if (string.IsNullOrWhiteSpace(targetTable))
                 {
-                    MessageBox.Show("请先配置目标数据表", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先配置目标数据表", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2456,7 +2493,8 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("请先选择查询数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择查询数据源", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2475,7 +2513,8 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("请先选择目标数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先选择目标数据源", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
 
@@ -2565,7 +2604,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "测试输出到数据表失败");
-                MessageBox.Show($"测试输出到数据表失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"测试输出到数据表失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -2615,7 +2655,8 @@ namespace ExcelProcessor.WPF.Controls
                 
                 if (string.IsNullOrWhiteSpace(outputPath) || string.IsNullOrWhiteSpace(fileName))
                 {
-                    MessageBox.Show("请先配置输出路径和文件名", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var errorDialog = new ErrorDialog("提示", "请先配置输出路径和文件名", "确定");
+                    errorDialog.ShowDialog();
                     return;
                 }
                 
@@ -2702,13 +2743,15 @@ namespace ExcelProcessor.WPF.Controls
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "SQL输出到Excel工作表执行异常");
-                    MessageBox.Show($"SQL输出到Excel工作表执行异常：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var errorDialog = new ErrorDialog("错误", $"SQL输出到Excel工作表执行异常：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "测试输出到工作表失败");
-                MessageBox.Show($"测试输出到工作表失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"测试输出到工作表失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -2823,7 +2866,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "SQL格式化失败");
-                MessageBox.Show($"SQL格式化失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"SQL格式化失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -2902,7 +2946,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "清空表选项处理失败");
-                MessageBox.Show($"清空表选项处理失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"清空表选项处理失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -2934,7 +2979,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "添加参数失败");
-                MessageBox.Show($"添加参数失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"添加参数失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -3059,7 +3105,8 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "执行测试查询失败");
-                MessageBox.Show($"执行测试查询失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("错误", $"执行测试查询失败：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 
@@ -3069,11 +3116,12 @@ namespace ExcelProcessor.WPF.Controls
         private async Task TestQueryAsync()
         {
             var sqlStatement = SqlEditor?.SqlText?.Trim();
-            if (string.IsNullOrWhiteSpace(sqlStatement))
-            {
-                MessageBox.Show("请先输入SQL语句", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+                            if (string.IsNullOrWhiteSpace(sqlStatement))
+                {
+                    var errorDialog = new ErrorDialog("提示", "请先输入SQL语句", "确定");
+                    errorDialog.ShowDialog();
+                    return;
+                }
 
             // 获取当前选中的数据源ID
             string dataSourceId = null;
@@ -3151,16 +3199,20 @@ namespace ExcelProcessor.WPF.Controls
                         }
                     }
 
-                    MessageBox.Show(resultText, "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var successDialog = new SuccessDialog("测试成功", resultText, "确定");
+                    successDialog.Owner = Window.GetWindow(this);
+                    successDialog.ShowDialog();
                 }
                 else
                 {
-                    MessageBox.Show($"测试查询失败：{testResult.ErrorMessage}", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var errorDialog = new ErrorDialog("测试失败", $"测试查询失败：{testResult.ErrorMessage}", "确定");
+                errorDialog.ShowDialog();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"测试查询异常：{ex.Message}", "异常", MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorDialog = new ErrorDialog("异常", $"测试查询异常：{ex.Message}", "确定");
+                errorDialog.ShowDialog();
             }
         }
 

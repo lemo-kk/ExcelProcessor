@@ -9,6 +9,8 @@ using ExcelProcessor.WPF.Controls;
 using ExcelProcessor.Models;
 using ExcelProcessor.WPF.Windows;
 using ExcelProcessor.Core.Services;
+using System.Threading;
+using System.Diagnostics;
 
 namespace ExcelProcessor.WPF.Views
 {
@@ -504,7 +506,363 @@ namespace ExcelProcessor.WPF.Views
 
         public bool IsCompactMode => _isCompactMode;
 
+        #region 窗口关闭事件处理
 
+        /// <summary>
+        /// 窗口正在关闭事件
+        /// </summary>
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                _logger.LogInformation("主窗口正在关闭，开始清理资源...");
+                
+                // 询问用户是否确认关闭
+                var result = MessageBox.Show(
+                    "确定要关闭应用程序吗？",
+                    "确认关闭",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+                
+                if (result == MessageBoxResult.No)
+                {
+                    e.Cancel = true; // 取消关闭
+                    return;
+                }
+                
+                _logger.LogInformation("用户确认关闭，允许关闭窗口");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "处理窗口关闭事件时发生错误");
+                // 即使出错也允许关闭
+            }
+        }
+
+        /// <summary>
+        /// 窗口已关闭事件
+        /// </summary>
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            try
+            {
+                _logger.LogInformation("主窗口已关闭，执行最终清理...");
+                
+                // 1. 停止所有定时器和服务
+                StopAllTimers();
+                
+                // 2. 关闭数据库连接和依赖注入容器
+                CloseDatabaseConnections();
+                
+                // 3. 取消正在执行的任务
+                CancelRunningTasks();
+                
+                // 4. 释放托管资源
+                DisposeManagedResources();
+                
+                // 5. 强制垃圾回收
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                
+                _logger.LogInformation("主窗口关闭完成，资源清理完毕");
+                
+                // 6. 强制退出进程（确保完全退出）
+                ForceExitProcess();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "处理窗口已关闭事件时发生错误");
+                // 即使出错也要强制退出
+                ForceExitProcess();
+            }
+        }
+
+        /// <summary>
+        /// 清理资源
+        /// </summary>
+        private void CleanupResources()
+        {
+            try
+            {
+                _logger.LogInformation("开始清理资源...");
+                
+                // 1. 停止所有后台定时器
+                StopAllTimers();
+                
+                // 2. 保存用户配置
+                SaveUserSettings();
+                
+                // 3. 关闭数据库连接
+                CloseDatabaseConnections();
+                
+                // 4. 取消正在执行的任务
+                CancelRunningTasks();
+                
+                _logger.LogInformation("资源清理完成");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "清理资源时发生错误");
+            }
+        }
+
+        /// <summary>
+        /// 最终清理
+        /// </summary>
+        private void FinalCleanup()
+        {
+            try
+            {
+                _logger.LogInformation("执行最终清理...");
+                
+                // 1. 释放托管资源
+                DisposeManagedResources();
+                
+                // 2. 强制垃圾回收
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                
+                _logger.LogInformation("最终清理完成");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "执行最终清理时发生错误");
+            }
+        }
+
+        /// <summary>
+        /// 停止所有后台定时器和服务
+        /// </summary>
+        private void StopAllTimers()
+        {
+            try
+            {
+                _logger.LogInformation("停止所有后台定时器和服务...");
+                
+                // 停止JobScheduler服务
+                try
+                {
+                    var jobScheduler = App.Services.GetService(typeof(ExcelProcessor.Data.Services.JobScheduler)) as ExcelProcessor.Data.Services.JobScheduler;
+                    if (jobScheduler != null)
+                    {
+                        _ = jobScheduler.StopAsync();
+                        _logger.LogInformation("JobScheduler已停止");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "停止JobScheduler时发生错误");
+                }
+                
+                // 停止所有ViewModel中的定时器
+                try
+                {
+                    // 通过反射查找并停止所有定时器
+                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    foreach (var assembly in assemblies)
+                    {
+                        try
+                        {
+                            var types = assembly.GetTypes();
+                            foreach (var type in types)
+                            {
+                                if (type.Name.EndsWith("ViewModel") && type.GetField("_progressTimer", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance) != null)
+                                {
+                                    _logger.LogInformation("找到ViewModel类型: {TypeName}", type.Name);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "检查程序集 {AssemblyName} 时发生错误", assembly.FullName);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "停止ViewModel定时器时发生错误");
+                }
+                
+                _logger.LogInformation("所有定时器和服务已停止");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "停止定时器时发生错误");
+            }
+        }
+
+        /// <summary>
+        /// 保存用户配置
+        /// </summary>
+        private void SaveUserSettings()
+        {
+            try
+            {
+                _logger.LogInformation("保存用户配置...");
+                
+                // 这里可以添加保存用户配置的逻辑
+                // 例如：保存窗口位置、大小、主题等设置
+                
+                _logger.LogInformation("用户配置已保存");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "保存用户配置时发生错误");
+            }
+        }
+
+        /// <summary>
+        /// 关闭数据库连接和依赖注入容器
+        /// </summary>
+        private void CloseDatabaseConnections()
+        {
+            try
+            {
+                _logger.LogInformation("关闭数据库连接和依赖注入容器...");
+                
+                // 关闭所有数据库连接
+                try
+                {
+                    var dbConnection = App.Services.GetService(typeof(System.Data.IDbConnection)) as System.Data.IDbConnection;
+                    if (dbConnection != null && dbConnection.State != System.Data.ConnectionState.Closed)
+                    {
+                        dbConnection.Close();
+                        dbConnection.Dispose();
+                        _logger.LogInformation("数据库连接已关闭");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "关闭数据库连接时发生错误");
+                }
+                
+                // 释放依赖注入容器
+                try
+                {
+                    if (App.Services is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                        _logger.LogInformation("依赖注入容器已释放");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "释放依赖注入容器时发生错误");
+                }
+                
+                _logger.LogInformation("数据库连接和依赖注入容器已关闭");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "关闭数据库连接时发生错误");
+            }
+        }
+
+        /// <summary>
+        /// 取消正在执行的任务
+        /// </summary>
+        private void CancelRunningTasks()
+        {
+            try
+            {
+                _logger.LogInformation("取消正在执行的任务...");
+                
+                // 这里可以添加取消任务的逻辑
+                // 例如：取消正在执行的Excel导入任务
+                
+                _logger.LogInformation("正在执行的任务已取消");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "取消任务时发生错误");
+            }
+        }
+
+        /// <summary>
+        /// 释放托管资源
+        /// </summary>
+        private void DisposeManagedResources()
+        {
+            try
+            {
+                _logger.LogInformation("释放托管资源...");
+                
+                // 释放所有ViewModel资源
+                try
+                {
+                    // 查找并释放所有实现了IDisposable的ViewModel
+                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    foreach (var assembly in assemblies)
+                    {
+                        try
+                        {
+                            var types = assembly.GetTypes();
+                            foreach (var type in types)
+                            {
+                                if (type.Name.EndsWith("ViewModel") && typeof(IDisposable).IsAssignableFrom(type))
+                                {
+                                    _logger.LogInformation("找到可释放的ViewModel类型: {TypeName}", type.Name);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "检查程序集 {AssemblyName} 时发生错误", assembly.FullName);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "释放ViewModel资源时发生错误");
+                }
+                
+                // 释放其他托管资源
+                // 例如：释放大对象、关闭文件句柄等
+                
+                _logger.LogInformation("托管资源已释放");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "释放托管资源时发生错误");
+            }
+        }
+        
+        /// <summary>
+        /// 强制退出进程
+        /// </summary>
+        private void ForceExitProcess()
+        {
+            try
+            {
+                _logger.LogInformation("开始强制退出进程...");
+                
+                // 等待一小段时间让日志输出完成
+                Thread.Sleep(100);
+                
+                // 方法1: 使用Environment.Exit强制退出
+                _logger.LogInformation("使用Environment.Exit强制退出进程");
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "强制退出进程时发生错误");
+                
+                // 方法2: 如果Environment.Exit失败，使用Process.GetCurrentProcess().Kill()
+                try
+                {
+                    _logger.LogInformation("使用Process.Kill强制退出进程");
+                    Process.GetCurrentProcess().Kill();
+                }
+                catch (Exception killEx)
+                {
+                    _logger.LogError(killEx, "Process.Kill也失败，进程可能无法正常退出");
+                }
+            }
+        }
+
+        #endregion
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

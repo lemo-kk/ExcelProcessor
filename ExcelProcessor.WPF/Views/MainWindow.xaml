@@ -12,7 +12,9 @@
         WindowState="Maximized"
         Background="{StaticResource DarkGrayBrush}"
         TextElement.Foreground="White"
-        FontFamily="Segoe UI">
+        FontFamily="Segoe UI"
+        Closing="Window_Closing"
+        Closed="Window_Closed">
 
     <Window.Resources>
         <!-- 导航按钮样式 -->

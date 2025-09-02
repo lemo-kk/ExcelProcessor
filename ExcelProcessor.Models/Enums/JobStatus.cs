@@ -58,6 +58,11 @@ namespace ExcelProcessor.Models
         /// <summary>
         /// 超时
         /// </summary>
-        Timeout = 10
+        Timeout = 10,
+
+        /// <summary>
+        /// 已禁用
+        /// </summary>
+        Disabled = 11
     }
 } 

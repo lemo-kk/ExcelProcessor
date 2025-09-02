@@ -18,7 +18,7 @@ namespace ExcelProcessor.WPF.ViewModels
 	/// <summary>
 	/// 作业管理页面ViewModel
 	/// </summary>
-	public class JobManagementViewModel : INotifyPropertyChanged
+	public class JobManagementViewModel : INotifyPropertyChanged, IDisposable
 	{
 		private readonly IJobService _jobService;
 		private readonly ILogger<JobManagementViewModel> _logger;
@@ -301,7 +301,8 @@ namespace ExcelProcessor.WPF.ViewModels
 				
 				if (success)
 				{
-					MessageBox.Show("作业创建成功", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+					var successDialog = new SuccessDialog("成功", "作业创建成功", "确定");
+					successDialog.ShowDialog();
 					await LoadJobsAsync(); // 重新加载作业列表
 				}
 				else
@@ -327,7 +328,8 @@ namespace ExcelProcessor.WPF.ViewModels
 				
 				if (success)
 				{
-					MessageBox.Show("作业更新成功", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+					var successDialog = new SuccessDialog("成功", "作业更新成功", "确定");
+					successDialog.ShowDialog();
 					await LoadJobsAsync(); // 重新加载作业列表
 				}
 				else
@@ -359,7 +361,8 @@ namespace ExcelProcessor.WPF.ViewModels
 					var (success, message) = await _jobService.DeleteJobAsync(job.Id);
 					if (success)
 					{
-						MessageBox.Show("作业删除成功", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+						var successDialog = new SuccessDialog("成功", "作业删除成功", "确定");
+						successDialog.ShowDialog();
 						await LoadJobsAsync();
 					}
 					else
@@ -398,7 +401,8 @@ namespace ExcelProcessor.WPF.ViewModels
 							RefreshJobInCollections(job);
 						});
 					}
-					MessageBox.Show($"作业 '{job.Name}' 开始执行", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+					var successDialog = new SuccessDialog("成功", $"作业 '{job.Name}' 开始执行", "确定");
+					successDialog.ShowDialog();
 					// 保持现有刷新逻辑，确保列表与统计同步
 					await LoadJobsAsync();
 				}
@@ -435,7 +439,8 @@ namespace ExcelProcessor.WPF.ViewModels
 						job.Status = JobStatus.Paused;
 						RefreshJobInCollections(job);
 					});
-					MessageBox.Show($"已暂停作业：{job.Name}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+					var successDialog = new SuccessDialog("提示", $"已暂停作业：{job.Name}", "确定");
+					successDialog.ShowDialog();
 				}
 				else
 				{
@@ -470,7 +475,8 @@ namespace ExcelProcessor.WPF.ViewModels
 						job.Status = JobStatus.Running;
 						RefreshJobInCollections(job);
 					});
-					MessageBox.Show($"已恢复作业：{job.Name}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+					var successDialog = new SuccessDialog("提示", $"已恢复作业：{job.Name}", "确定");
+					successDialog.ShowDialog();
 				}
 				else
 				{
@@ -677,6 +683,52 @@ namespace ExcelProcessor.WPF.ViewModels
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
+
+		#region IDisposable Implementation
+
+		private bool _disposed = false;
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!_disposed && disposing)
+			{
+				try
+				{
+					_logger?.LogInformation("JobManagementViewModel正在释放资源...");
+					
+					// 停止定时器
+					if (_progressTimer != null)
+					{
+						_progressTimer.Stop();
+						_progressTimer.Dispose();
+						_logger?.LogInformation("进度定时器已停止");
+					}
+					
+					_logger?.LogInformation("JobManagementViewModel资源释放完成");
+				}
+				catch (Exception ex)
+				{
+					_logger?.LogError(ex, "释放JobManagementViewModel资源时发生错误");
+				}
+				finally
+				{
+					_disposed = true;
+				}
+			}
+		}
+
+		~JobManagementViewModel()
+		{
+			Dispose(false);
+		}
+
+		#endregion
 
 		protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
 		{

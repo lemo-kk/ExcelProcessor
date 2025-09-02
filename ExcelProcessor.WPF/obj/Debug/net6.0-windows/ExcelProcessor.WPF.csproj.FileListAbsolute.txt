@@ -327,3 +327,5 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelPr
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ExcelProcessor.WPF.csproj.CopyComplete
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ExcelProcessor.WPF.genruntimeconfig.cache
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ref\ExcelProcessor.WPF.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ErrorDialog.baml
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ErrorDialog.g.cs
