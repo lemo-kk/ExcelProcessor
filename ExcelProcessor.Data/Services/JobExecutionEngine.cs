@@ -110,6 +110,7 @@ namespace ExcelProcessor.Data.Services
                 context.AddLog($"找到 {steps.Count} 个作业步骤");
                 
                 // 按顺序执行步骤
+                bool hasStepFailed = false;
                 foreach (var step in steps.OrderBy(s => s.OrderIndex))
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -124,6 +125,13 @@ namespace ExcelProcessor.Data.Services
                         continue;
                     }
 
+                    // 如果已有步骤失败，直接跳过后续步骤
+                    if (hasStepFailed)
+                    {
+                        context.AddLog($"跳过步骤 {step.OrderIndex}: {step.Name}，因为前面的步骤已失败");
+                        continue;
+                    }
+
                     context.AddLog($"开始执行步骤 {step.OrderIndex}: {step.Name}");
                     context.AddLog($"步骤类型: {step.Type}");
                     context.AddLog($"步骤配置: ExcelConfigId={step.ExcelConfigId}, SqlConfigId={step.SqlConfigId}");
@@ -133,6 +141,20 @@ namespace ExcelProcessor.Data.Services
                     if (!stepResult.IsSuccess)
                     {
                         context.AddLog($"步骤执行失败: {step.Name}, 错误: {stepResult.ErrorMessage}");
+                        hasStepFailed = true;
+                        
+                        // 步骤执行失败，将作业状态设置为失败
+                        jobExecution.Status = JobStatus.Failed;
+                        jobExecution.EndTime = DateTime.Now;
+                        jobExecution.Duration = DateTime.Now - jobExecution.StartTime;
+                        jobExecution.ErrorMessage = $"步骤 '{step.Name}' 执行失败: {stepResult.ErrorMessage}";
+                        jobExecution.ErrorDetails = stepResult.ErrorDetails;
+                        jobExecution.UpdatedAt = DateTime.Now;
+                        
+                        // 立即保存失败状态到数据库
+                        await _jobExecutionRepository.UpdateAsync(jobExecution);
+                        
+                        context.AddLog($"作业状态已设置为失败，后续步骤将不再执行");
                         
                         if (!step.ContinueOnFailure)
                         {
@@ -146,26 +168,45 @@ namespace ExcelProcessor.Data.Services
                     }
                 }
 
-                // 作业执行完成
-                result.IsSuccess = true;
-                result.ExecutionId = executionId;
-                result.StartTime = jobExecution.StartTime;
-                result.EndTime = DateTime.Now;
-                result.DurationSeconds = (result.EndTime.Value - result.StartTime).TotalSeconds;
-                result.ExecutionLogs = context.Logs.ToList();
-                
-                jobExecution.Status = JobStatus.Completed;
-                jobExecution.EndTime = result.EndTime;
-                jobExecution.Duration = result.EndTime.Value - jobExecution.StartTime;
-                jobExecution.UpdatedAt = DateTime.Now;
-                
-                // 保存执行记录状态到数据库
-                await _jobExecutionRepository.UpdateAsync(jobExecution);
-                
-                context.AddLog($"作业执行完成: {jobConfig.Name}");
-                _logger.LogInformation("作业执行成功: {JobName} ({JobId}), 执行ID: {ExecutionId}", jobConfig.Name, jobConfig.Id, executionId);
-                
-                TriggerExecutionEvent(executionId, ExecutionEventType.JobCompleted, "作业执行完成");
+                // 检查作业是否因为步骤失败而终止
+                if (hasStepFailed)
+                {
+                    result.IsSuccess = false;
+                    result.ErrorMessage = "作业因步骤执行失败而终止";
+                    result.ExecutionId = executionId;
+                    result.StartTime = jobExecution.StartTime;
+                    result.EndTime = DateTime.Now;
+                    result.DurationSeconds = (result.EndTime.Value - result.StartTime).TotalSeconds;
+                    result.ExecutionLogs = context.Logs.ToList();
+                    
+                    context.AddLog($"作业因步骤失败而终止执行");
+                    _logger.LogWarning("作业因步骤失败而终止: {JobName} ({JobId}), 执行ID: {ExecutionId}", jobConfig.Name, jobConfig.Id, executionId);
+                    
+                    TriggerExecutionEvent(executionId, ExecutionEventType.JobFailed, "作业因步骤失败而终止");
+                }
+                else
+                {
+                    // 作业执行完成
+                    result.IsSuccess = true;
+                    result.ExecutionId = executionId;
+                    result.StartTime = jobExecution.StartTime;
+                    result.EndTime = DateTime.Now;
+                    result.DurationSeconds = (result.EndTime.Value - result.StartTime).TotalSeconds;
+                    result.ExecutionLogs = context.Logs.ToList();
+                    
+                    jobExecution.Status = JobStatus.Completed;
+                    jobExecution.EndTime = result.EndTime;
+                    jobExecution.Duration = result.EndTime.Value - jobExecution.StartTime;
+                    jobExecution.UpdatedAt = DateTime.Now;
+                    
+                    // 保存执行记录状态到数据库
+                    await _jobExecutionRepository.UpdateAsync(jobExecution);
+                    
+                    context.AddLog($"作业执行完成: {jobConfig.Name}");
+                    _logger.LogInformation("作业执行成功: {JobName} ({JobId}), 执行ID: {ExecutionId}", jobConfig.Name, jobConfig.Id, executionId);
+                    
+                    TriggerExecutionEvent(executionId, ExecutionEventType.JobCompleted, "作业执行完成");
+                }
             }
             catch (Exception ex)
             {
