@@ -588,8 +588,11 @@ namespace ExcelProcessor.WPF.ViewModels
 		{
 			try
 			{
+				// 创建作业列表的副本，避免在遍历时修改集合
+				var jobsToUpdate = _allJobs.ToList();
+				
 				// 获取所有作业的最新执行状态
-				foreach (var job in _allJobs)
+				foreach (var job in jobsToUpdate)
 				{
 					// 获取作业的最新执行记录
 					var latestExecution = await _jobService.GetLatestJobExecutionAsync(job.Id);
