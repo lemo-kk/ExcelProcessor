@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using ExcelProcessor.Data.Repositories;
 using System.IO; // Added for File.Exists
 using ExcelProcessor.Data.Services; // Added for DataImportService
+using Microsoft.Extensions.DependencyInjection; // Added for App.Services
+
 
 namespace ExcelProcessor.Data.Services
 {
@@ -27,6 +29,7 @@ namespace ExcelProcessor.Data.Services
         private readonly IExcelConfigService _excelConfigService;
         private readonly IJobExecutionRepository _jobExecutionRepository;
         private readonly IJobStepRepository _jobStepRepository; // Added job step repository
+        private readonly ISqlOutputService _sqlOutputService; // Added SQL output service
         private readonly ILogger<JobExecutionEngine> _logger;
         private readonly ConcurrentDictionary<string, JobExecutionContext> _executionContexts = new();
         private readonly ConcurrentDictionary<string, ExecutionProgress> _executionProgress = new();
@@ -40,6 +43,7 @@ namespace ExcelProcessor.Data.Services
             IExcelConfigService excelConfigService,
             IJobExecutionRepository jobExecutionRepository,
             IJobStepRepository jobStepRepository, // Added job step repository
+            ISqlOutputService sqlOutputService, // Added SQL output service
             ILogger<JobExecutionEngine> logger)
         {
             _excelService = excelService;
@@ -48,6 +52,7 @@ namespace ExcelProcessor.Data.Services
             _excelConfigService = excelConfigService;
             _jobExecutionRepository = jobExecutionRepository;
             _jobStepRepository = jobStepRepository; // Initialize job step repository
+            _sqlOutputService = sqlOutputService; // Initialize SQL output service
             _logger = logger;
         }
 
@@ -847,25 +852,47 @@ namespace ExcelProcessor.Data.Services
                     throw new ArgumentException(errorMessage);
                 }
 
-                // 验证数据源ID
+                // 验证数据源
                 if (string.IsNullOrWhiteSpace(sqlConfig.DataSourceId))
                 {
                     var errorMessage = "数据源ID不能为空";
                     context.AddLog(errorMessage);
                     throw new ArgumentException(errorMessage);
                 }
-                
-                // 使用找到的配置执行SQL
-                await ExecuteSqlWithConfig(sqlConfig, step, context, result);
+
+                // 根据SQL配置的输出类型，调用相应的SQL管理功能
+                if (string.IsNullOrWhiteSpace(sqlConfig.OutputType))
+                {
+                    // 如果没有配置输出类型，执行普通SQL查询
+                    await ExecuteSqlWithConfig(sqlConfig, step, context, result);
+                }
+                else if (sqlConfig.OutputType == "数据表")
+                {
+                    // 输出到数据表
+                    await ExecuteSqlOutputToTableAsync(sqlConfig, step, context, result);
+                }
+                else if (sqlConfig.OutputType == "Excel工作表")
+                {
+                    // 输出到Excel工作表
+                    await ExecuteSqlOutputToExcelAsync(sqlConfig, step, context, result);
+                }
+                else
+                {
+                    var errorMessage = $"不支持的输出类型: {sqlConfig.OutputType}";
+                    context.AddLog(errorMessage);
+                    throw new NotSupportedException(errorMessage);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "执行SQL执行步骤时发生错误: {StepName}", step.Name);
-                context.AddLog($"执行SQL执行步骤时发生错误: {ex.Message}");
+                _logger.LogError(ex, "SQL执行步骤执行失败: {StepName} ({StepId})", step.Name, step.Id);
+                context.AddLog($"SQL执行步骤执行失败: {ex.Message}");
                 
                 result.IsSuccess = false;
                 result.ErrorMessage = ex.Message;
                 result.ErrorDetails = ex.ToString();
+                
+                throw;
             }
         }
 
@@ -1124,20 +1151,9 @@ namespace ExcelProcessor.Data.Services
                 context.AddLog($"SQL语句: {sqlConfig.SqlStatement}");
                 context.AddLog($"数据源ID: {sqlConfig.DataSourceId}");
 
-                // 获取数据源配置
-                var dataSource = await _sqlService.GetDataSourceByIdAsync(sqlConfig.DataSourceId);
-                if (dataSource == null)
-                {
-                    var errorMessage = $"未找到数据源: {sqlConfig.DataSourceId}";
-                    context.AddLog(errorMessage);
-                    throw new ArgumentException(errorMessage);
-                }
-
-                context.AddLog($"连接到数据源: {dataSource.Name} ({dataSource.ConnectionString})");
-
-                // 执行SQL语句
+                // 执行SQL配置（使用统一的方法）
                 context.AddLog("开始执行SQL语句...");
-                var sqlResult = await _sqlService.ExecuteSqlAsync(sqlConfig.SqlStatement, dataSource.ConnectionString);
+                var sqlResult = await _sqlService.ExecuteSqlConfigAsync(sqlConfig.Id);
                 
                 if (sqlResult.Status == "成功")
                 {
@@ -1158,17 +1174,269 @@ namespace ExcelProcessor.Data.Services
                 {
                     result.IsSuccess = false;
                     result.ErrorMessage = sqlResult.ErrorMessage ?? "SQL执行失败";
-                    result.ErrorDetails = sqlResult.ErrorMessage;
+                    result.ErrorDetails = $"SQL配置: {sqlConfig.Name}, 状态: {sqlResult.Status}";
                     
                     context.AddLog($"SQL执行失败: {result.ErrorMessage}");
-                    _logger.LogError("SQL执行步骤执行失败: {StepName}, 错误: {Error}", 
+                    _logger.LogError("SQL执行步骤执行失败: {StepName}, 错误: {ErrorMessage}", 
                         step.Name, result.ErrorMessage);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "执行SQL时发生错误: {StepName}", step.Name);
-                context.AddLog($"执行SQL时发生错误: {ex.Message}");
+                _logger.LogError(ex, "执行SQL配置失败: {StepName}", step.Name);
+                context.AddLog($"执行SQL配置失败: {ex.Message}");
+                
+                result.IsSuccess = false;
+                result.ErrorMessage = ex.Message;
+                result.ErrorDetails = ex.ToString();
+                
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 执行SQL输出到数据表
+        /// </summary>
+        private async Task ExecuteSqlOutputToTableAsync(SqlConfig sqlConfig, JobStep step, JobExecutionContext context, StepExecutionResult result)
+        {
+            try
+            {
+                context.AddLog($"开始执行SQL输出到数据表: {sqlConfig.OutputTarget}");
+                context.AddLog($"SQL语句: {sqlConfig.SqlStatement}");
+                context.AddLog($"查询数据源ID: {sqlConfig.DataSourceId}");
+                context.AddLog($"目标数据源ID: {sqlConfig.OutputDataSourceId}");
+                context.AddLog($"目标表名: {sqlConfig.OutputTarget}");
+                context.AddLog($"清空表选项: {sqlConfig.ClearTargetBeforeImport}");
+
+                // 验证输出配置
+                if (string.IsNullOrWhiteSpace(sqlConfig.OutputTarget))
+                {
+                    var errorMessage = "SQL配置的输出目标不能为空";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                // 调用SQL管理的功能执行输出到表
+                var outputResult = await _sqlOutputService.OutputToTableAsync(
+                    sqlConfig.SqlStatement,
+                    sqlConfig.DataSourceId,
+                    sqlConfig.OutputDataSourceId,
+                    sqlConfig.OutputTarget,
+                    sqlConfig.ClearTargetBeforeImport,
+                    null // 暂时不传递参数，后续可以扩展
+                );
+
+                if (outputResult.IsSuccess)
+                {
+                    result.IsSuccess = true;
+                    result.OutputData["AffectedRows"] = outputResult.AffectedRows;
+                    result.OutputData["OperationType"] = "SQL_OUTPUT_TO_TABLE";
+                    result.OutputData["SqlConfigName"] = sqlConfig.Name;
+                    result.OutputData["DataSourceId"] = sqlConfig.DataSourceId;
+                    result.OutputData["OutputDataSourceId"] = sqlConfig.OutputDataSourceId;
+                    result.OutputData["TargetTable"] = sqlConfig.OutputTarget;
+                    result.OutputData["ClearTable"] = sqlConfig.ClearTargetBeforeImport;
+                    result.OutputData["ExecutionTime"] = outputResult.ExecutionTimeMs / 1000.0; // 转换为秒
+
+                    context.SetVariable("TableOutputResult", result.OutputData);
+                    context.AddLog($"SQL输出到数据表完成: 影响行数 {outputResult.AffectedRows}, 执行时间 {outputResult.ExecutionTimeMs / 1000.0:F2}秒");
+
+                    _logger.LogInformation("SQL输出到数据表步骤执行成功: {StepName}, 影响行数: {AffectedRows}", 
+                        step.Name, outputResult.AffectedRows);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ErrorMessage = outputResult.ErrorMessage ?? "SQL输出到数据表失败";
+                    result.ErrorDetails = $"SQL配置: {sqlConfig.Name}, 目标表: {sqlConfig.OutputTarget}";
+
+                    context.AddLog($"SQL输出到数据表失败: {result.ErrorMessage}");
+                    _logger.LogError("SQL输出到数据表步骤执行失败: {StepName}, 错误: {ErrorMessage}", 
+                        step.Name, result.ErrorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "执行SQL输出到数据表失败: {StepName}", step.Name);
+                context.AddLog($"执行SQL输出到数据表失败: {ex.Message}");
+
+                result.IsSuccess = false;
+                result.ErrorMessage = ex.Message;
+                result.ErrorDetails = ex.ToString();
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 执行SQL输出到Excel工作表
+        /// </summary>
+        private async Task ExecuteSqlOutputToExcelAsync(SqlConfig sqlConfig, JobStep step, JobExecutionContext context, StepExecutionResult result)
+        {
+            try
+            {
+                context.AddLog($"开始执行SQL输出到Excel工作表: {sqlConfig.OutputTarget}");
+                context.AddLog($"SQL语句: {sqlConfig.SqlStatement}");
+                context.AddLog($"数据源ID: {sqlConfig.DataSourceId}");
+                context.AddLog($"输出目标: {sqlConfig.OutputTarget}");
+                context.AddLog($"清空Sheet选项: {sqlConfig.ClearSheetBeforeOutput}");
+
+                // 验证输出配置
+                if (string.IsNullOrWhiteSpace(sqlConfig.OutputTarget))
+                {
+                    var errorMessage = "SQL配置的输出目标不能为空";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                // 解析输出目标（格式：文件路径!Sheet名称）
+                string outputPath;
+                string sheetName;
+
+                if (sqlConfig.OutputTarget.Contains("!"))
+                {
+                    var parts = sqlConfig.OutputTarget.Split('!');
+                    if (parts.Length >= 2)
+                    {
+                        outputPath = parts[0];
+                        sheetName = parts[1];
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"无效的Excel输出目标格式: {sqlConfig.OutputTarget}");
+                    }
+                }
+                else
+                {
+                    // 如果没有!分隔符，使用默认Sheet名称
+                    outputPath = sqlConfig.OutputTarget;
+                    sheetName = "Sheet1";
+                }
+
+                context.AddLog($"输出路径: {outputPath}");
+                context.AddLog($"Sheet名称: {sheetName}");
+
+                // 调用SQL管理的功能执行输出到Excel
+                var outputResult = await _sqlOutputService.OutputToExcelAsync(
+                    sqlConfig.SqlStatement,
+                    sqlConfig.DataSourceId,
+                    outputPath,
+                    sheetName,
+                    sqlConfig.ClearSheetBeforeOutput,
+                    null // 暂时不传递参数，后续可以扩展
+                );
+
+                if (outputResult.IsSuccess)
+                {
+                    result.IsSuccess = true;
+                    result.OutputData["AffectedRows"] = outputResult.AffectedRows;
+                    result.OutputData["OperationType"] = "SQL_OUTPUT_TO_EXCEL";
+                    result.OutputData["SqlConfigName"] = sqlConfig.Name;
+                    result.OutputData["DataSourceId"] = sqlConfig.DataSourceId;
+                    result.OutputData["OutputPath"] = outputPath;
+                    result.OutputData["SheetName"] = sheetName;
+                    result.OutputData["ClearSheet"] = sqlConfig.ClearSheetBeforeOutput;
+                    result.OutputData["ExecutionTime"] = outputResult.ExecutionTimeMs / 1000.0; // 转换为秒
+
+                    context.SetVariable("ExcelOutputResult", result.OutputData);
+                    context.AddLog($"SQL输出到Excel工作表完成: 影响行数 {outputResult.AffectedRows}, 执行时间 {outputResult.ExecutionTimeMs / 1000.0:F2}秒");
+
+                    _logger.LogInformation("SQL输出到Excel工作表步骤执行成功: {StepName}, 影响行数: {AffectedRows}", 
+                        step.Name, outputResult.AffectedRows);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ErrorMessage = outputResult.ErrorMessage ?? "SQL输出到Excel工作表失败";
+                    result.ErrorDetails = $"SQL配置: {sqlConfig.Name}, 输出路径: {outputPath}, Sheet: {sheetName}";
+
+                    context.AddLog($"SQL输出到Excel工作表失败: {result.ErrorMessage}");
+                    _logger.LogError("SQL输出到Excel工作表步骤执行失败: {StepName}, 错误: {ErrorMessage}", 
+                        step.Name, result.ErrorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "执行SQL输出到Excel工作表失败: {StepName}", step.Name);
+                context.AddLog($"执行SQL输出到Excel工作表失败: {ex.Message}");
+
+                result.IsSuccess = false;
+                result.ErrorMessage = ex.Message;
+                result.ErrorDetails = ex.ToString();
+
+                throw;
+            }
+        }
+
+        private async Task ExecuteDataExportStep(JobStep step, JobExecutionContext context, StepExecutionResult result)
+        {
+            try
+            {
+                context.AddLog($"执行数据导出步骤: {step.Name}");
+                
+                // 检查SqlConfigId
+                if (string.IsNullOrWhiteSpace(step.SqlConfigId))
+                {
+                    var errorMessage = $"数据导出步骤的SQL配置ID不能为空。请检查：\n" +
+                                     $"1. 步骤配置是否正确\n" +
+                                     $"2. SQL配置是否已创建\n" +
+                                     $"3. 数据库是否已正确初始化";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                // 根据SqlConfigId查找SQL配置
+                var sqlConfig = await GetSqlConfigById(step.SqlConfigId, context);
+                if (sqlConfig == null)
+                {
+                    var errorMessage = $"未找到ID为 {step.SqlConfigId} 的SQL配置。请检查：\n" +
+                                     $"1. SQL配置是否已创建\n" +
+                                     $"2. SQL配置ID是否正确\n" +
+                                     $"3. 数据库是否已正确初始化";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                context.AddLog($"找到SQL配置: {sqlConfig.Name}");
+                context.AddLog($"SQL语句: {sqlConfig.SqlStatement}");
+                context.AddLog($"输出类型: {sqlConfig.OutputType}");
+                context.AddLog($"输出目标: {sqlConfig.OutputTarget}");
+
+                // 验证输出配置
+                if (string.IsNullOrWhiteSpace(sqlConfig.OutputType))
+                {
+                    var errorMessage = "SQL配置的输出类型不能为空";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                if (string.IsNullOrWhiteSpace(sqlConfig.OutputTarget))
+                {
+                    var errorMessage = "SQL配置的输出目标不能为空";
+                    context.AddLog(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                // 根据输出类型执行不同的导出逻辑
+                if (sqlConfig.OutputType == "数据表")
+                {
+                    await ExecuteDataExportToTableAsync(sqlConfig, step, context, result);
+                }
+                else if (sqlConfig.OutputType == "Excel工作表")
+                {
+                    await ExecuteDataExportToExcelAsync(sqlConfig, step, context, result);
+                }
+                else
+                {
+                    var errorMessage = $"不支持的输出类型: {sqlConfig.OutputType}";
+                    context.AddLog(errorMessage);
+                    throw new NotSupportedException(errorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "执行数据导出步骤时发生错误: {StepName}", step.Name);
+                context.AddLog($"执行数据导出步骤时发生错误: {ex.Message}");
                 
                 result.IsSuccess = false;
                 result.ErrorMessage = ex.Message;
@@ -1176,28 +1444,148 @@ namespace ExcelProcessor.Data.Services
             }
         }
 
-        private async Task ExecuteDataExportStep(JobStep step, JobExecutionContext context, StepExecutionResult result)
+        /// <summary>
+        /// 执行数据导出到数据表
+        /// </summary>
+        private async Task ExecuteDataExportToTableAsync(SqlConfig sqlConfig, JobStep step, JobExecutionContext context, StepExecutionResult result)
         {
-            // 模拟数据导出步骤执行
-            await Task.Delay(1000); // 模拟处理时间
-            
             try
             {
-                context.AddLog($"执行数据导出步骤: {step.Name}");
-
-                // 模拟导出结果
-                result.OutputData["ExportedRows"] = 85;
-                result.OutputData["ExportFormat"] = "Excel";
-                result.OutputData["ExportPath"] = "C:\\temp\\export.xlsx";
+                context.AddLog($"开始导出数据到表: {sqlConfig.OutputTarget}");
                 
-                context.SetVariable("ExportResult", result.OutputData);
+                // 执行SQL并输出到数据表
+                var outputResult = await _sqlOutputService.OutputToTableAsync(
+                    sqlConfig.SqlStatement,
+                    sqlConfig.DataSourceId,
+                    sqlConfig.OutputDataSourceId,
+                    sqlConfig.OutputTarget,
+                    sqlConfig.ClearTargetBeforeImport,
+                    null // 暂时不传递参数，后续可以扩展
+                );
+                
+                if (outputResult.IsSuccess)
+                {
+                    result.IsSuccess = true;
+                    result.OutputData["ExportedRows"] = outputResult.AffectedRows;
+                    result.OutputData["ExportFormat"] = "数据表";
+                    result.OutputData["ExportTarget"] = sqlConfig.OutputTarget;
+                    result.OutputData["OperationType"] = "DATA_EXPORT_TO_TABLE";
+                    result.OutputData["SqlConfigName"] = sqlConfig.Name;
+                    result.OutputData["DataSourceId"] = sqlConfig.DataSourceId;
+                    result.OutputData["OutputDataSourceId"] = sqlConfig.OutputDataSourceId;
+                    result.OutputData["ExecutionTime"] = outputResult.ExecutionTimeMs / 1000.0; // 转换为秒
+                    
+                    context.SetVariable("ExportResult", result.OutputData);
+                    context.AddLog($"数据导出到表完成: 影响行数 {outputResult.AffectedRows}, 执行时间 {outputResult.ExecutionTimeMs / 1000.0:F2}秒");
+                    
+                    _logger.LogInformation("数据导出到表步骤执行成功: {StepName}, 影响行数: {AffectedRows}", 
+                        step.Name, outputResult.AffectedRows);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ErrorMessage = outputResult.ErrorMessage ?? "数据导出到表失败";
+                    result.ErrorDetails = outputResult.ErrorMessage;
+                    
+                    context.AddLog($"数据导出到表失败: {result.ErrorMessage}");
+                    _logger.LogError("数据导出到表步骤执行失败: {StepName}, 错误: {Error}", 
+                        step.Name, result.ErrorMessage);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "执行数据导出步骤时发生错误: {StepName}", step.Name);
-                context.AddLog($"执行步骤时发生错误: {ex.Message}");
-                result.OutputData["Error"] = ex.Message;
-                result.OutputData["ExportedRows"] = 0;
+                _logger.LogError(ex, "执行数据导出到表时发生错误: {StepName}", step.Name);
+                context.AddLog($"执行数据导出到表时发生错误: {ex.Message}");
+                
+                result.IsSuccess = false;
+                result.ErrorMessage = ex.Message;
+                result.ErrorDetails = ex.ToString();
+            }
+        }
+
+        /// <summary>
+        /// 执行数据导出到Excel工作表
+        /// </summary>
+        private async Task ExecuteDataExportToExcelAsync(SqlConfig sqlConfig, JobStep step, JobExecutionContext context, StepExecutionResult result)
+        {
+            try
+            {
+                context.AddLog($"开始导出数据到Excel工作表: {sqlConfig.OutputTarget}");
+                
+                // 解析输出目标（格式：文件路径!Sheet名称）
+                string outputPath;
+                string sheetName;
+                
+                if (sqlConfig.OutputTarget.Contains("!"))
+                {
+                    var parts = sqlConfig.OutputTarget.Split('!');
+                    if (parts.Length >= 2)
+                    {
+                        outputPath = parts[0];
+                        sheetName = parts[1];
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"无效的Excel输出目标格式: {sqlConfig.OutputTarget}");
+                    }
+                }
+                else
+                {
+                    // 如果没有!分隔符，使用默认Sheet名称
+                    outputPath = sqlConfig.OutputTarget;
+                    sheetName = "Sheet1";
+                }
+                
+                context.AddLog($"输出路径: {outputPath}");
+                context.AddLog($"Sheet名称: {sheetName}");
+                
+                // 执行SQL并输出到Excel
+                var outputResult = await _sqlOutputService.OutputToExcelAsync(
+                    sqlConfig.SqlStatement,
+                    sqlConfig.DataSourceId,
+                    outputPath,
+                    sheetName,
+                    sqlConfig.ClearSheetBeforeOutput,
+                    null // 暂时不传递参数，后续可以扩展
+                );
+                
+                if (outputResult.IsSuccess)
+                {
+                    result.IsSuccess = true;
+                    result.OutputData["ExportedRows"] = outputResult.AffectedRows;
+                    result.OutputData["ExportFormat"] = "Excel";
+                    result.OutputData["ExportPath"] = outputPath;
+                    result.OutputData["SheetName"] = sheetName;
+                    result.OutputData["OperationType"] = "DATA_EXPORT_TO_EXCEL";
+                    result.OutputData["SqlConfigName"] = sqlConfig.Name;
+                    result.OutputData["DataSourceId"] = sqlConfig.DataSourceId;
+                    result.OutputData["ExecutionTime"] = outputResult.ExecutionTimeMs / 1000.0; // 转换为秒
+                    
+                    context.SetVariable("ExportResult", result.OutputData);
+                    context.AddLog($"数据导出到Excel完成: 影响行数 {outputResult.AffectedRows}, 执行时间 {outputResult.ExecutionTimeMs / 1000.0:F2}秒");
+                    
+                    _logger.LogInformation("数据导出到Excel步骤执行成功: {StepName}, 影响行数: {AffectedRows}", 
+                        step.Name, outputResult.AffectedRows);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ErrorMessage = outputResult.ErrorMessage ?? "数据导出到Excel失败";
+                    result.ErrorDetails = outputResult.ErrorMessage;
+                    
+                    context.AddLog($"数据导出到Excel失败: {result.ErrorMessage}");
+                    _logger.LogError("数据导出到Excel步骤执行失败: {StepName}, 错误: {Error}", 
+                        step.Name, result.ErrorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "执行数据导出到Excel时发生错误: {StepName}", step.Name);
+                context.AddLog($"执行数据导出到Excel时发生错误: {ex.Message}");
+                
+                result.IsSuccess = false;
+                result.ErrorMessage = ex.Message;
+                result.ErrorDetails = ex.ToString();
             }
         }
 

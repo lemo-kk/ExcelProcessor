@@ -135,6 +135,9 @@ namespace ExcelProcessor.Data.Database
             // 创建系统配置表
             CreateSystemConfigTable(connection);
 
+            // 创建SQL执行历史表
+            CreateSqlExecutionHistoryTable(connection);
+
             // 执行数据库迁移
             var migration = new DatabaseMigration(_logger);
             migration.Migrate(connection);
@@ -880,6 +883,32 @@ namespace ExcelProcessor.Data.Database
             }
         }
 
+        /// <summary>
+        /// 创建SQL执行历史表
+        /// </summary>
+        private void CreateSqlExecutionHistoryTable(SQLiteConnection connection)
+        {
+            var sql = @"
+                CREATE TABLE IF NOT EXISTS SqlExecutionHistory (
+                    Id TEXT PRIMARY KEY,
+                    SqlConfigId TEXT NOT NULL,
+                    Status TEXT NOT NULL,
+                    StartTime TEXT NOT NULL,
+                    EndTime TEXT,
+                    Duration INTEGER NOT NULL DEFAULT 0,
+                    AffectedRows INTEGER NOT NULL DEFAULT 0,
+                    ErrorMessage TEXT,
+                    ResultData TEXT,
+                    ExecutedBy TEXT,
+                    ExecutionParameters TEXT,
+                    FOREIGN KEY (SqlConfigId) REFERENCES SqlConfigs(Id) ON DELETE CASCADE,
+                    FOREIGN KEY (ExecutedBy) REFERENCES Users(Id) ON DELETE SET NULL
+                )";
+
+            using var command = new SQLiteCommand(sql, connection);
+            command.ExecuteNonQuery();
+            _logger.LogInformation("SQL执行历史表创建完成");
+        }
 
     }
 } 
