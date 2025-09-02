@@ -1481,8 +1481,25 @@ namespace ExcelProcessor.WPF.Controls
                 
                 if (outputType == "数据表")
                 {
-                    // 数据表输出时，输出数据源与查询数据源相同
-                    outputDataSourceId = dataSourceId;
+                    // 数据表输出时，从目标数据源下拉框获取输出数据源ID
+                    if (DataSourceComboBox.SelectedItem != null)
+                    {
+                        var selectedDataSourceName = DataSourceComboBox.SelectedItem.ToString();
+                        var targetDataSource = _dataSources.FirstOrDefault(ds => ds == selectedDataSourceName);
+                        if (targetDataSource != null)
+                        {
+                            // 根据数据源名称获取数据源ID
+                            var dataSourceConfigs = await _dataSourceService.GetAllDataSourcesAsync();
+                            var targetDataSourceConfig = dataSourceConfigs.FirstOrDefault(ds => ds.Name == targetDataSource);
+                            outputDataSourceId = targetDataSourceConfig?.Id;
+                        }
+                    }
+                    
+                    // 如果没有选择目标数据源，使用查询数据源作为默认值
+                    if (string.IsNullOrWhiteSpace(outputDataSourceId))
+                    {
+                        outputDataSourceId = dataSourceId;
+                    }
                 }
                 else if (outputType == "Excel工作表")
                 {
