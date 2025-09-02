@@ -2507,7 +2507,7 @@ namespace ExcelProcessor.Data.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     SqlConfigId = string.Empty,
-                    Status = "Completed",
+                    Status = "成功",
                     StartTime = startTime,
                     EndTime = DateTime.Now,
                     Duration = (long)executionTime,
@@ -2524,7 +2524,7 @@ namespace ExcelProcessor.Data.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     SqlConfigId = string.Empty,
-                    Status = "Failed",
+                    Status = "失败",
                     StartTime = startTime,
                     EndTime = DateTime.Now,
                     Duration = (long)executionTime,
