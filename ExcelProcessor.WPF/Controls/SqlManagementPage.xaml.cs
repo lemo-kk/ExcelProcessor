@@ -976,18 +976,33 @@ namespace ExcelProcessor.WPF.Controls
                         _logger.LogError(dsEx, "回填查询数据源失败");
                     }
                     
-                    // 加载目标数据源选中项（根据配置的 DataSourceId 回填名称）
+                    // 加载目标数据源选中项（根据配置的 OutputDataSourceId 回填名称）
                     try
                     {
-                        if (!string.IsNullOrWhiteSpace(sqlConfig.DataSourceId))
+                        if (!string.IsNullOrWhiteSpace(sqlConfig.OutputDataSourceId))
                         {
+                            var dataSourceConfigs = await _dataSourceService.GetAllDataSourcesAsync();
+                            var targetDataSource = dataSourceConfigs.FirstOrDefault(ds => ds.Id == sqlConfig.OutputDataSourceId);
+                            if (targetDataSource != null)
+                            {
+                                SetDataSourceSelection(DataSourceComboBox, targetDataSource.Name);
+                                _currentDataSourceName = targetDataSource.Name;
+                                _logger.LogInformation("已回填目标数据源: {DataSource}", targetDataSource.Name);
+                                
+                                // 加载该数据源的表名
+                                await LoadTableNamesAsync(targetDataSource.Name);
+                            }
+                        }
+                        else if (!string.IsNullOrWhiteSpace(sqlConfig.DataSourceId))
+                        {
+                            // 如果没有输出数据源，使用查询数据源作为目标数据源
                             var dataSourceConfigs = await _dataSourceService.GetAllDataSourcesAsync();
                             var targetDataSource = dataSourceConfigs.FirstOrDefault(ds => ds.Id == sqlConfig.DataSourceId);
                             if (targetDataSource != null)
                             {
                                 SetDataSourceSelection(DataSourceComboBox, targetDataSource.Name);
                                 _currentDataSourceName = targetDataSource.Name;
-                                _logger.LogInformation("已回填目标数据源: {DataSource}", targetDataSource.Name);
+                                _logger.LogInformation("使用查询数据源作为目标数据源: {DataSource}", targetDataSource.Name);
                                 
                                 // 加载该数据源的表名
                                 await LoadTableNamesAsync(targetDataSource.Name);
@@ -1460,22 +1475,20 @@ namespace ExcelProcessor.WPF.Controls
                     return;
                 }
 
-                // 获取输出数据源ID - 已隐藏，不再需要
+                // 获取输出数据源ID
                 string outputDataSourceId = null;
-                // var outputDataSourceItem = OutputDataSourceComboBox?.SelectedItem as ComboBoxItem;
-                // if (outputDataSourceItem != null)
-                // {
-                //     var outputDataSourceName = outputDataSourceItem.Content?.ToString();
-                //     if (!string.IsNullOrEmpty(outputDataSourceName))
-                //     {
-                //         var dataSourceConfigs = await _dataSourceService.GetAllDataSourcesAsync();
-                //         var selectedOutputDataSource = dataSourceConfigs.FirstOrDefault(ds => ds.Name == outputDataSourceName);
-                //         if (selectedOutputDataSource != null)
-                //         {
-                //             outputDataSourceId = selectedOutputDataSource.Id;
-                //     }
-                //     }
-                // }
+                var outputType = GetSelectedOutputType();
+                
+                if (outputType == "数据表")
+                {
+                    // 数据表输出时，输出数据源与查询数据源相同
+                    outputDataSourceId = dataSourceId;
+                }
+                else if (outputType == "Excel工作表")
+                {
+                    // Excel输出时，不需要输出数据源
+                    outputDataSourceId = null;
+                }
 
                 // 序列化参数为JSON
                 var parametersJson = System.Text.Json.JsonSerializer.Serialize(sqlParameters);
@@ -2411,8 +2424,8 @@ namespace ExcelProcessor.WPF.Controls
                     return;
                 }
 
-                // 获取当前选中的查询数据源ID（使用页面选择的数据源）
-                string dataSourceId = null;
+                // 获取当前选中的查询数据源ID
+                string queryDataSourceId = null;
                 var selectedQueryDataSource = QueryDataSourceComboBox?.SelectedItem as string;
                 if (!string.IsNullOrWhiteSpace(selectedQueryDataSource))
                 {
@@ -2420,13 +2433,32 @@ namespace ExcelProcessor.WPF.Controls
                     var queryDataSource = dataSourceConfigs.FirstOrDefault(ds => ds.Name == selectedQueryDataSource);
                     if (queryDataSource != null)
                     {
-                        dataSourceId = queryDataSource.Id;
+                        queryDataSourceId = queryDataSource.Id;
                         _logger.LogInformation("测试输出使用查询数据源: {DataSource}", selectedQueryDataSource);
                     }
                 }
                 else
                 {
                     MessageBox.Show("请先选择查询数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 获取目标数据源ID
+                string targetDataSourceId = null;
+                var selectedTargetDataSource = DataSourceComboBox?.SelectedItem as string;
+                if (!string.IsNullOrWhiteSpace(selectedTargetDataSource))
+                {
+                    var dataSourceConfigs = await _dataSourceService.GetAllDataSourcesAsync();
+                    var targetDataSource = dataSourceConfigs.FirstOrDefault(ds => ds.Name == selectedTargetDataSource);
+                    if (targetDataSource != null)
+                    {
+                        targetDataSourceId = targetDataSource.Id;
+                        _logger.LogInformation("测试输出使用目标数据源: {DataSource}", selectedTargetDataSource);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("请先选择目标数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -2470,7 +2502,7 @@ namespace ExcelProcessor.WPF.Controls
                     
                     // 实际执行SQL输出到表
                     var sqlOutputService = App.Services.GetRequiredService<ISqlOutputService>();
-                    var outputResult = await sqlOutputService.OutputToTableAsync(sqlStatement, dataSourceId, dataSourceId, targetTable, clearTableBeforeInsert, parametersDict);
+                    var outputResult = await sqlOutputService.OutputToTableAsync(sqlStatement, queryDataSourceId, targetDataSourceId, targetTable, clearTableBeforeInsert, parametersDict);
 
                     if (outputResult.IsSuccess)
                     {
@@ -2578,8 +2610,8 @@ namespace ExcelProcessor.WPF.Controls
                 
                 var outputTarget = Path.Combine(outputPath, fileName);
 
-                // 获取当前选中的查询数据源ID（使用页面选择的数据源）
-                string? dataSourceId = null;
+                // 获取当前选中的查询数据源ID
+                string? queryDataSourceId = null;
                 var selectedQueryDataSource = QueryDataSourceComboBox?.SelectedItem as string;
                 if (!string.IsNullOrWhiteSpace(selectedQueryDataSource))
                 {
@@ -2587,7 +2619,7 @@ namespace ExcelProcessor.WPF.Controls
                     var queryDataSource = dataSourceConfigs.FirstOrDefault(ds => ds.Name == selectedQueryDataSource);
                     if (queryDataSource != null)
                     {
-                        dataSourceId = queryDataSource.Id;
+                        queryDataSourceId = queryDataSource.Id;
                         _logger.LogInformation("测试输出到工作表使用查询数据源: {DataSource}", selectedQueryDataSource);
                     }
                 }
@@ -2611,7 +2643,7 @@ namespace ExcelProcessor.WPF.Controls
 
                     // 实际执行SQL输出到Excel工作表
                     var sqlOutputService = App.Services.GetRequiredService<ISqlOutputService>();
-                    var outputResult = await sqlOutputService.OutputToExcelAsync(sqlStatement, dataSourceId, outputTarget, sheetName, clearSheetBeforeOutput, null);
+                    var outputResult = await sqlOutputService.OutputToExcelAsync(sqlStatement, queryDataSourceId, outputTarget, sheetName, clearSheetBeforeOutput, null);
 
                     if (outputResult.IsSuccess)
                     {
