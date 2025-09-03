@@ -89,36 +89,13 @@ namespace ExcelProcessor.WPF.Controls
                     return;
                 }
 
-                // 检查作业是否包含Excel导入步骤
-                var hasExcelImportSteps = _jobConfig.Steps?.Any(step => step.Type == StepType.ExcelImport) ?? false;
-
-                if (hasExcelImportSteps)
-                {
-                    // 如果包含Excel导入步骤，弹出执行对话框
-                    var dialog = new Dialogs.JobExecutionDialog(_jobConfig, _jobService);
-                    dialog.Owner = Window.GetWindow(this);
-                    dialog.ShowDialog();
-                    
-                    // 触发作业执行事件
-                    JobExecuted?.Invoke(this, _jobConfig);
-                }
-                else
-                {
-                    // 如果不包含Excel导入步骤，直接执行作业
-                    var (success, message, executionId) = await _jobService.ExecuteJobAsync(_jobConfig.Id);
-                    
-                    if (success)
-                    {
-                        MessageBox.Show($"作业开始执行：{message}", "执行成功", MessageBoxButton.OK, MessageBoxImage.Information);
-                        
-                        // 触发作业执行事件
-                        JobExecuted?.Invoke(this, _jobConfig);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"执行失败：{message}", "执行失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
+                // 所有作业都弹出执行对话框，统一交互方式
+                var dialog = new Dialogs.JobExecutionDialog(_jobConfig, _jobService);
+                dialog.Owner = Window.GetWindow(this);
+                dialog.ShowDialog();
+                
+                // 触发作业执行事件
+                JobExecuted?.Invoke(this, _jobConfig);
             }
             catch (Exception ex)
             {

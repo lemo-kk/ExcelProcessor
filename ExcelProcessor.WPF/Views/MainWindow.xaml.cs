@@ -316,7 +316,16 @@ namespace ExcelProcessor.WPF.Views
 
         private void LoadImportExportPage()
         {
-            MessageBox.Show("此功能暂未实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                var importExportPage = new Pages.ImportExportPage();
+                MainContentFrame.Navigate(importExportPage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "加载导入导出页面失败");
+                MessageBox.Show($"加载导入导出页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadSystemSettingsPage()

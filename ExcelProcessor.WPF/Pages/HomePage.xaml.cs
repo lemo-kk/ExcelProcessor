@@ -88,8 +88,9 @@ namespace ExcelProcessor.WPF.Pages
                     // 订阅作业执行事件
                     jobCard.JobExecuted += async (s, executedJob) =>
                     {
-                        // 刷新手动执行作业列表
+                        // 刷新手动执行作业列表和最近执行任务
                         await _viewModel.RefreshManualJobsAsync();
+                        await _viewModel.RefreshRecentTasksAsync();
                     };
                 }
             }
@@ -100,60 +101,70 @@ namespace ExcelProcessor.WPF.Pages
         }
 
         /// <summary>
-        /// 手动执行作业卡片点击事件
+        /// 查看任务详情按钮点击事件
         /// </summary>
-        private async void ManualJobCard_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private async void ViewTaskDetails_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (sender is Border border && border.Tag is string jobId)
+                if (sender is Button button && button.Tag is RecentTaskViewModel task)
                 {
                     // 获取作业服务
                     var jobService = App.Services.GetRequiredService<IJobService>();
                     
-                    // 获取作业详细信息
-                    var job = await jobService.GetJobByIdAsync(jobId);
-                    if (job == null)
-                    {
-                        System.Windows.MessageBox.Show("无法获取作业信息", "错误", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                        return;
-                    }
+                    // 打开作业执行历史对话框
+                    var dialog = new JobExecutionHistoryDialog(jobService, task.JobId, task.JobName);
+                    dialog.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"查看任务详情失败：{ex.Message}");
+                MessageBox.Show($"查看任务详情失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
-                    // 检查作业是否包含Excel导入步骤
-                    var hasExcelImportSteps = job.Steps?.Any(step => step.Type == StepType.ExcelImport) ?? false;
-
-                    if (hasExcelImportSteps)
+        /// <summary>
+        /// 重新执行任务按钮点击事件
+        /// </summary>
+        private async void ReExecuteTask_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Tag is RecentTaskViewModel task)
+                {
+                    // 获取作业服务
+                    var jobService = App.Services.GetRequiredService<IJobService>();
+                    
+                    // 确认重新执行
+                    var result = MessageBox.Show($"确定要重新执行作业 '{task.JobName}' 吗？", "确认重新执行", 
+                        MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    
+                    if (result == MessageBoxResult.Yes)
                     {
-                        // 如果包含Excel导入步骤，弹出执行对话框
-                        var dialog = new Dialogs.JobExecutionDialog(job, jobService);
-                        dialog.Owner = Window.GetWindow(this);
-                        dialog.ShowDialog();
-                        
-                        // 对话框关闭后刷新手动执行作业列表
-                        await _viewModel.RefreshManualJobsAsync();
-                    }
-                    else
-                    {
-                        // 如果不包含Excel导入步骤，直接执行作业
-                        var (success, message, executionId) = await jobService.ExecuteJobAsync(jobId);
+                        // 执行作业
+                        var (success, message, executionId) = await jobService.ExecuteJobAsync(task.JobId);
                         
                         if (success)
                         {
-                            System.Windows.MessageBox.Show($"作业开始执行：{message}", "执行成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                            MessageBox.Show($"作业 '{task.JobName}' 已开始执行", "执行成功", 
+                                MessageBoxButton.OK, MessageBoxImage.Information);
                             
-                            // 刷新手动执行作业列表
-                            await _viewModel.RefreshManualJobsAsync();
+                            // 刷新最近执行任务列表
+                            await _viewModel.RefreshRecentTasksAsync();
                         }
                         else
                         {
-                            System.Windows.MessageBox.Show($"执行失败：{message}", "执行失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show($"执行作业失败：{message}", "执行失败", 
+                                MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"执行作业时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"重新执行任务失败：{ex.Message}");
+                MessageBox.Show($"重新执行任务失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

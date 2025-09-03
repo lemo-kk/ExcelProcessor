@@ -18,7 +18,7 @@ namespace ExcelProcessor.WPF.Dialogs
     {
         private readonly JobConfig _jobConfig;
         private readonly IJobService _jobService;
-        private List<ExcelStepInfo> _excelSteps;
+        private List<JobStepInfo> _jobSteps;
 
         public JobExecutionDialog(JobConfig jobConfig, IJobService jobService)
         {
@@ -30,7 +30,7 @@ namespace ExcelProcessor.WPF.Dialogs
             Title = $"作业执行 - {_jobConfig.Name}";
             JobNameText.Text = _jobConfig.Name;
             
-            // 异步初始化Excel步骤
+            // 异步初始化作业步骤
             _ = InitializeAsync();
         }
 
@@ -41,11 +41,11 @@ namespace ExcelProcessor.WPF.Dialogs
         {
             try
             {
-                // 初始化Excel步骤信息
-                _excelSteps = await InitializeExcelStepsAsync();
+                // 初始化作业步骤信息
+                _jobSteps = await InitializeJobStepsAsync();
                 
-                // 显示Excel步骤或提示信息
-                await Dispatcher.InvokeAsync(() => DisplayExcelSteps());
+                // 显示作业步骤或提示信息
+                await Dispatcher.InvokeAsync(() => DisplayJobSteps());
             }
             catch (Exception ex)
             {
@@ -57,50 +57,130 @@ namespace ExcelProcessor.WPF.Dialogs
         }
 
         /// <summary>
-        /// 初始化Excel步骤信息
+        /// 初始化作业步骤信息
         /// </summary>
-        private async Task<List<ExcelStepInfo>> InitializeExcelStepsAsync()
+        private async Task<List<JobStepInfo>> InitializeJobStepsAsync()
         {
-            var excelSteps = new List<ExcelStepInfo>();
+            var jobSteps = new List<JobStepInfo>();
             
             if (_jobConfig.Steps != null)
             {
-                foreach (var step in _jobConfig.Steps.Where(s => s.Type == StepType.ExcelImport))
+                // 按OrderIndex排序获取所有步骤
+                var orderedSteps = _jobConfig.Steps.OrderBy(s => s.OrderIndex).ToList();
+                
+                foreach (var step in orderedSteps)
                 {
                     try
                     {
-                        // 获取Excel配置的详细信息
-                        var excelConfig = await GetExcelConfigAsync(step.ExcelConfigId);
-                        
-                        var excelStep = new ExcelStepInfo
+                        var stepInfo = new JobStepInfo
                         {
                             StepId = step.Id,
                             Name = step.Name,
                             Description = step.Description,
-                            FilePath = excelConfig?.FilePath ?? "路径未配置",
-                            ExcelConfigId = step.ExcelConfigId
+                            Type = step.Type,
+                            OrderIndex = step.OrderIndex,
+                            FilePath = string.Empty,
+                            HasPath = false,
+                            ShowBrowseButton = false
                         };
+
+                        // 根据步骤类型获取路径信息
+                        switch (step.Type)
+                        {
+                            case StepType.ExcelImport:
+                                var excelConfig = await GetExcelConfigAsync(step.ExcelConfigId);
+                                if (excelConfig != null)
+                                {
+                                    stepInfo.FilePath = excelConfig.FilePath;
+                                    stepInfo.HasPath = true;
+                                    stepInfo.ShowBrowseButton = true; // Excel导入步骤显示浏览按钮
+                                }
+                                break;
+
+                            case StepType.SqlExecution:
+                                // SQL执行步骤可能输出到Excel，检查是否有输出配置
+                                var sqlConfig = await GetSqlConfigAsync(step.SqlConfigId);
+                                if (sqlConfig != null)
+                                {
+                                    if (sqlConfig.OutputType.Equals("Excel工作表", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        // 对于输出到Excel工作表的SQL，显示输出目标信息
+                                        stepInfo.FilePath = $"输出到Excel工作表: {sqlConfig.OutputTarget}";
+                                        stepInfo.HasPath = true;
+                                        stepInfo.ShowBrowseButton = true; // 输出到Excel工作表时显示浏览按钮
+                                    }
+                                    else if (sqlConfig.OutputType.Equals("数据表", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        // 对于输出到数据表的SQL，显示表名信息
+                                        stepInfo.FilePath = $"输出到数据表: {sqlConfig.OutputTarget}";
+                                        stepInfo.HasPath = true;
+                                        stepInfo.ShowBrowseButton = false; // 输出到数据表时不显示浏览按钮
+                                    }
+                                    else
+                                    {
+                                        // 其他输出类型，显示输出类型和目标
+                                        stepInfo.FilePath = $"输出类型: {sqlConfig.OutputType}, 目标: {sqlConfig.OutputTarget}";
+                                        stepInfo.HasPath = true;
+                                        stepInfo.ShowBrowseButton = false; // 其他输出类型不显示浏览按钮
+                                    }
+                                }
+                                break;
+
+                            case StepType.DataExport:
+                                // 数据导出步骤，检查导出类型和路径
+                                var exportConfig = await GetDataExportConfigAsync(step);
+                                if (exportConfig != null && exportConfig.ExportType.Equals("Excel", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    stepInfo.FilePath = exportConfig.TargetPath;
+                                    stepInfo.HasPath = true;
+                                    stepInfo.ShowBrowseButton = true; // Excel导出步骤显示浏览按钮
+                                }
+                                break;
+
+                            case StepType.FileOperation:
+                                // 文件操作步骤，检查源路径或目标路径
+                                var fileOpConfig = await GetFileOperationConfigAsync(step);
+                                if (fileOpConfig != null)
+                                {
+                                    if (!string.IsNullOrEmpty(fileOpConfig.SourcePath))
+                                    {
+                                        stepInfo.FilePath = fileOpConfig.SourcePath;
+                                        stepInfo.HasPath = true;
+                                        stepInfo.ShowBrowseButton = true; // 文件操作步骤显示浏览按钮
+                                    }
+                                    else if (!string.IsNullOrEmpty(fileOpConfig.TargetPath))
+                                    {
+                                        stepInfo.FilePath = fileOpConfig.TargetPath;
+                                        stepInfo.HasPath = true;
+                                        stepInfo.ShowBrowseButton = true; // 文件操作步骤显示浏览按钮
+                                    }
+                                }
+                                break;
+                        }
                         
-                        excelSteps.Add(excelStep);
+                        jobSteps.Add(stepInfo);
                     }
                     catch (Exception ex)
                     {
-                        // 如果获取配置失败，使用步骤信息
-                        var excelStep = new ExcelStepInfo
+                        // 如果获取配置失败，使用步骤基本信息
+                        var stepInfo = new JobStepInfo
                         {
                             StepId = step.Id,
                             Name = step.Name,
                             Description = step.Description,
+                            Type = step.Type,
+                            OrderIndex = step.OrderIndex,
                             FilePath = $"配置获取失败: {ex.Message}",
-                            ExcelConfigId = step.ExcelConfigId
+                            HasPath = false,
+                            ShowBrowseButton = false
                         };
                         
-                        excelSteps.Add(excelStep);
+                        jobSteps.Add(stepInfo);
                     }
                 }
             }
             
-            return excelSteps;
+            return jobSteps;
         }
 
         /// <summary>
@@ -129,20 +209,81 @@ namespace ExcelProcessor.WPF.Dialogs
         }
 
         /// <summary>
-        /// 显示Excel步骤信息
+        /// 获取SQL配置信息
         /// </summary>
-        private void DisplayExcelSteps()
+        private async Task<SqlConfig?> GetSqlConfigAsync(string sqlConfigId)
         {
-            if (_excelSteps.Any())
+            try
             {
-                ExcelStepsList.ItemsSource = _excelSteps;
-                ExcelStepsList.Visibility = Visibility.Visible;
-                NoExcelStepsBorder.Visibility = Visibility.Collapsed;
+                // 通过依赖注入获取SQL服务
+                var sqlService = App.Services.GetService(typeof(ExcelProcessor.Core.Interfaces.ISqlService)) 
+                    as ExcelProcessor.Core.Interfaces.ISqlService;
+                
+                if (sqlService != null)
+                {
+                    return await sqlService.GetSqlConfigByIdAsync(sqlConfigId);
+                }
+                
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"获取SQL配置失败: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取数据导出配置信息
+        /// </summary>
+        private async Task<DataExportStepConfig?> GetDataExportConfigAsync(JobStep step)
+        {
+            try
+            {
+                // 这里需要根据实际的配置存储方式来实现
+                // 暂时返回null，后续可以根据需要完善
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"获取数据导出配置失败: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取文件操作配置信息
+        /// </summary>
+        private async Task<FileOperationStepConfig?> GetFileOperationConfigAsync(JobStep step)
+        {
+            try
+            {
+                // 这里需要根据实际的配置存储方式来实现
+                // 暂时返回null，后续可以根据需要完善
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"获取文件操作配置失败: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 显示作业步骤信息
+        /// </summary>
+        private void DisplayJobSteps()
+        {
+            if (_jobSteps.Any())
+            {
+                JobStepsList.ItemsSource = _jobSteps;
+                JobStepsList.Visibility = Visibility.Visible;
+                NoJobStepsBorder.Visibility = Visibility.Collapsed;
             }
             else
             {
-                ExcelStepsList.Visibility = Visibility.Collapsed;
-                NoExcelStepsBorder.Visibility = Visibility.Visible;
+                JobStepsList.Visibility = Visibility.Collapsed;
+                NoJobStepsBorder.Visibility = Visibility.Visible;
             }
         }
 
@@ -153,8 +294,78 @@ namespace ExcelProcessor.WPF.Dialogs
         {
             try
             {
-                if (sender is System.Windows.Controls.Button button && button.Tag is string filePath)
+                if (sender is System.Windows.Controls.Button button && button.Tag is JobStepInfo stepInfo)
                 {
+                    var filePath = stepInfo.FilePath;
+                    
+                    // 根据步骤类型和输出类型处理路径
+                    if (stepInfo.Type == StepType.SqlExecution)
+                    {
+                        // SQL执行步骤，检查输出类型
+                        if (filePath.StartsWith("输出到Excel工作表:"))
+                        {
+                            // 从显示文本中提取实际的Excel文件路径
+                            var actualPath = filePath.Replace("输出到Excel工作表: ", "");
+                            
+                            // 解析输出目标（格式：文件路径!Sheet名称）
+                            if (actualPath.Contains("!"))
+                            {
+                                var parts = actualPath.Split('!');
+                                if (parts.Length >= 2)
+                                {
+                                    var excelFilePath = parts[0];
+                                    var sheetName = parts[1];
+                                    
+                                    // 检查Excel文件路径是否存在
+                                    if (File.Exists(excelFilePath))
+                                    {
+                                        // 如果文件存在，打开文件所在目录
+                                        var directory = Path.GetDirectoryName(excelFilePath);
+                                        if (!string.IsNullOrEmpty(directory))
+                                        {
+                                            Process.Start("explorer.exe", directory);
+                                            return;
+                                        }
+                                    }
+                                    else if (Directory.Exists(Path.GetDirectoryName(excelFilePath) ?? ""))
+                                    {
+                                        // 如果目录存在但文件不存在，打开目录
+                                        var directory = Path.GetDirectoryName(excelFilePath);
+                                        if (!string.IsNullOrEmpty(directory))
+                                        {
+                                            Process.Start("explorer.exe", directory);
+                                            return;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // 如果路径不存在，尝试打开父目录
+                                        var directory = Path.GetDirectoryName(excelFilePath);
+                                        if (!string.IsNullOrEmpty(directory))
+                                        {
+                                            try
+                                            {
+                                                Process.Start("explorer.exe", directory);
+                                                return;
+                                            }
+                                            catch
+                                            {
+                                                // 如果父目录也不存在，显示提示信息
+                                                MessageBox.Show($"Excel文件路径不存在：{excelFilePath}\n\nSheet名称：{sheetName}\n\n请检查配置的路径是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // 如果无法解析路径，显示提示信息
+                            MessageBox.Show($"无法解析Excel文件路径：{actualPath}\n\n请检查SQL配置中的输出目标设置。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                            return;
+                        }
+                    }
+                    
+                    // 处理文件路径
                     if (Directory.Exists(filePath))
                     {
                         // 如果是目录，打开资源管理器
@@ -181,43 +392,7 @@ namespace ExcelProcessor.WPF.Dialogs
             }
         }
 
-        /// <summary>
-        /// 放入Excel按钮点击事件
-        /// </summary>
-        private void OpenExcelButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is System.Windows.Controls.Button button && button.Tag is string filePath)
-                {
-                    if (File.Exists(filePath))
-                    {
-                        // 尝试用Excel打开文件
-                        try
-                        {
-                            Process.Start(new ProcessStartInfo
-                            {
-                                FileName = filePath,
-                                UseShellExecute = true
-                            });
-                        }
-                        catch
-                        {
-                            // 如果直接打开失败，尝试用默认程序打开
-                            Process.Start("explorer.exe", filePath);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show($"文件不存在：{filePath}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"打开Excel文件失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
+
 
         /// <summary>
         /// 执行作业按钮点击事件
@@ -274,14 +449,51 @@ namespace ExcelProcessor.WPF.Dialogs
     }
 
     /// <summary>
-    /// Excel步骤信息类
+    /// 作业步骤信息类
     /// </summary>
-    public class ExcelStepInfo
+    public class JobStepInfo
     {
         public string StepId { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public StepType Type { get; set; }
+        public int OrderIndex { get; set; }
         public string FilePath { get; set; } = string.Empty;
-        public string ExcelConfigId { get; set; } = string.Empty;
+        public bool HasPath { get; set; }
+        public bool ShowBrowseButton { get; set; }
+        
+        /// <summary>
+        /// 步骤类型显示名称
+        /// </summary>
+        public string TypeDisplayName => Type switch
+        {
+            StepType.ExcelImport => "Excel导入",
+            StepType.SqlExecution => "SQL执行",
+            StepType.DataProcessing => "数据处理",
+            StepType.FileOperation => "文件操作",
+            StepType.EmailSend => "邮件发送",
+            StepType.Condition => "条件判断",
+            StepType.Loop => "循环",
+            StepType.Wait => "等待",
+            StepType.CustomScript => "自定义脚本",
+            StepType.DataValidation => "数据验证",
+            StepType.ReportGeneration => "报表生成",
+            StepType.DataExport => "数据导出",
+            StepType.Notification => "通知",
+            _ => "未知类型"
+        };
+        
+        /// <summary>
+        /// 浏览按钮文本
+        /// </summary>
+        public string BrowseButtonText => Type switch
+        {
+            StepType.ExcelImport => "打开导入路径",
+            StepType.SqlExecution when FilePath.StartsWith("输出到Excel工作表:") => "打开导出路径",
+            StepType.SqlExecution => "打开路径",
+            StepType.DataExport => "打开导出路径",
+            StepType.FileOperation => "打开路径",
+            _ => "打开路径"
+        };
     }
 } 

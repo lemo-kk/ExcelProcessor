@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="ExcelProcessor.WPF.Pages.ImportExportPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:converters="clr-namespace:ExcelProcessor.WPF.Converters"
+      Title="导入导出管理"
+      Background="Transparent">
+
+    <Page.Resources>
+        <!-- 转换器资源 -->
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        
+        <!-- 页面标题样式 -->
+        <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Margin" Value="0,0,0,20" />
+        </Style>
+
+        <!-- 区域标题样式 -->
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <!-- 卡片容器样式 -->
+        <Style x:Key="CardContainerStyle" TargetType="Border">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="24" />
+            <Setter Property="Margin" Value="0,0,0,24" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="3" Opacity="0.3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 主要按钮样式 -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+            <Setter Property="Background" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="20,12" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <!-- 次要按钮样式 -->
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+            <Setter Property="BorderBrush" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CyberBlueBrush}" />
+            <Setter Property="Padding" Value="20,12" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <!-- 下拉框样式 -->
+        <Style x:Key="ComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+            <Setter Property="Background" Value="#333333" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="MinWidth" Value="300" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+
+        <!-- 文本框样式 -->
+        <Style x:Key="TextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="Background" Value="#333333" />
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+
+        <!-- 复选框样式 -->
+        <Style x:Key="CheckBoxStyle" TargetType="CheckBox" BasedOn="{StaticResource MaterialDesignCheckBox}">
+            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <!-- 状态标签样式 -->
+        <Style x:Key="StatusTagStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- 状态标签文本样式 -->
+        <Style x:Key="StatusTagTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- 数据表格样式 -->
+        <Style x:Key="DataGridStyle" TargetType="DataGrid" BasedOn="{StaticResource MaterialDesignDataGrid}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="#404040" />
+            <Setter Property="GridLinesVisibility" Value="Horizontal" />
+            <Setter Property="HorizontalGridLinesBrush" Value="#404040" />
+            <Setter Property="RowBackground" Value="Transparent" />
+            <Setter Property="AlternatingRowBackground" Value="#1A1A1A" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="CanUserAddRows" Value="False" />
+            <Setter Property="CanUserDeleteRows" Value="False" />
+            <Setter Property="CanUserResizeRows" Value="False" />
+            <Setter Property="CanUserSortColumns" Value="True" />
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="SelectionMode" Value="Single" />
+            <Setter Property="SelectionUnit" Value="FullRow" />
+        </Style>
+    </Page.Resources>
+
+    <!-- 主布局容器 -->
+    <Grid>
+        <!-- 主内容区域 -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Disabled"
+                      Margin="20">
+            <StackPanel>
+                <!-- 页面标题 -->
+                <TextBlock Text="导入导出管理" 
+                         Style="{StaticResource PageTitleStyle}"
+                         HorizontalAlignment="Center" />
+
+                <!-- 页面描述 -->
+                <TextBlock Text="管理作业配置的导入和导出，支持跨环境部署和配置备份"
+                         FontSize="14"
+                         Foreground="#CCCCCC"
+                         HorizontalAlignment="Center"
+                         TextWrapping="Wrap"
+                         TextAlignment="Center"
+                         MaxWidth="600"
+                         Margin="0,0,0,32" />
+
+                <!-- 导出作业配置包区域 -->
+                <Border Style="{StaticResource CardContainerStyle}">
+                    <StackPanel>
+                        <!-- 导出区域标题 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left" 
+                                   Margin="0,0,0,20">
+                            <materialDesign:PackIcon Kind="PackageVariant" 
+                                                   Width="24" 
+                                                   Height="24"
+                                                   Foreground="{StaticResource CyberBlueBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0" />
+                            <TextBlock Text="导出作业配置包" 
+                                     Style="{StaticResource SectionTitleStyle}" />
+                        </StackPanel>
+
+                        <!-- 作业选择 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left" 
+                                   Margin="0,0,0,20">
+                            <TextBlock Text="选择作业:" 
+                                     Foreground="#E0E0E0"
+                                     FontSize="13"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,12,0" />
+                            <ComboBox x:Name="JobSelectionComboBox"
+                                     Style="{StaticResource ComboBoxStyle}"
+                                     DisplayMemberPath="JobName"
+                                     SelectedValuePath="JobId"
+                                     ItemsSource="{Binding AvailableJobs}"
+                                     SelectedItem="{Binding SelectedJob}" />
+                        </StackPanel>
+
+                        <!-- 导出内容预览 -->
+                        <TextBlock Text="导出内容预览:" 
+                                 Foreground="#E0E0E0"
+                                 FontSize="13"
+                                 FontWeight="SemiBold"
+                                 Margin="0,0,0,12" />
+
+                        <Border Background="#1A1A1A"
+                                CornerRadius="8"
+                                Padding="16"
+                                Margin="0,0,0,20">
+                            <StackPanel>
+                                <CheckBox Content="Excel配置数据 (0个)" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding IncludeExcelConfigs}"
+                                         IsEnabled="False" />
+                                <CheckBox Content="SQL管理数据 (0个)" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding IncludeSqlScripts}"
+                                         IsEnabled="False" />
+                                <CheckBox Content="作业配置 (1个)" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding IncludeJobConfig}"
+                                         IsEnabled="False" />
+                                <CheckBox Content="数据源配置 (0个)" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding IncludeDataSources}"
+                                         IsEnabled="False" />
+                                <CheckBox Content="字段映射配置 (0个)" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding IncludeFieldMappings}"
+                                         IsEnabled="False" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 导出按钮 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left">
+                            <Button Content="导出配置包" 
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Click="ExportJobPackage_Click" />
+                            <Button Content="预览配置" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="PreviewJobPackage_Click" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 导入作业配置包区域 -->
+                <Border Style="{StaticResource CardContainerStyle}">
+                    <StackPanel>
+                        <!-- 导入区域标题 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left" 
+                                   Margin="0,0,0,20">
+                            <materialDesign:PackIcon Kind="PackageDown" 
+                                                   Width="24" 
+                                                   Height="24"
+                                                   Foreground="{StaticResource CyberBlueBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0" />
+                            <TextBlock Text="导入作业配置包" 
+                                     Style="{StaticResource SectionTitleStyle}" />
+                        </StackPanel>
+
+                        <!-- 文件选择 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left" 
+                                   Margin="0,0,0,20">
+                            <TextBlock Text="选择文件:" 
+                                     Foreground="#E0E0E0"
+                                     FontSize="13"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,12,0" />
+                            <Button Content="浏览..." 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Padding="16,12"
+                                    Click="BrowsePackageFile_Click" />
+                            <TextBox x:Name="PackageFilePathTextBox"
+                                   Style="{StaticResource TextBoxStyle}"
+                                   Text="{Binding PackageFilePath}"
+                                   IsReadOnly="True"
+                                   MinWidth="400"
+                                   Margin="12,0,0,0" />
+                        </StackPanel>
+
+                        <!-- 导入选项 -->
+                        <TextBlock Text="导入选项:" 
+                                 Foreground="#E0E0E0"
+                                 FontSize="13"
+                                 FontWeight="SemiBold"
+                                 Margin="0,0,0,12" />
+
+                        <Border Background="#1A1A1A"
+                                CornerRadius="8"
+                                Padding="16"
+                                Margin="0,0,0,20">
+                            <StackPanel>
+                                <CheckBox Content="覆盖现有配置 (如果配置已存在)" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding OverwriteExisting}" />
+                                <CheckBox Content="自动创建数据源连接" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding AutoCreateDataSources}" />
+                                <CheckBox Content="导入后自动启用作业" 
+                                         Style="{StaticResource CheckBoxStyle}"
+                                         IsChecked="{Binding AutoEnableJobs}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 导入内容预览 -->
+                        <TextBlock Text="导入内容预览:" 
+                                 Foreground="#E0E0E0"
+                                 FontSize="13"
+                                 FontWeight="SemiBold"
+                                 Margin="0,0,0,12" />
+
+                        <Border Background="#1A1A1A"
+                                CornerRadius="8"
+                                Padding="16"
+                                Margin="0,0,0,20">
+                            <StackPanel>
+                                <TextBlock Text="配置包信息" 
+                                         Foreground="#CCCCCC"
+                                         FontSize="12"
+                                         Margin="0,0,0,8" />
+                                <TextBlock Text="包含的配置项" 
+                                         Foreground="#CCCCCC"
+                                         FontSize="12"
+                                         Margin="0,0,0,8" />
+                                <TextBlock Text="冲突检测结果" 
+                                         Foreground="#CCCCCC"
+                                         FontSize="12"
+                                         Margin="0,0,0,8" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 导入按钮 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left">
+                            <Button Content="导入配置包" 
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Click="ImportJobPackage_Click" />
+                            <Button Content="验证配置" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="ValidateJobPackage_Click" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 导入导出历史记录区域 -->
+                <Border Style="{StaticResource CardContainerStyle}">
+                    <StackPanel>
+                        <!-- 历史记录区域标题 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left" 
+                                   Margin="0,0,0,20">
+                            <materialDesign:PackIcon Kind="History" 
+                                                   Width="24" 
+                                                   Height="24"
+                                                   Foreground="{StaticResource CyberBlueBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0" />
+                            <TextBlock Text="导入导出历史记录" 
+                                     Style="{StaticResource SectionTitleStyle}" />
+                        </StackPanel>
+
+                        <!-- 历史记录表格 -->
+                        <DataGrid x:Name="HistoryDataGrid"
+                                 Style="{StaticResource DataGridStyle}"
+                                 ItemsSource="{Binding ImportExportHistory}"
+                                 Height="300"
+                                 Margin="0,0,0,16">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="操作时间" 
+                                                  Binding="{Binding OperationTime}" 
+                                                  Width="150" />
+                                <DataGridTextColumn Header="操作类型" 
+                                                  Binding="{Binding OperationType}" 
+                                                  Width="100" />
+                                <DataGridTextColumn Header="作业名称" 
+                                                  Binding="{Binding JobName}" 
+                                                  Width="*" />
+                                <DataGridTextColumn Header="状态" 
+                                                  Binding="{Binding Status}" 
+                                                  Width="100">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Padding" Value="8,4" />
+                                            <Setter Property="Background" Value="{Binding StatusColor}" />
+                                            <Setter Property="Foreground" Value="White" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTemplateColumn Header="操作" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="查看" 
+                                                        Style="{StaticResource SecondaryButtonStyle}"
+                                                        Padding="8,4"
+                                                        FontSize="11"
+                                                        Click="ViewHistoryDetails_Click"
+                                                        Tag="{Binding}" />
+                                                <Button Content="重新导入" 
+                                                        Style="{StaticResource PrimaryButtonStyle}"
+                                                        Padding="8,4"
+                                                        FontSize="11"
+                                                        Margin="4,0,0,0"
+                                                        Click="ReImportFromHistory_Click"
+                                                        Tag="{Binding}"
+                                                        Visibility="{Binding CanReImport, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- 历史记录操作按钮 -->
+                        <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Left">
+                            <Button Content="刷新历史" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="RefreshHistory_Click" />
+                            <Button Content="导出日志" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="ExportHistoryLog_Click" />
+                            <Button Content="清空历史" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="ClearHistory_Click" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 如果没有历史记录，显示提示信息 -->
+                <Border x:Name="NoHistoryBorder"
+                        Background="#2A2A2A"
+                        CornerRadius="12"
+                        Padding="50,30"
+                        Margin="0,0,0,20"
+                        Effect="{StaticResource MaterialDesignElevationShadow1}"
+                        Visibility="{Binding HistoryCount, Converter={StaticResource CountToVisibilityConverter}}">
+                    <StackPanel HorizontalAlignment="Center">
+                        <materialDesign:PackIcon Kind="History" 
+                                               Width="56" 
+                                               Height="56"
+                                               Foreground="#666666"
+                                               HorizontalAlignment="Center" />
+                        <TextBlock Text="暂无导入导出记录" 
+                                 FontSize="18" 
+                                 FontWeight="SemiBold"
+                                 Foreground="#666666"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,16,0,10" />
+                        <TextBlock Text="执行导入或导出操作后将在此处显示记录" 
+                                 FontSize="13"
+                                 Foreground="#888888"
+                                 HorizontalAlignment="Center"
+                                 TextWrapping="Wrap"
+                                 TextAlignment="Center"
+                                 MaxWidth="400"
+                                 LineHeight="18" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page> 
