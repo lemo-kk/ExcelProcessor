@@ -37,6 +37,9 @@
             <converters:BoolToStatusTextConverter x:Key="BoolToStatusTextConverter" />
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
             <converters:SimpleManualExecutionToVisibilityConverter x:Key="SimpleManualExecutionToVisibilityConverter" />
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+            <converters:BoolToTextConverter x:Key="BoolToTextConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application> 

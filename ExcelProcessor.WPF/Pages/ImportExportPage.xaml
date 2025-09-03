@@ -67,7 +67,7 @@
         <!-- 下拉框样式 -->
         <Style x:Key="ComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
             <Setter Property="Background" Value="#333333" />
-            <Setter Property="Foreground" Value="#E0E0E0" />
+            <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="#404040" />
             <Setter Property="Height" Value="40" />
             <Setter Property="MinWidth" Value="300" />
@@ -176,8 +176,8 @@
                                      Margin="0,0,12,0" />
                             <ComboBox x:Name="JobSelectionComboBox"
                                      Style="{StaticResource ComboBoxStyle}"
-                                     DisplayMemberPath="JobName"
-                                     SelectedValuePath="JobId"
+                                     DisplayMemberPath="Name"
+                                     SelectedValuePath="Id"
                                      ItemsSource="{Binding AvailableJobs}"
                                      SelectedItem="{Binding SelectedJob}" />
                         </StackPanel>
@@ -189,31 +189,200 @@
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,12" />
 
+                        <!-- 预览加载状态 -->
                         <Border Background="#1A1A1A"
                                 CornerRadius="8"
                                 Padding="16"
-                                Margin="0,0,0,20">
+                                Margin="0,0,0,20"
+                                Visibility="{Binding IsPreviewLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <ProgressBar IsIndeterminate="True" 
+                                           Width="20" 
+                                           Height="20" 
+                                           Margin="0,0,12,0" />
+                                <TextBlock Text="{Binding PreviewStatusMessage}" 
+                                         Foreground="#CCCCCC"
+                                         VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 导出内容预览详情 -->
+                        <Border Background="#1A1A1A"
+                                CornerRadius="8"
+                                Padding="16"
+                                Margin="0,0,0,20"
+                                Visibility="{Binding ExportPreviewInfo, Converter={StaticResource NullToVisibilityConverter}}">
                             <StackPanel>
-                                <CheckBox Content="Excel配置数据 (0个)" 
-                                         Style="{StaticResource CheckBoxStyle}"
-                                         IsChecked="{Binding IncludeExcelConfigs}"
-                                         IsEnabled="False" />
-                                <CheckBox Content="SQL管理数据 (0个)" 
-                                         Style="{StaticResource CheckBoxStyle}"
-                                         IsChecked="{Binding IncludeSqlScripts}"
-                                         IsEnabled="False" />
-                                <CheckBox Content="作业配置 (1个)" 
-                                         Style="{StaticResource CheckBoxStyle}"
-                                         IsChecked="{Binding IncludeJobConfig}"
-                                         IsEnabled="False" />
-                                <CheckBox Content="数据源配置 (0个)" 
-                                         Style="{StaticResource CheckBoxStyle}"
-                                         IsChecked="{Binding IncludeDataSources}"
-                                         IsEnabled="False" />
-                                <CheckBox Content="字段映射配置 (0个)" 
-                                         Style="{StaticResource CheckBoxStyle}"
-                                         IsChecked="{Binding IncludeFieldMappings}"
-                                         IsEnabled="False" />
+                                <!-- 作业基本信息 -->
+                                <Border Background="#2A2A2A"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="作业基本信息" 
+                                                 Foreground="#E0E0E0"
+                                                 FontSize="12"
+                                                 FontWeight="SemiBold"
+                                                 Margin="0,0,0,8" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            
+                                            <TextBlock Text="作业名称:" Grid.Column="0" Grid.Row="0" Foreground="#CCCCCC" FontSize="11" Margin="0,0,8,4"/>
+                                            <TextBlock Text="{Binding ExportPreviewInfo.JobName}" Grid.Column="1" Grid.Row="0" Foreground="#FFFFFF" FontSize="11" Margin="0,0,16,4"/>
+                                            <TextBlock Text="创建时间:" Grid.Column="2" Grid.Row="0" Foreground="#CCCCCC" FontSize="11" Margin="0,0,8,4"/>
+                                            <TextBlock Text="{Binding ExportPreviewInfo.JobCreatedAt, StringFormat='yyyy-MM-dd HH:mm'}" Grid.Column="3" Grid.Row="0" Foreground="#FFFFFF" FontSize="11" Margin="0,0,16,4"/>
+                                            
+                                            <TextBlock Text="作业描述:" Grid.Column="0" Grid.Row="1" Foreground="#CCCCCC" FontSize="11" Margin="0,0,8,4"/>
+                                            <TextBlock Text="{Binding ExportPreviewInfo.JobDescription}" Grid.Column="1" Grid.Row="1" Foreground="#FFFFFF" FontSize="11" Margin="0,0,16,4"/>
+                                            <TextBlock Text="作业状态:" Grid.Column="2" Grid.Row="1" Foreground="#CCCCCC" FontSize="11" Margin="0,0,8,4"/>
+                                            <TextBlock Text="{Binding ExportPreviewInfo.JobIsEnabled, Converter={StaticResource BoolToTextConverter}, ConverterParameter='启用|禁用'}" Grid.Column="3" Grid.Row="1" Foreground="#FFFFFF" FontSize="11" Margin="0,0,16,4"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 配置项统计 -->
+                                <Border Background="#2A2A2A"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="配置项统计" 
+                                                 Foreground="#E0E0E0"
+                                                 FontSize="12"
+                                                 FontWeight="SemiBold"
+                                                 Margin="0,0,0,8" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding ExportPreviewInfo.ExcelConfigCount}" Foreground="#4CAF50" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Excel配置" Foreground="#CCCCCC" FontSize="10" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding ExportPreviewInfo.SqlScriptCount}" Foreground="#2196F3" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="SQL脚本" Foreground="#CCCCCC" FontSize="10" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding ExportPreviewInfo.DataSourceCount}" Foreground="#FF9800" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="数据源" Foreground="#CCCCCC" FontSize="10" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="3" HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding ExportPreviewInfo.FieldMappingCount}" Foreground="#9C27B0" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="字段映射" Foreground="#CCCCCC" FontSize="10" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 导出信息 -->
+                                <Border Background="#2A2A2A"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="导出信息" 
+                                                 Foreground="#E0E0E0"
+                                                 FontSize="12"
+                                                 FontWeight="SemiBold"
+                                                 Margin="0,0,0,8" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <TextBlock Text="预估包大小:" Grid.Column="0" Grid.Row="0" Foreground="#CCCCCC" FontSize="11" Margin="0,0,8,4"/>
+                                            <TextBlock Text="{Binding ExportPreviewInfo.FormattedPackageSize}" Grid.Column="1" Grid.Row="0" Foreground="#FFFFFF" FontSize="11" Margin="0,0,16,4"/>
+                                            <TextBlock Text="预估导出时间:" Grid.Column="2" Grid.Row="0" Foreground="#CCCCCC" FontSize="11" Margin="0,0,8,4"/>
+                                            <TextBlock Text="{Binding ExportPreviewInfo.FormattedExportTime}" Grid.Column="3" Grid.Row="0" Foreground="#FFFFFF" FontSize="11" Margin="0,0,16,4"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 依赖关系 -->
+                                <Border Background="#2A2A2A"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,0,12"
+                                        Visibility="{Binding ExportPreviewInfo.Dependencies.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                                    <StackPanel>
+                                        <TextBlock Text="依赖关系" 
+                                                 Foreground="#E0E0E0"
+                                                 FontSize="12"
+                                                 FontWeight="SemiBold"
+                                                 Margin="0,0,0,8" />
+                                        <ItemsControl ItemsSource="{Binding ExportPreviewInfo.Dependencies}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" Foreground="#CCCCCC" FontSize="11" Margin="0,2"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 警告信息 -->
+                                <Border Background="#2A2A2A"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,0,12"
+                                        Visibility="{Binding ExportPreviewInfo.Warnings.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                                    <StackPanel>
+                                        <TextBlock Text="⚠️ 警告信息" 
+                                                 Foreground="#FF9800"
+                                                 FontSize="12"
+                                                 FontWeight="SemiBold"
+                                                 Margin="0,0,0,8" />
+                                        <ItemsControl ItemsSource="{Binding ExportPreviewInfo.Warnings}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" Foreground="#CCCCCC" FontSize="11" Margin="0,2"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 建议信息 -->
+                                <Border Background="#2A2A2A"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,0,12"
+                                        Visibility="{Binding ExportPreviewInfo.Recommendations.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                                    <StackPanel>
+                                        <TextBlock Text="💡 建议信息" 
+                                                 Foreground="#4CAF50"
+                                                 FontSize="12"
+                                                 FontWeight="SemiBold"
+                                                 Margin="0,0,0,8" />
+                                        <ItemsControl ItemsSource="{Binding ExportPreviewInfo.Recommendations}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" Foreground="#CCCCCC" FontSize="11" Margin="0,2"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
                         </Border>
 

@@ -65,6 +65,10 @@ namespace ExcelProcessor.Data.DependencyInjection
             services.AddScoped<IDatabaseTableService, DatabaseTableService>();
             services.AddScoped<ISqlOutputService, SqlOutputService>();
 
+            // 注册作业配置包服务
+            services.AddScoped<IJobPackageService, JobPackageService>();
+            services.AddScoped<IImportExportHistoryService, ImportExportHistoryService>();
+
             // 注册作业调度器（单例模式）
             services.AddSingleton<JobScheduler>();
 

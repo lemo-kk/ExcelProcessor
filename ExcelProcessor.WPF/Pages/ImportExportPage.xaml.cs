@@ -334,7 +334,7 @@ namespace ExcelProcessor.WPF.Pages
         /// <summary>
         /// 导出历史日志按钮点击事件
         /// </summary>
-        private void ExportHistoryLog_Click(object sender, RoutedEventArgs e)
+        private async void ExportHistoryLog_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -349,7 +349,7 @@ namespace ExcelProcessor.WPF.Pages
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     // 执行导出日志操作
-                    var success = _viewModel.ExportHistoryLog(saveFileDialog.FileName);
+                    var (success, message) = await _viewModel.ExportHistoryLogAsync(saveFileDialog.FileName);
                     
                     if (success)
                     {
@@ -358,7 +358,7 @@ namespace ExcelProcessor.WPF.Pages
                     }
                     else
                     {
-                        MessageBoxExtensions.Show("导出历史日志失败", "导出失败", 
+                        MessageBoxExtensions.Show($"导出历史日志失败：{message}", "导出失败", 
                             MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -373,7 +373,7 @@ namespace ExcelProcessor.WPF.Pages
         /// <summary>
         /// 清空历史记录按钮点击事件
         /// </summary>
-        private void ClearHistory_Click(object sender, RoutedEventArgs e)
+        private async void ClearHistory_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -383,7 +383,7 @@ namespace ExcelProcessor.WPF.Pages
                 if (result == MessageBoxResult.Yes)
                 {
                     // 执行清空历史记录操作
-                    var success = _viewModel.ClearImportExportHistory();
+                    var (success, message) = await _viewModel.ClearImportExportHistoryAsync();
                     
                     if (success)
                     {
@@ -391,7 +391,7 @@ namespace ExcelProcessor.WPF.Pages
                     }
                     else
                     {
-                        MessageBoxExtensions.Show("清空历史记录失败", "清空失败", 
+                        MessageBoxExtensions.Show($"清空历史记录失败：{message}", "清空失败", 
                             MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
