@@ -85,7 +85,7 @@
                         Padding="50,30"
                         Margin="0,0,0,20"
                         Effect="{StaticResource MaterialDesignElevationShadow1}"
-                        Visibility="{Binding ManualJobsCount, Converter={StaticResource CountToVisibilityConverter}}">
+                        Visibility="{Binding ManualJobsCount, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter=inverse}">
                     <StackPanel HorizontalAlignment="Center">
                         <materialDesign:PackIcon Kind="PlayCircleOutline" 
                                                Width="56" 
@@ -189,7 +189,7 @@
                     Padding="50,30"
                     Margin="0,0,0,20"
                     Effect="{StaticResource MaterialDesignElevationShadow1}"
-                    Visibility="{Binding RecentTasksCount, Converter={StaticResource CountToVisibilityConverter}}">
+                    Visibility="{Binding RecentTasksCount, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter=inverse}">
                 <StackPanel HorizontalAlignment="Center">
                     <materialDesign:PackIcon Kind="History" 
                                            Width="56" 
