@@ -1,9 +1,7 @@
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelProcessor.WPF.exe
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelProcessor.WPF.dll
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ICSharpCode.AvalonEdit.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\BCrypt.Net-Next.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Dapper.dll
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\EPPlus.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\MaterialDesignColors.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\MaterialDesignThemes.Wpf.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.Data.Sqlite.dll
@@ -25,11 +23,8 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microso
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.Extensions.Options.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.Extensions.Options.ConfigurationExtensions.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.Extensions.Primitives.dll
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.IO.RecyclableMemoryStream.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\MySql.Data.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Npgsql.dll
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Oracle.ManagedDataAccess.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\SQLitePCLRaw.batteries_v2.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\SQLitePCLRaw.core.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\SQLitePCLRaw.provider.e_sqlite3.dll
@@ -42,6 +37,7 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\runtime
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelProcessor.Core.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelProcessor.Data.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelProcessor.Models.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ICSharpCode.AvalonEdit.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Azure.Core.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Azure.Identity.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\BouncyCastle.Cryptography.dll
@@ -51,6 +47,7 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Cronos.
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\DocumentFormat.OpenXml.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\EntityFramework.SqlServer.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\EntityFramework.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\EPPlus.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\EPPlus.Interfaces.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\EPPlus.System.Drawing.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelNumberFormat.dll
@@ -71,6 +68,7 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microso
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.IdentityModel.Protocols.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.IdentityModel.Tokens.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.IO.RecyclableMemoryStream.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.SqlServer.Server.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.TestPlatform.CoreUtilities.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.TestPlatform.PlatformAbstractions.dll
@@ -84,8 +82,10 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microso
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.Web.WebView2.Wpf.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Microsoft.Xaml.Behaviors.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Moq.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\MySql.Data.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\NuGet.Frameworks.dll
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Oracle.ManagedDataAccess.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Serilog.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Serilog.Extensions.Logging.dll
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\Serilog.Sinks.File.dll
@@ -243,7 +243,9 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Control
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\SqlTestResultDialog.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\TestOutputResultDialog.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\CreateTemplateDialog.baml
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ErrorDialog.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\JobEditDialog.baml
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\JobExecutionDialog.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ProgressDialog.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\RoleEditDialog.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\StepSelectionDialog.baml
@@ -251,7 +253,6 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\UserEditDialog.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\DataSourcePage.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\ExcelImportPage.baml
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\HomePage.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\RoleManagementPage.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\SystemSettingsPage.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\UserManagementPage.baml
@@ -272,13 +273,16 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Control
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\FilePathConfigControl.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\ImportProgressDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\ImportResultDialog.g.cs
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\ManualJobCard.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\ProgressDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\SqlEditor.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\SqlManagementPage.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\SqlTestResultDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\TestOutputResultDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\CreateTemplateDialog.g.cs
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ErrorDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\JobEditDialog.g.cs
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\JobExecutionDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\JobExecutionHistoryDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ProgressDialog.g.cs
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\RoleEditDialog.g.cs
@@ -303,8 +307,10 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ExcelPr
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ExcelProcessor.WPF_MarkupCompile.lref
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\App.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\ConfigurationReferencePage.baml
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\ManualJobCard.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Controls\SqlManagementPage.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\JobExecutionHistoryDialog.baml
+E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\HomePage.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Pages\JobManagementPage.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Styles\Inputs.baml
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ExcelProcessor.WPF.g.resources
@@ -327,5 +333,3 @@ E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\bin\Debug\net6.0-windows\ExcelPr
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ExcelProcessor.WPF.csproj.CopyComplete
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ExcelProcessor.WPF.genruntimeconfig.cache
 E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\ref\ExcelProcessor.WPF.dll
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ErrorDialog.baml
-E:\code\code demo\EXCEL_V1.0\ExcelProcessor.WPF\obj\Debug\net6.0-windows\Dialogs\ErrorDialog.g.cs

@@ -63,6 +63,27 @@ namespace ExcelProcessor.WPF.ViewModels
         #region 方法
 
         /// <summary>
+        /// 检查作业是否包含Excel导入类型的步骤
+        /// </summary>
+        /// <param name="job">作业配置</param>
+        /// <returns>是否包含Excel导入步骤</returns>
+        public bool HasExcelImportSteps(JobConfig job)
+        {
+            try
+            {
+                if (job?.Steps == null || !job.Steps.Any())
+                    return false;
+
+                return job.Steps.Any(step => step.Type == StepType.ExcelImport);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "检查作业Excel导入步骤时发生错误: {JobName}", job?.Name);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 加载手动执行的作业
         /// </summary>
         private async Task LoadManualJobsAsync()

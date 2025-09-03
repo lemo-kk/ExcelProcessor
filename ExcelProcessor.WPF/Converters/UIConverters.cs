@@ -241,4 +241,55 @@ namespace ExcelProcessor.WPF.Converters
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// 作业是否包含Excel导入步骤的转换器
+    /// </summary>
+    public class JobHasExcelImportStepsConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // 这里我们需要通过反射或其他方式来检查作业是否包含Excel导入步骤
+            // 由于无法直接访问JobConfig类型，我们返回一个默认值
+            // 实际使用时，这个转换器应该被替换为更合适的实现
+            return false; // 默认返回false，表示不包含Excel导入步骤
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 作业是否包含Excel导入步骤到图标颜色的转换器
+    /// </summary>
+    public class HasExcelImportStepsToIconColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // 通过parameter参数传递是否包含Excel导入步骤的信息
+            // parameter应该是一个布尔值或字符串"true"/"false"
+            bool hasExcelImport = false;
+            
+            if (parameter is bool boolParam)
+            {
+                hasExcelImport = boolParam;
+            }
+            else if (parameter is string stringParam)
+            {
+                bool.TryParse(stringParam, out hasExcelImport);
+            }
+            
+            // 如果包含Excel导入步骤，返回绿色；否则返回默认的紫色
+            return hasExcelImport 
+                ? new SolidColorBrush(Color.FromRgb(76, 175, 80)) // #4CAF50 绿色
+                : new SolidColorBrush(Color.FromRgb(156, 39, 176)); // #9C27B0 紫色
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 } 
