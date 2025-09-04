@@ -1,4 +1,4 @@
-using ExcelProcessor.Core.Services;
+﻿using ExcelProcessor.Core.Services;
 using ExcelProcessor.Core.Interfaces;
 using ExcelProcessor.Data.Repositories;
 using ExcelProcessor.Data.Services;
@@ -22,6 +22,8 @@ namespace ExcelProcessor.Data.DependencyInjection
         {
             // 注册仓储
             services.AddScoped<UserRepository>();
+            services.AddScoped<RoleRepository>();
+            services.AddScoped<PermissionRepository>();
             services.AddScoped<ExcelConfigRepository>();
             services.AddScoped<IJobRepository, JobRepository>();
             services.AddScoped<IJobStepRepository, JobStepRepository>();
@@ -30,6 +32,8 @@ namespace ExcelProcessor.Data.DependencyInjection
             
             // 新增：核心仓储接口映射
             services.AddScoped<IRepository<User>, UserRepository>();
+            services.AddScoped<IRepository<Role>, RoleRepository>();
+            services.AddScoped<IRepository<Permission>, PermissionRepository>();
             services.AddScoped<ISystemConfigRepository, SystemConfigRepository>();
 
             // 新增：Excel 相关仓储接口映射
@@ -40,6 +44,8 @@ namespace ExcelProcessor.Data.DependencyInjection
 
             // 注册业务服务
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IExcelConfigService, ExcelConfigService>();
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<IJobService, JobService>();
