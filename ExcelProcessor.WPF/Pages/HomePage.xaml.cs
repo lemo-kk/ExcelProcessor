@@ -45,7 +45,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 // 如果依赖注入失败，显示错误信息
-                System.Windows.MessageBox.Show($"初始化页面失败：{ex.Message}", "错误", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"初始化页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -120,7 +120,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"查看任务详情失败：{ex.Message}");
-                MessageBox.Show($"查看任务详情失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"查看任务详情失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -137,7 +137,7 @@ namespace ExcelProcessor.WPF.Pages
                     var jobService = App.Services.GetRequiredService<IJobService>();
                     
                     // 确认重新执行
-                    var result = MessageBox.Show($"确定要重新执行作业 '{task.JobName}' 吗？", "确认重新执行", 
+                    var result = Extensions.MessageBoxExtensions.Show($"确定要重新执行作业 '{task.JobName}' 吗？", "确认重新执行", 
                         MessageBoxButton.YesNo, MessageBoxImage.Question);
                     
                     if (result == MessageBoxResult.Yes)
@@ -147,7 +147,7 @@ namespace ExcelProcessor.WPF.Pages
                         
                         if (success)
                         {
-                            MessageBox.Show($"作业 '{task.JobName}' 已开始执行", "执行成功", 
+                            Extensions.MessageBoxExtensions.Show($"作业 '{task.JobName}' 已开始执行", "执行成功", 
                                 MessageBoxButton.OK, MessageBoxImage.Information);
                             
                             // 刷新最近执行任务列表
@@ -155,7 +155,7 @@ namespace ExcelProcessor.WPF.Pages
                         }
                         else
                         {
-                            MessageBox.Show($"执行作业失败：{message}", "执行失败", 
+                            Extensions.MessageBoxExtensions.Show($"执行作业失败：{message}", "执行失败", 
                                 MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
@@ -164,7 +164,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"重新执行任务失败：{ex.Message}");
-                MessageBox.Show($"重新执行任务失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"重新执行任务失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

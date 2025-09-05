@@ -182,7 +182,7 @@ namespace ExcelProcessor.WPF.Windows
             {
                 if (!ValidateForm())
                 {
-                    MessageBox.Show("请检查表单信息是否正确填写。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请检查表单信息是否正确填写。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -191,21 +191,21 @@ namespace ExcelProcessor.WPF.Windows
                 {
                     if (string.IsNullOrWhiteSpace(PasswordBox.Password))
                     {
-                        MessageBox.Show("请输入密码。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("请输入密码。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         PasswordBox.Focus();
                         return;
                     }
 
                     if (PasswordBox.Password != ConfirmPasswordBox.Password)
                     {
-                        MessageBox.Show("两次输入的密码不一致。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("两次输入的密码不一致。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         ConfirmPasswordBox.Focus();
                         return;
                     }
 
                     if (PasswordBox.Password.Length < 6)
                     {
-                        MessageBox.Show("密码长度不能少于6位。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("密码长度不能少于6位。", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         PasswordBox.Focus();
                         return;
                     }
@@ -232,7 +232,7 @@ namespace ExcelProcessor.WPF.Windows
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存用户信息时发生错误：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"保存用户信息时发生错误：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

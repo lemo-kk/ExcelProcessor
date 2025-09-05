@@ -363,7 +363,7 @@ namespace ExcelProcessor.WPF.Dialogs
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"保存失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -423,14 +423,14 @@ namespace ExcelProcessor.WPF.Dialogs
         {
             if (string.IsNullOrWhiteSpace(_role.Code))
             {
-                MessageBox.Show("请输入角色代码", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Extensions.MessageBoxExtensions.Show("请输入角色代码", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                 RoleCodeTextBox.Focus();
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(_role.Name))
             {
-                MessageBox.Show("请输入角色名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Extensions.MessageBoxExtensions.Show("请输入角色名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                 RoleNameTextBox.Focus();
                 return false;
             }

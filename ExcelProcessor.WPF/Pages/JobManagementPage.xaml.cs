@@ -50,7 +50,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"初始化页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"初始化页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -102,7 +102,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"刷新数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"刷新数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -121,7 +121,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"创建作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"创建作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -148,7 +148,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"编辑作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"编辑作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -167,7 +167,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"清除筛选失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"清除筛选失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -183,7 +183,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"执行作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"执行作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -198,7 +198,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"暂停作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"暂停作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -213,7 +213,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"恢复作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"恢复作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -228,7 +228,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"删除作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"删除作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -248,7 +248,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"查看作业详情失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"查看作业详情失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

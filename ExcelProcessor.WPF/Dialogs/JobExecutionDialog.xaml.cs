@@ -51,7 +51,7 @@ namespace ExcelProcessor.WPF.Dialogs
             {
                 await Dispatcher.InvokeAsync(() =>
                 {
-                    MessageBox.Show($"初始化失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"初始化失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 });
             }
         }
@@ -351,7 +351,7 @@ namespace ExcelProcessor.WPF.Dialogs
                                             catch
                                             {
                                                 // 如果父目录也不存在，显示提示信息
-                                                MessageBox.Show($"Excel文件路径不存在：{excelFilePath}\n\nSheet名称：{sheetName}\n\n请检查配置的路径是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                                                Extensions.MessageBoxExtensions.Show($"Excel文件路径不存在：{excelFilePath}\n\nSheet名称：{sheetName}\n\n请检查配置的路径是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                                                 return;
                                             }
                                         }
@@ -360,7 +360,7 @@ namespace ExcelProcessor.WPF.Dialogs
                             }
                             
                             // 如果无法解析路径，显示提示信息
-                            MessageBox.Show($"无法解析Excel文件路径：{actualPath}\n\n请检查SQL配置中的输出目标设置。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                            Extensions.MessageBoxExtensions.Show($"无法解析Excel文件路径：{actualPath}\n\n请检查SQL配置中的输出目标设置。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                             return;
                         }
                     }
@@ -382,13 +382,13 @@ namespace ExcelProcessor.WPF.Dialogs
                     }
                     else
                     {
-                        MessageBox.Show($"路径不存在：{filePath}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        Extensions.MessageBoxExtensions.Show($"路径不存在：{filePath}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开路径失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"打开路径失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

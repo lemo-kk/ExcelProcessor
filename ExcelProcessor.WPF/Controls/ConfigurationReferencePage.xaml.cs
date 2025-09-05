@@ -60,7 +60,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载配置引用失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载配置引用失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -85,7 +85,7 @@ namespace ExcelProcessor.WPF.Controls
         {
             if (_currentReference == null)
             {
-                MessageBox.Show("请先选择一个配置引用", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("请先选择一个配置引用", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -118,11 +118,11 @@ namespace ExcelProcessor.WPF.Controls
         {
             if (_currentReference == null)
             {
-                MessageBox.Show("请先选择一个配置引用", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("请先选择一个配置引用", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            var result = MessageBox.Show($"确定要删除配置引用 '{_currentReference.Name}' 吗？", 
+            var result = Extensions.MessageBoxExtensions.Show($"确定要删除配置引用 '{_currentReference.Name}' 吗？", 
                 "确认删除", MessageBoxButton.YesNo, MessageBoxImage.Question);
             
             if (result == MessageBoxResult.Yes)
@@ -132,17 +132,17 @@ namespace ExcelProcessor.WPF.Controls
                     var (success, message) = await _referenceService.DeleteReferenceAsync(_currentReference.Id);
                     if (success)
                     {
-                        MessageBox.Show("删除成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        Extensions.MessageBoxExtensions.Show("删除成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                         LoadReferencesAsync();
                     }
                     else
                     {
-                        MessageBox.Show($"删除失败: {message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Extensions.MessageBoxExtensions.Show($"删除失败: {message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"删除失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"删除失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -151,7 +151,7 @@ namespace ExcelProcessor.WPF.Controls
         {
             if (_currentReference == null)
             {
-                MessageBox.Show("请先选择一个配置引用", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("请先选择一个配置引用", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -166,16 +166,16 @@ namespace ExcelProcessor.WPF.Controls
                         message += "\n执行日志:\n" + string.Join("\n", result.ExecutionLogs);
                     }
                     
-                    MessageBox.Show(message, "执行结果", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show(message, "执行结果", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    MessageBox.Show($"执行失败: {result.ErrorMessage}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"执行失败: {result.ErrorMessage}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"执行失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"执行失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -200,7 +200,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"搜索失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"搜索失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -264,7 +264,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载配置列表失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载配置列表失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -275,19 +275,19 @@ namespace ExcelProcessor.WPF.Controls
                 // 验证表单
                 if (string.IsNullOrWhiteSpace(ReferenceNameTextBox.Text))
                 {
-                    MessageBox.Show("请输入引用名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请输入引用名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (ReferenceTypeComboBox.SelectedItem == null)
                 {
-                    MessageBox.Show("请选择引用类型", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请选择引用类型", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (ReferencedConfigComboBox.SelectedItem == null)
                 {
-                    MessageBox.Show("请选择引用的配置", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请选择引用的配置", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -300,7 +300,7 @@ namespace ExcelProcessor.WPF.Controls
                     }
                     catch
                     {
-                        MessageBox.Show("覆盖参数格式不正确，请输入有效的JSON", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("覆盖参数格式不正确，请输入有效的JSON", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
                 }
@@ -344,18 +344,18 @@ namespace ExcelProcessor.WPF.Controls
 
                 if (success)
                 {
-                    MessageBox.Show(_isEditMode ? "更新成功" : "创建成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show(_isEditMode ? "更新成功" : "创建成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                     ReferenceDialog.IsOpen = false;
                     LoadReferencesAsync();
                 }
                 else
                 {
-                    MessageBox.Show($"操作失败: {message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"操作失败: {message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"保存失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

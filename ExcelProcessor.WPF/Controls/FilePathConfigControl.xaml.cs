@@ -210,11 +210,11 @@ namespace ExcelProcessor.WPF.Controls
                     }
                 }
 
-                MessageBox.Show("默认目录结构创建成功！", "创建成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("默认目录结构创建成功！", "创建成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"创建目录失败：{ex.Message}", "创建失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"创建目录失败：{ex.Message}", "创建失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -229,12 +229,12 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("输入目录不存在，请先创建目录！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("输入目录不存在，请先创建目录！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开目录失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"打开目录失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -249,12 +249,12 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("输出目录不存在，请先创建目录！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("输出目录不存在，请先创建目录！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开目录失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"打开目录失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

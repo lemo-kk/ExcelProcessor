@@ -199,7 +199,7 @@ namespace ExcelProcessor.WPF.ViewModels
             catch (Exception ex)
             {
                 _logger.LogError(ex, "加载作业数据失败");
-                MessageBox.Show($"加载作业数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载作业数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -307,13 +307,13 @@ namespace ExcelProcessor.WPF.ViewModels
                 }
                 else
                 {
-                    MessageBox.Show($"创建失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"创建失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "创建作业失败");
-                MessageBox.Show($"创建作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"创建作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -334,13 +334,13 @@ namespace ExcelProcessor.WPF.ViewModels
                 }
                 else
                 {
-                    MessageBox.Show($"更新失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"更新失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "编辑作业失败");
-                MessageBox.Show($"编辑作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"编辑作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -350,7 +350,7 @@ namespace ExcelProcessor.WPF.ViewModels
             {
                 if (job == null) return;
 
-                var result = MessageBox.Show(
+                var result = Extensions.MessageBoxExtensions.Show(
                     $"确定要删除作业 '{job.Name}' 吗？此操作不可恢复。",
                     "确认删除",
                     MessageBoxButton.YesNo,
@@ -367,14 +367,14 @@ namespace ExcelProcessor.WPF.ViewModels
                     }
                     else
                     {
-                        MessageBox.Show($"删除失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Extensions.MessageBoxExtensions.Show($"删除失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除作业失败");
-                MessageBox.Show($"删除作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"删除作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -408,13 +408,13 @@ namespace ExcelProcessor.WPF.ViewModels
                 }
                 else
                 {
-                    MessageBox.Show($"执行失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"执行失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "执行作业失败");
-                MessageBox.Show($"执行作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"执行作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -427,7 +427,7 @@ namespace ExcelProcessor.WPF.ViewModels
 				var executionId = await GetExecutionIdForJobAsync(job.Id);
 				if (string.IsNullOrWhiteSpace(executionId))
 				{
-					MessageBox.Show("当前作业没有运行实例，无法暂停", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+					Extensions.MessageBoxExtensions.Show("当前作业没有运行实例，无法暂停", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
 					return;
 				}
 
@@ -444,13 +444,13 @@ namespace ExcelProcessor.WPF.ViewModels
 				}
 				else
 				{
-					MessageBox.Show($"暂停失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+					Extensions.MessageBoxExtensions.Show($"暂停失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "暂停作业失败");
-                MessageBox.Show($"暂停作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"暂停作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -463,7 +463,7 @@ namespace ExcelProcessor.WPF.ViewModels
 				var executionId = await GetExecutionIdForJobAsync(job.Id);
 				if (string.IsNullOrWhiteSpace(executionId))
 				{
-					MessageBox.Show("当前作业没有可恢复的执行实例", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+					Extensions.MessageBoxExtensions.Show("当前作业没有可恢复的执行实例", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
 					return;
 				}
 
@@ -480,13 +480,13 @@ namespace ExcelProcessor.WPF.ViewModels
 				}
 				else
 				{
-					MessageBox.Show($"恢复失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+					Extensions.MessageBoxExtensions.Show($"恢复失败：{message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "恢复作业失败");
-                MessageBox.Show($"恢复作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"恢复作业失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

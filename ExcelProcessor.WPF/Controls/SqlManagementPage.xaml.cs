@@ -97,7 +97,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "初始化SQL数据失败");
-                MessageBox.Show($"初始化SQL数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"初始化SQL数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -746,7 +746,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "选择路径失败");
-                MessageBox.Show($"选择路径失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"选择路径失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -768,7 +768,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "数据源选择变化处理失败");
-                MessageBox.Show($"数据源选择失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"数据源选择失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -788,7 +788,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "查询数据源选择变化处理失败");
-                MessageBox.Show($"查询数据源选择失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"查询数据源选择失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1363,12 +1363,12 @@ namespace ExcelProcessor.WPF.Controls
                 SqlEditor.SqlText = "-- 请在此输入SQL语句\nSELECT * FROM your_table WHERE 1=1";
                 
                 _logger.LogInformation("开始新增SQL配置");
-                MessageBox.Show("已准备新增SQL配置，请填写相关信息", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("已准备新增SQL配置，请填写相关信息", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "新增SQL配置失败");
-                MessageBox.Show($"新增SQL配置失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"新增SQL配置失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1384,7 +1384,7 @@ namespace ExcelProcessor.WPF.Controls
                 }
 
                 // 确认删除
-                var result = MessageBox.Show(
+                var result = Extensions.MessageBoxExtensions.Show(
                     $"确定要删除SQL配置 '{_currentSqlItem.Name}' 吗？\n\n此操作不可撤销！",
                     "确认删除",
                     MessageBoxButton.YesNo,
@@ -1810,7 +1810,7 @@ namespace ExcelProcessor.WPF.Controls
                 }
 
                 // 显示执行确认对话框
-                var result = MessageBox.Show(
+                var result = Extensions.MessageBoxExtensions.Show(
                     $"确定要执行SQL配置 '{_currentSqlItem.Name}' 吗？\n\nSQL语句：\n{_currentSqlItem.SqlStatement}",
                     "确认执行",
                     MessageBoxButton.YesNo,
@@ -1905,7 +1905,7 @@ namespace ExcelProcessor.WPF.Controls
                                          $"⏱️ 执行时间：{executionResult.Duration}ms\n" +
                                          $"📅 执行时间：{executionResult.StartTime:yyyy-MM-dd HH:mm:ss}";
 
-                        MessageBox.Show(errorMessage, "查询失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Extensions.MessageBoxExtensions.Show(errorMessage, "查询失败", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
 
                     _logger.LogInformation("SQL执行完成: {SqlName}, 状态: {Status}, 耗时: {Duration}ms",
@@ -1915,7 +1915,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "执行SQL失败");
-                MessageBox.Show($"执行SQL失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"执行SQL失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -2014,7 +2014,7 @@ namespace ExcelProcessor.WPF.Controls
                 };
                 exportButton.Click += (s, e) =>
                 {
-                    MessageBox.Show("导出功能开发中...", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("导出功能开发中...", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 };
 
                 var closeButton = new Button
@@ -2047,7 +2047,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "显示查询结果窗口失败");
-                MessageBox.Show($"显示查询结果失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"显示查询结果失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -2166,7 +2166,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "执行SQL查询测试失败");
-                MessageBox.Show($"执行SQL查询测试失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"执行SQL查询测试失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -2221,13 +2221,13 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("不支持的输出类型", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("不支持的输出类型", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "执行SQL输出失败");
-                MessageBox.Show($"执行SQL输出失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"执行SQL输出失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -2412,7 +2412,7 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show($"SQL执行失败：{result.ErrorMessage}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"SQL执行失败：{result.ErrorMessage}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
                 _logger.LogInformation("SQL输出到Excel完成: {SqlStatement}, 输出路径: {OutputPath}, 文件名: {FileName}, Sheet: {SheetName}, 成功: {IsSuccess}, 参数数量: {ParameterCount}", 
@@ -2462,7 +2462,7 @@ namespace ExcelProcessor.WPF.Controls
             catch (Exception ex)
             {
                 _logger.LogError(ex, "测试输出格式失败");
-                MessageBox.Show($"测试输出格式失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"测试输出格式失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -2683,7 +2683,7 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("请先选择查询数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请先选择查询数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -2852,7 +2852,7 @@ namespace ExcelProcessor.WPF.Controls
                 var sqlText = SqlEditor.SqlText?.Trim();
                 if (string.IsNullOrWhiteSpace(sqlText))
                 {
-                    MessageBox.Show("请先输入SQL语句", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请先输入SQL语句", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -2861,7 +2861,7 @@ namespace ExcelProcessor.WPF.Controls
                 SqlEditor.SqlText = formattedSql;
                 
                 _logger.LogInformation("SQL语句格式化完成");
-                MessageBox.Show("SQL语句格式化完成", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("SQL语句格式化完成", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -2931,7 +2931,7 @@ namespace ExcelProcessor.WPF.Controls
                 _logger.LogInformation("用户选择插入前清空表");
                 
                 // 显示确认对话框
-                var result = MessageBox.Show(
+                var result = Extensions.MessageBoxExtensions.Show(
                     "选中此选项将在插入数据前清空目标表的所有数据，此操作不可撤销。\n\n确定要继续吗？",
                     "确认清空表",
                     MessageBoxButton.YesNo,

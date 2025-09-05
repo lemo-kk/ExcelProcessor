@@ -166,7 +166,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "加载角色数据失败");
-                MessageBox.Show($"加载角色数据失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载角色数据失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -195,7 +195,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "筛选角色数据失败");
-                MessageBox.Show($"筛选角色数据失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"筛选角色数据失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -321,7 +321,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "添加角色失败");
-                MessageBox.Show($"添加角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"添加角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -342,7 +342,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "编辑角色失败");
-                MessageBox.Show($"编辑角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"编辑角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -352,20 +352,20 @@ namespace ExcelProcessor.WPF.Pages
             {
                 if (sender is Button button && button.DataContext is Role role)
                 {
-                    var result = MessageBox.Show($"确定要删除角色 '{role.Name}' 吗？", "确认删除", 
+                    var result = Extensions.MessageBoxExtensions.Show($"确定要删除角色 '{role.Name}' 吗？", "确认删除", 
                         MessageBoxButton.YesNo, MessageBoxImage.Question);
                     
                     if (result == MessageBoxResult.Yes)
                     {
                         // 这里应该调用删除服务
-                        MessageBox.Show("删除功能待实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        Extensions.MessageBoxExtensions.Show("删除功能待实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除角色失败");
-                MessageBox.Show($"删除角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"删除角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -402,7 +402,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "复制角色失败");
-                MessageBox.Show($"复制角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"复制角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -411,12 +411,12 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // 这里应该实现导出功能
-                MessageBox.Show("导出功能待实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("导出功能待实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "导出失败");
-                MessageBox.Show($"导出失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"导出失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -431,7 +431,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "清除筛选失败");
-                MessageBox.Show($"清除筛选失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"清除筛选失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

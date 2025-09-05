@@ -23,7 +23,7 @@ namespace ExcelProcessor.WPF.Controls
         {
             if (_previewData == null || !_previewData.Any())
             {
-                MessageBox.Show("没有数据可预览", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("没有数据可预览", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 

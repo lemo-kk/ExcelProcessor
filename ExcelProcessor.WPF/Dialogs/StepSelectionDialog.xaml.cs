@@ -67,7 +67,7 @@ namespace ExcelProcessor.WPF.Dialogs
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"初始化数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"初始化数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -158,7 +158,7 @@ namespace ExcelProcessor.WPF.Dialogs
             {
                 if (_selectedStepType == StepType.ExcelImport && ExcelConfigComboBox.SelectedItem == null)
                 {
-                    MessageBox.Show("请先选择步骤类型", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请先选择步骤类型", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -172,7 +172,7 @@ namespace ExcelProcessor.WPF.Dialogs
                         }
                         else
                         {
-                            MessageBox.Show("请选择一个Excel配置", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            Extensions.MessageBoxExtensions.Show("请选择一个Excel配置", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                             return;
                         }
                         break;
@@ -184,13 +184,13 @@ namespace ExcelProcessor.WPF.Dialogs
                         }
                         else
                         {
-                            MessageBox.Show("请选择一个SQL配置", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            Extensions.MessageBoxExtensions.Show("请选择一个SQL配置", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                             return;
                         }
                         break;
 
                     default:
-                        MessageBox.Show("不支持的步骤类型", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Extensions.MessageBoxExtensions.Show("不支持的步骤类型", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                 }
 
@@ -200,7 +200,7 @@ namespace ExcelProcessor.WPF.Dialogs
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"创建步骤失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"创建步骤失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

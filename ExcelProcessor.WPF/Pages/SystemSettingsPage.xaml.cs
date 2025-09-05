@@ -173,7 +173,7 @@ namespace ExcelProcessor.WPF.Pages
                         // 在UI线程中显示错误
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            MessageBox.Show($"保存登录设置失败：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                            Extensions.MessageBoxExtensions.Show($"保存登录设置失败：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
                         });
                     }
                 });
@@ -421,7 +421,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载设置时发生错误：{ex.Message}", "加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载设置时发生错误：{ex.Message}", "加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
                 
                 // 如果加载失败，使用默认设置
                 LoadDefaultSettings();
@@ -458,7 +458,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载默认设置时发生错误：{ex.Message}", "加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载默认设置时发生错误：{ex.Message}", "加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -516,16 +516,16 @@ namespace ExcelProcessor.WPF.Pages
                 
                 if (result)
                 {
-                    MessageBox.Show("设置保存成功！", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("设置保存成功！", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    MessageBox.Show("设置保存失败！", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("设置保存失败！", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存设置时发生错误：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"保存设置时发生错误：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -533,7 +533,7 @@ namespace ExcelProcessor.WPF.Pages
         {
             try
             {
-                var result = MessageBox.Show("确定要重置所有设置到默认值吗？", "确认重置", 
+                var result = Extensions.MessageBoxExtensions.Show("确定要重置所有设置到默认值吗？", "确认重置", 
                     MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (result == MessageBoxResult.Yes)
@@ -558,12 +558,12 @@ namespace ExcelProcessor.WPF.Pages
 
                     // 重新加载设置
                     LoadDefaultSettings();
-                    MessageBox.Show("设置已重置到默认值！", "重置成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("设置已重置到默认值！", "重置成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"重置设置时发生错误：{ex.Message}", "重置失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"重置设置时发生错误：{ex.Message}", "重置失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -572,11 +572,11 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // TODO: 实现检查更新逻辑
-                MessageBox.Show("当前已是最新版本！", "检查更新", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("当前已是最新版本！", "检查更新", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"检查更新时发生错误：{ex.Message}", "检查失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"检查更新时发生错误：{ex.Message}", "检查失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -597,7 +597,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"选择输入路径时发生错误：{ex.Message}", "选择失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"选择输入路径时发生错误：{ex.Message}", "选择失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -618,7 +618,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"选择输出路径时发生错误：{ex.Message}", "选择失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"选择输出路径时发生错误：{ex.Message}", "选择失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -649,11 +649,11 @@ namespace ExcelProcessor.WPF.Pages
                 InputPathTextBox.Text = Path.Combine(appRoot, "data", "input");
                 OutputPathTextBox.Text = Path.Combine(appRoot, "data", "output");
 
-                MessageBox.Show("默认目录创建成功！", "创建成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("默认目录创建成功！", "创建成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"创建默认目录时发生错误：{ex.Message}", "创建失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"创建默认目录时发生错误：{ex.Message}", "创建失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -662,11 +662,11 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // TODO: 实现数据库连接测试
-                MessageBox.Show("数据库连接正常！", "连接测试", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("数据库连接正常！", "连接测试", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"连接测试失败：{ex.Message}", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"连接测试失败：{ex.Message}", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -675,11 +675,11 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // TODO: 实现数据库备份
-                MessageBox.Show("数据库备份成功！", "备份成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("数据库备份成功！", "备份成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"数据库备份失败：{ex.Message}", "备份失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"数据库备份失败：{ex.Message}", "备份失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -688,11 +688,11 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // TODO: 实现设置导出
-                MessageBox.Show("设置导出成功！", "导出成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("设置导出成功！", "导出成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"设置导出失败：{ex.Message}", "导出失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"设置导出失败：{ex.Message}", "导出失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -701,11 +701,11 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // TODO: 实现设置导入
-                MessageBox.Show("设置导入成功！", "导入成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("设置导入成功！", "导入成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"设置导入失败：{ex.Message}", "导入失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"设置导入失败：{ex.Message}", "导入失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -721,12 +721,12 @@ namespace ExcelProcessor.WPF.Pages
                 }
                 else
                 {
-                    MessageBox.Show("日志文件夹不存在！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("日志文件夹不存在！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开日志文件夹失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"打开日志文件夹失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -734,18 +734,18 @@ namespace ExcelProcessor.WPF.Pages
         {
             try
             {
-                var result = MessageBox.Show("确定要清空所有日志文件吗？", "确认清空", 
+                var result = Extensions.MessageBoxExtensions.Show("确定要清空所有日志文件吗？", "确认清空", 
                     MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (result == MessageBoxResult.Yes)
                 {
                     // TODO: 实现清空日志逻辑
-                    MessageBox.Show("日志已清空！", "清空成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("日志已清空！", "清空成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"清空日志失败：{ex.Message}", "清空失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"清空日志失败：{ex.Message}", "清空失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -754,11 +754,11 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // TODO: 实现检查更新逻辑
-                MessageBox.Show("当前已是最新版本！", "检查更新", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("当前已是最新版本！", "检查更新", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"检查更新失败：{ex.Message}", "检查失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"检查更新失败：{ex.Message}", "检查失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -772,11 +772,11 @@ namespace ExcelProcessor.WPF.Pages
                                $"机器名：{Environment.MachineName}\n" +
                                $"用户名：{Environment.UserName}";
                 
-                MessageBox.Show(systemInfo, "系统信息", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show(systemInfo, "系统信息", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"获取系统信息失败：{ex.Message}", "获取失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"获取系统信息失败：{ex.Message}", "获取失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -790,7 +790,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开用户管理失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"打开用户管理失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -799,11 +799,11 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // TODO: 实现修改密码功能
-                MessageBox.Show("修改密码功能开发中...", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("修改密码功能开发中...", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"修改密码失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"修改密码失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -819,7 +819,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开角色管理失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"打开角色管理失败：{ex.Message}", "操作失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -845,7 +845,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"初始化性能监控失败：{ex.Message}", "初始化失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"初始化性能监控失败：{ex.Message}", "初始化失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -905,7 +905,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"刷新性能指标失败：{ex.Message}", "刷新失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"刷新性能指标失败：{ex.Message}", "刷新失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -916,7 +916,7 @@ namespace ExcelProcessor.WPF.Pages
         {
             try
             {
-                var result = MessageBox.Show("确定要清空所有缓存吗？", "确认清空", 
+                var result = Extensions.MessageBoxExtensions.Show("确定要清空所有缓存吗？", "确认清空", 
                     MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (result == MessageBoxResult.Yes)
@@ -928,7 +928,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"清空缓存失败：{ex.Message}", "清空失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"清空缓存失败：{ex.Message}", "清空失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

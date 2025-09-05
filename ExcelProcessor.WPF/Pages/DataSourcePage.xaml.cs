@@ -63,7 +63,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "初始化数据源数据失败");
-                MessageBox.Show($"初始化数据源数据失败: {ex.Message}", "错误", 
+                Extensions.MessageBoxExtensions.Show($"初始化数据源数据失败: {ex.Message}", "错误", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 
                 // 使用空集合
@@ -198,13 +198,13 @@ namespace ExcelProcessor.WPF.Pages
                 // 重新应用搜索过滤
                 ApplySearchFilter();
                 
-                MessageBox.Show("数据源列表已刷新", "刷新完成", 
+                Extensions.MessageBoxExtensions.Show("数据源列表已刷新", "刷新完成", 
                     MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "刷新数据源列表失败");
-                MessageBox.Show($"刷新数据源列表失败: {ex.Message}", "错误", 
+                Extensions.MessageBoxExtensions.Show($"刷新数据源列表失败: {ex.Message}", "错误", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -234,7 +234,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "打开添加数据源对话框失败");
-                MessageBox.Show($"打开添加数据源对话框失败: {ex.Message}", "错误", 
+                Extensions.MessageBoxExtensions.Show($"打开添加数据源对话框失败: {ex.Message}", "错误", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -1137,7 +1137,7 @@ namespace ExcelProcessor.WPF.Pages
                 
                 // 使用系统原生MessageBox
                 var icon = isSuccess ? MessageBoxImage.Information : MessageBoxImage.Warning;
-                MessageBox.Show(message, title, MessageBoxButton.OK, icon);
+                Extensions.MessageBoxExtensions.Show(message, title, MessageBoxButton.OK, icon);
                 
                 // 恢复主窗口的Topmost设置
                 if (mainWindow != null)
@@ -1149,7 +1149,7 @@ namespace ExcelProcessor.WPF.Pages
             {
                 _logger.LogError(ex, "显示系统消息框失败");
                 // 如果失败，回退到普通MessageBox
-                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                Extensions.MessageBoxExtensions.Show(message, title, MessageBoxButton.OK, 
                     isSuccess ? MessageBoxImage.Information : MessageBoxImage.Warning);
             }
         }

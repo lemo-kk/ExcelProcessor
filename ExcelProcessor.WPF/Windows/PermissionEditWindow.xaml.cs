@@ -353,13 +353,13 @@ namespace ExcelProcessor.WPF.Windows
             try
             {
                 // TODO: 保存权限配置到数据库
-                MessageBox.Show("权限配置已成功保存。", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("权限配置已成功保存。", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 DialogResult = true;
                 Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存权限配置时发生错误：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"保存权限配置时发生错误：{ex.Message}", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

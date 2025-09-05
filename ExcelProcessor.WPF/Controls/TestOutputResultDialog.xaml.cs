@@ -58,7 +58,7 @@ namespace ExcelProcessor.WPF.Controls
                     ? $"测试输出到{outputType}成功！" 
                     : $"测试输出到{outputType}失败！\n\n错误信息：{errorMessage}";
                 
-                MessageBox.Show(message, "测试结果", MessageBoxButton.OK, 
+                Extensions.MessageBoxExtensions.Show(message, "测试结果", MessageBoxButton.OK, 
                     isSuccess ? MessageBoxImage.Information : MessageBoxImage.Error);
             }
         }
@@ -202,7 +202,7 @@ namespace ExcelProcessor.WPF.Controls
                 // 如果设置结果时出现异常，记录错误并关闭窗口
                 System.Diagnostics.Debug.WriteLine($"设置测试结果失败: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"异常堆栈: {ex.StackTrace}");
-                MessageBox.Show($"显示测试结果时出现错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"显示测试结果时出现错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
             }
         }
@@ -237,13 +237,13 @@ namespace ExcelProcessor.WPF.Controls
                     }
                     else
                     {
-                        MessageBox.Show("无法找到输出文件或文件夹", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("无法找到输出文件或文件夹", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开文件位置失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"打开文件位置失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

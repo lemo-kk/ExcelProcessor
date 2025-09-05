@@ -243,7 +243,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载用户数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载用户数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -329,7 +329,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"添加用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"添加用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -347,7 +347,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"编辑用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"编辑用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -355,7 +355,7 @@ namespace ExcelProcessor.WPF.Pages
         {
             if (user == null) return;
 
-            var result = MessageBox.Show($"确定要删除用户 '{user.Username}' 吗？", "确认删除", 
+            var result = Extensions.MessageBoxExtensions.Show($"确定要删除用户 '{user.Username}' 吗？", "确认删除", 
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
@@ -364,11 +364,11 @@ namespace ExcelProcessor.WPF.Pages
                 {
                     await _userService.DeleteUserAsync(user.Id);
                     await LoadUsersAsync();
-                    MessageBox.Show("用户删除成功", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("用户删除成功", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"删除用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"删除用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -466,7 +466,7 @@ namespace ExcelProcessor.WPF.Pages
         {
             if (SelectedUsersCount == 0) return;
 
-            var result = MessageBox.Show($"确定要删除选中的 {SelectedUsersCount} 个用户吗？", "确认批量删除", 
+            var result = Extensions.MessageBoxExtensions.Show($"确定要删除选中的 {SelectedUsersCount} 个用户吗？", "确认批量删除", 
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
@@ -478,11 +478,11 @@ namespace ExcelProcessor.WPF.Pages
                     
                     await LoadUsersAsync();
                     SelectedUsers.Clear();
-                    MessageBox.Show($"成功删除 {SelectedUsersCount} 个用户", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show($"成功删除 {SelectedUsersCount} 个用户", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"批量删除用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"批量删除用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -503,11 +503,11 @@ namespace ExcelProcessor.WPF.Pages
                 
                 await LoadUsersAsync();
                 SelectedUsers.Clear();
-                MessageBox.Show($"成功启用 {SelectedUsersCount} 个用户", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show($"成功启用 {SelectedUsersCount} 个用户", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"批量启用用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"批量启用用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -515,7 +515,7 @@ namespace ExcelProcessor.WPF.Pages
         {
             if (SelectedUsersCount == 0) return;
 
-            var result = MessageBox.Show($"确定要禁用选中的 {SelectedUsersCount} 个用户吗？", "确认批量禁用", 
+            var result = Extensions.MessageBoxExtensions.Show($"确定要禁用选中的 {SelectedUsersCount} 个用户吗？", "确认批量禁用", 
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
@@ -532,11 +532,11 @@ namespace ExcelProcessor.WPF.Pages
                     
                     await LoadUsersAsync();
                     SelectedUsers.Clear();
-                    MessageBox.Show($"成功禁用 {SelectedUsersCount} 个用户", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show($"成功禁用 {SelectedUsersCount} 个用户", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"批量禁用用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"批量禁用用户失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

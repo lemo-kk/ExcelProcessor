@@ -142,7 +142,7 @@ namespace ExcelProcessor.WPF.Controls
 
             if (errors.Count > 0)
             {
-                MessageBox.Show($"配置验证失败：\n{string.Join("\n", errors)}", "验证错误", 
+                Extensions.MessageBoxExtensions.Show($"配置验证失败：\n{string.Join("\n", errors)}", "验证错误", 
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
@@ -155,7 +155,7 @@ namespace ExcelProcessor.WPF.Controls
         /// </summary>
         public void ClearConfig()
         {
-            var result = MessageBox.Show("确定要清空所有配置吗？此操作不可撤销。", "确认清空", 
+            var result = Extensions.MessageBoxExtensions.Show("确定要清空所有配置吗？此操作不可撤销。", "确认清空", 
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
                 
             if (result == MessageBoxResult.Yes)

@@ -34,7 +34,7 @@ namespace ExcelProcessor.WPF.Dialogs
             // 验证输入
             if (string.IsNullOrWhiteSpace(TemplateNameTextBox.Text))
             {
-                MessageBox.Show("请输入模板名称。", "验证错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Extensions.MessageBoxExtensions.Show("请输入模板名称。", "验证错误", MessageBoxButton.OK, MessageBoxImage.Warning);
                 TemplateNameTextBox.Focus();
                 return;
             }
@@ -43,7 +43,7 @@ namespace ExcelProcessor.WPF.Dialogs
             ContentType = GetSelectedContentType();
             if (string.IsNullOrEmpty(ContentType))
             {
-                MessageBox.Show("请选择模板包含的内容类型。", "验证错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Extensions.MessageBoxExtensions.Show("请选择模板包含的内容类型。", "验证错误", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

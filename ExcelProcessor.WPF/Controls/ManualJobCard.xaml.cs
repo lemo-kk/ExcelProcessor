@@ -85,7 +85,7 @@ namespace ExcelProcessor.WPF.Controls
             {
                 if (_jobConfig == null || _jobService == null)
                 {
-                    MessageBox.Show("作业数据未正确加载", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("作业数据未正确加载", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -99,7 +99,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"执行作业时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"执行作业时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

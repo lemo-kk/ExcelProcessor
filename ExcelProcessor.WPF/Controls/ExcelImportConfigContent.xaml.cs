@@ -124,7 +124,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载配置数据时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载配置数据时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -206,7 +206,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载字段映射时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载字段映射时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 
                 // 出错时也使用示例数据
                 var sampleMappings = new List<FieldMapping>
@@ -379,12 +379,12 @@ namespace ExcelProcessor.WPF.Controls
                 }
                 else
                 {
-                    MessageBox.Show("不支持的文件格式，请选择Excel文件(.xlsx/.xls)或CSV文件(.csv)", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("不支持的文件格式，请选择Excel文件(.xlsx/.xls)或CSV文件(.csv)", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 // 显示成功消息
-                MessageBox.Show($"文件已成功加载：{fileName}\n\n" +
+                Extensions.MessageBoxExtensions.Show($"文件已成功加载：{fileName}\n\n" +
                     $"配置名称：{configName}\n" +
                     $"目标表名：{tableName}\n\n" +
                     $"已自动填充默认设置，请根据需要调整字段映射。", 
@@ -392,7 +392,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"处理文件时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"处理文件时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1164,13 +1164,13 @@ namespace ExcelProcessor.WPF.Controls
             // 数据预览功能（根据“拆分每一行”选项选择不同逻辑）
             if (string.IsNullOrEmpty(FilePath))
             {
-                MessageBox.Show("请先选择Excel文件", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Extensions.MessageBoxExtensions.Show("请先选择Excel文件", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (string.IsNullOrEmpty(HeaderRow) || !int.TryParse(HeaderRow, out int headerRowNum))
             {
-                MessageBox.Show("请输入有效的标题行号", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Extensions.MessageBoxExtensions.Show("请输入有效的标题行号", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -1186,7 +1186,7 @@ namespace ExcelProcessor.WPF.Controls
 
                 if (!System.IO.File.Exists(absolutePath))
                 {
-                    MessageBox.Show($"找不到文件：{absolutePath}\n请确认路径是否正确，或将文件放到应用运行目录下对应位置。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show($"找不到文件：{absolutePath}\n请确认路径是否正确，或将文件放到应用运行目录下对应位置。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
             }
@@ -1212,14 +1212,14 @@ namespace ExcelProcessor.WPF.Controls
 
                 if (previewData == null || previewData.Count == 0)
                 {
-                    MessageBox.Show("没有数据可预览。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("没有数据可预览。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
                 ShowDataPreviewDialog(previewData);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"预览数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"预览数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1473,13 +1473,13 @@ namespace ExcelProcessor.WPF.Controls
                 // 验证基本配置
                 if (string.IsNullOrWhiteSpace(FilePath))
                 {
-                    MessageBox.Show("请先选择Excel文件", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请先选择Excel文件", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(ConfigName))
                 {
-                    MessageBox.Show("请输入配置名称", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请输入配置名称", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -1487,14 +1487,14 @@ namespace ExcelProcessor.WPF.Controls
                 var fieldMappings = FieldMappingDataGrid.ItemsSource as List<FieldMapping>;
                 if (fieldMappings == null || fieldMappings.Count == 0)
                 {
-                    MessageBox.Show("请先配置字段映射", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请先配置字段映射", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 // 验证数据源选择
                 if (string.IsNullOrWhiteSpace(TargetDataSource))
                 {
-                    MessageBox.Show("请选择目标数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请选择目标数据源", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -1502,7 +1502,7 @@ namespace ExcelProcessor.WPF.Controls
                 var dataSourceService = App.Services.GetService(typeof(IDataSourceService)) as IDataSourceService;
                 if (dataSourceService == null)
                 {
-                    MessageBox.Show("数据源服务未初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("数据源服务未初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -1510,7 +1510,7 @@ namespace ExcelProcessor.WPF.Controls
                 var dataSource = await dataSourceService.GetDataSourceByNameAsync(TargetDataSource);
                 if (dataSource == null)
                 {
-                    MessageBox.Show($"找不到数据源：{TargetDataSource}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"找不到数据源：{TargetDataSource}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -1518,7 +1518,7 @@ namespace ExcelProcessor.WPF.Controls
                 var isConnected = await dataSourceService.TestConnectionAsync(dataSource);
                 if (!isConnected)
                 {
-                    MessageBox.Show($"数据源连接失败：无法连接到数据源 {TargetDataSource}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show($"数据源连接失败：无法连接到数据源 {TargetDataSource}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -1543,14 +1543,14 @@ namespace ExcelProcessor.WPF.Controls
                     var dataImportService = App.Services.GetService(typeof(IDataImportService)) as IDataImportService;
                     if (dataImportService == null)
                     {
-                        MessageBox.Show("数据导入服务未初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Extensions.MessageBoxExtensions.Show("数据导入服务未初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
                     // 验证标题行号
                     if (!int.TryParse(HeaderRow, out int headerRowNumber) || headerRowNumber <= 0)
                     {
-                        MessageBox.Show("请输入有效的标题行号（大于0的整数）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("请输入有效的标题行号（大于0的整数）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
 
@@ -1585,7 +1585,7 @@ namespace ExcelProcessor.WPF.Controls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"测试导入时发生异常：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"测试导入时发生异常：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1903,11 +1903,11 @@ namespace ExcelProcessor.WPF.Controls
         {
             if (result.IsSuccess)
             {
-                MessageBox.Show("导入测试成功", "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("导入测试成功", "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                MessageBox.Show("导入测试失败", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show("导入测试失败", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

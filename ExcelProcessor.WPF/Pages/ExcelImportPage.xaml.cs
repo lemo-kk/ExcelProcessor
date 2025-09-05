@@ -106,7 +106,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"加载配置列表失败：{ex.Message}");
-                MessageBox.Show($"加载配置列表失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载配置列表失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 LoadSampleData(); // 加载示例数据作为备选
             }
         }
@@ -135,7 +135,7 @@ namespace ExcelProcessor.WPF.Pages
                 if (button == null)
                 {
                     Console.WriteLine("按钮对象为空");
-                    MessageBox.Show("按钮对象为空", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("按钮对象为空", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 
@@ -147,7 +147,7 @@ namespace ExcelProcessor.WPF.Pages
                 {
                     Console.WriteLine("配置数据为空");
                     Console.WriteLine($"DataContext内容: {button.DataContext}");
-                    MessageBox.Show("配置数据为空，请检查数据绑定", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("配置数据为空，请检查数据绑定", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 
@@ -163,7 +163,7 @@ namespace ExcelProcessor.WPF.Pages
             {
                 Console.WriteLine($"编辑按钮点击时发生异常: {ex.Message}");
                 Console.WriteLine($"异常堆栈: {ex.StackTrace}");
-                MessageBox.Show($"编辑配置时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"编辑配置时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -178,7 +178,7 @@ namespace ExcelProcessor.WPF.Pages
                 
                 if (config != null)
                 {
-                    var result = MessageBox.Show($"确定要删除配置 '{config.ConfigName}' 吗？", "确认删除", 
+                    var result = Extensions.MessageBoxExtensions.Show($"确定要删除配置 '{config.ConfigName}' 吗？", "确认删除", 
                         MessageBoxButton.YesNo, MessageBoxImage.Question);
                     
                     if (result == MessageBoxResult.Yes)
@@ -188,7 +188,7 @@ namespace ExcelProcessor.WPF.Pages
                         
                         if (success)
                         {
-                            MessageBox.Show($"配置 '{config.ConfigName}' 已删除", "删除成功", 
+                            Extensions.MessageBoxExtensions.Show($"配置 '{config.ConfigName}' 已删除", "删除成功", 
                                 MessageBoxButton.OK, MessageBoxImage.Information);
                             
                             // 刷新配置列表
@@ -196,7 +196,7 @@ namespace ExcelProcessor.WPF.Pages
                         }
                         else
                         {
-                            MessageBox.Show($"删除配置 '{config.ConfigName}' 失败", "删除失败", 
+                            Extensions.MessageBoxExtensions.Show($"删除配置 '{config.ConfigName}' 失败", "删除失败", 
                                 MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
@@ -204,7 +204,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"删除配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"删除配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -267,7 +267,7 @@ namespace ExcelProcessor.WPF.Pages
                         catch (Exception ex)
                         {
                         Console.WriteLine($"保存配置时出错: {ex.Message}");
-                            MessageBox.Show($"保存配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                            Extensions.MessageBoxExtensions.Show($"保存配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                 };
                 
@@ -280,7 +280,7 @@ namespace ExcelProcessor.WPF.Pages
                         catch (Exception ex)
                         {
                         Console.WriteLine($"测试配置时出错: {ex.Message}");
-                            MessageBox.Show($"测试配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                            Extensions.MessageBoxExtensions.Show($"测试配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                 };
                 
@@ -357,7 +357,7 @@ namespace ExcelProcessor.WPF.Pages
             {
                 Console.WriteLine($"显示配置对话框时发生异常: {ex.Message}");
                 Console.WriteLine($"异常堆栈: {ex.StackTrace}");
-                MessageBox.Show($"显示配置对话框时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"显示配置对话框时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -371,14 +371,14 @@ namespace ExcelProcessor.WPF.Pages
                 if (string.IsNullOrWhiteSpace(content.ConfigName))
                 {
                     Console.WriteLine("配置名称为空");
-                    MessageBox.Show("请输入配置名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请输入配置名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(content.FilePath))
                 {
                     Console.WriteLine("文件路径为空");
-                    MessageBox.Show("请选择Excel文件", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请选择Excel文件", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 
@@ -386,7 +386,7 @@ namespace ExcelProcessor.WPF.Pages
                 if (!int.TryParse(content.HeaderRow, out int headerRowNumber) || headerRowNumber <= 0)
                 {
                     Console.WriteLine($"标题行号无效: {content.HeaderRow}");
-                    MessageBox.Show("请输入有效的标题行号（大于0的整数）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请输入有效的标题行号（大于0的整数）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 
@@ -425,7 +425,7 @@ namespace ExcelProcessor.WPF.Pages
                 if (_excelConfigService == null)
                 {
                     Console.WriteLine("错误: _excelConfigService 为 null");
-                    MessageBox.Show("配置服务未初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("配置服务未初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -472,7 +472,7 @@ namespace ExcelProcessor.WPF.Pages
                     }
 
                     Console.WriteLine("保存成功，显示成功消息");
-                    MessageBox.Show($"配置 '{config.ConfigName}' 保存成功！", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show($"配置 '{config.ConfigName}' 保存成功！", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     
                     Console.WriteLine("刷新配置列表...");
                     // 刷新配置列表
@@ -483,14 +483,14 @@ namespace ExcelProcessor.WPF.Pages
                 else
                 {
                     Console.WriteLine("保存失败，显示错误消息");
-                    MessageBox.Show("保存配置失败，请重试", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Extensions.MessageBoxExtensions.Show("保存配置失败，请重试", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"保存配置异常: {ex.Message}");
                 Console.WriteLine($"异常堆栈: {ex.StackTrace}");
-                MessageBox.Show($"保存配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"保存配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -503,26 +503,26 @@ namespace ExcelProcessor.WPF.Pages
                 // 验证基本配置
                 if (string.IsNullOrWhiteSpace(content.ConfigName))
                 {
-                    MessageBox.Show("请输入配置名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请输入配置名称", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(content.FilePath))
                 {
-                    MessageBox.Show("请选择Excel文件", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请选择Excel文件", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (!File.Exists(content.FilePath))
                 {
-                    MessageBox.Show("选择的Excel文件不存在", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("选择的Excel文件不存在", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 // 验证标题行号
                 if (!int.TryParse(content.HeaderRow, out int headerRowNumber) || headerRowNumber <= 0)
                 {
-                    MessageBox.Show("请输入有效的标题行号（大于0的整数）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请输入有效的标题行号（大于0的整数）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -530,7 +530,7 @@ namespace ExcelProcessor.WPF.Pages
                 var fieldMappings = content.FieldMappings;
                 if (fieldMappings == null || fieldMappings.Count == 0)
                 {
-                    MessageBox.Show("请至少添加一个字段映射", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("请至少添加一个字段映射", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -560,11 +560,11 @@ namespace ExcelProcessor.WPF.Pages
                 if (errors.Count > 0)
                 {
                     var errorMessage = $"配置测试失败：{content.ConfigName}\n\n错误：\n" + string.Join("\n", errors);
-                    MessageBox.Show(errorMessage, "测试失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show(errorMessage, "测试失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else
                 {
-                    MessageBox.Show($"配置测试完成：{content.ConfigName}\n\n配置验证通过，可以正常使用。", "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show($"配置测试完成：{content.ConfigName}\n\n配置验证通过，可以正常使用。", "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 
                 Console.WriteLine("=== 测试配置完成 ===");
@@ -572,7 +572,7 @@ namespace ExcelProcessor.WPF.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"测试配置异常: {ex.Message}");
-                MessageBox.Show($"测试配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"测试配置时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -583,19 +583,19 @@ namespace ExcelProcessor.WPF.Pages
                 // 验证配置
                 if (string.IsNullOrWhiteSpace(config.ConfigName))
                 {
-                    MessageBox.Show("配置名称不能为空", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("配置名称不能为空", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(config.FilePath))
                 {
-                    MessageBox.Show("文件路径不能为空", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show("文件路径不能为空", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 
                 if (!System.IO.File.Exists(config.FilePath))
                 {
-                    MessageBox.Show($"Excel文件不存在：{config.FilePath}", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Extensions.MessageBoxExtensions.Show($"Excel文件不存在：{config.FilePath}", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 
@@ -605,21 +605,21 @@ namespace ExcelProcessor.WPF.Pages
                     var worksheet = package.Workbook.Worksheets[config.SheetName];
                     if (worksheet == null)
                     {
-                        MessageBox.Show($"工作表 '{config.SheetName}' 不存在", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show($"工作表 '{config.SheetName}' 不存在", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
                     
                     var dimension = worksheet.Dimension;
                     if (dimension == null)
                     {
-                        MessageBox.Show("Excel文件为空或无法读取", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("Excel文件为空或无法读取", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
                     
                     // 检查标题行是否存在
                     if (config.HeaderRow > dimension.End.Row)
                     {
-                        MessageBox.Show($"标题行 {config.HeaderRow} 超出文件范围（最大行数：{dimension.End.Row}）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show($"标题行 {config.HeaderRow} 超出文件范围（最大行数：{dimension.End.Row}）", "验证失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
                     
@@ -656,7 +656,7 @@ namespace ExcelProcessor.WPF.Pages
                         $"数据行数: {dimension.End.Row - config.HeaderRow}\n\n" +
                         $"前{previewRowCount}行数据预览已生成。";
                     
-                    MessageBox.Show(resultMessage, "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show(resultMessage, "测试成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     
                     // 显示数据预览对话框
                     var dialog = new Controls.DataPreviewDialog(previewData, config.HeaderRow);
@@ -665,7 +665,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"测试配置时出错：{ex.Message}", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"测试配置时出错：{ex.Message}", "测试失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -722,11 +722,11 @@ namespace ExcelProcessor.WPF.Pages
             var selectedConfigs = GetSelectedConfigs();
             if (selectedConfigs.Count == 0)
             {
-                MessageBox.Show("请先选择要删除的配置项", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("请先选择要删除的配置项", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            var result = MessageBox.Show($"确定要删除选中的 {selectedConfigs.Count} 个配置项吗？", 
+            var result = Extensions.MessageBoxExtensions.Show($"确定要删除选中的 {selectedConfigs.Count} 个配置项吗？", 
                 "确认删除", MessageBoxButton.YesNo, MessageBoxImage.Question);
             
             if (result == MessageBoxResult.Yes)
@@ -738,7 +738,7 @@ namespace ExcelProcessor.WPF.Pages
                         await _excelConfigService.DeleteConfigAsync(config.ConfigName);
                     }
                     
-                    MessageBox.Show($"成功删除 {selectedConfigs.Count} 个配置项", "删除成功", 
+                    Extensions.MessageBoxExtensions.Show($"成功删除 {selectedConfigs.Count} 个配置项", "删除成功", 
                         MessageBoxButton.OK, MessageBoxImage.Information);
                     
                     // 重新加载配置列表
@@ -746,7 +746,7 @@ namespace ExcelProcessor.WPF.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"删除配置时出错：{ex.Message}", "删除失败", 
+                    Extensions.MessageBoxExtensions.Show($"删除配置时出错：{ex.Message}", "删除失败", 
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }

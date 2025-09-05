@@ -45,7 +45,7 @@ namespace ExcelProcessor.WPF.Dialogs
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载执行记录失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载执行记录失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -85,11 +85,11 @@ namespace ExcelProcessor.WPF.Dialogs
                 .ToList();
             if (errors == null || errors.Count == 0)
             {
-                MessageBox.Show("无错误信息可复制。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                Extensions.MessageBoxExtensions.Show("无错误信息可复制。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             Clipboard.SetText(string.Join(Environment.NewLine, errors));
-            MessageBox.Show("错误信息已复制到剪贴板。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            Extensions.MessageBoxExtensions.Show("错误信息已复制到剪贴板。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void CopyCellContent_Click(object sender, RoutedEventArgs e)
@@ -114,7 +114,7 @@ namespace ExcelProcessor.WPF.Dialogs
                         if (!string.IsNullOrEmpty(content))
                         {
                             Clipboard.SetText(content);
-                            MessageBox.Show("内容已复制到剪贴板。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                            Extensions.MessageBoxExtensions.Show("内容已复制到剪贴板。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
                 }
@@ -139,7 +139,7 @@ namespace ExcelProcessor.WPF.Dialogs
                                $"错误信息: {stepExecution.ErrorMessage ?? "无"}";
                     
                     Clipboard.SetText(info);
-                    MessageBox.Show("行信息已复制到剪贴板。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Extensions.MessageBoxExtensions.Show("行信息已复制到剪贴板。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
