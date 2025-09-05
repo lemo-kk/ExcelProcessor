@@ -11,6 +11,9 @@ using MaterialDesignThemes.Wpf;
 using ExcelProcessor.WPF.Pages;
 using ExcelProcessor.WPF.Windows;
 using ExcelProcessor.Data.Services;
+using ExcelProcessor.Core.Services;
+using ExcelProcessor.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ExcelProcessor.WPF.Pages
 {
@@ -46,6 +49,9 @@ namespace ExcelProcessor.WPF.Pages
         private readonly Process _currentProcess;
         private readonly DispatcherTimer _performanceTimer;
         private DataCacheService _cacheService;
+        
+        // 系统配置服务
+        private readonly ISystemConfigService _systemConfigService;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -53,6 +59,9 @@ namespace ExcelProcessor.WPF.Pages
         {
             InitializeComponent();
             DataContext = this;
+
+            // 获取系统配置服务
+            _systemConfigService = App.Services.GetRequiredService<ISystemConfigService>();
 
             // 初始化性能监控
             _currentProcess = Process.GetCurrentProcess();
@@ -63,7 +72,7 @@ namespace ExcelProcessor.WPF.Pages
             _performanceTimer.Tick += PerformanceTimer_Tick;
 
             InitializeComboBoxes();
-            LoadDefaultSettings();
+            LoadSettingsAsync();
             InitializePerformanceMonitoring();
         }
 
@@ -153,13 +162,11 @@ namespace ExcelProcessor.WPF.Pages
                 _enableLogin = value;
                 OnPropertyChanged(nameof(EnableLogin));
                 // 实时保存登录设置
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
                     try
                     {
-                        // 模拟保存登录设置
-                        // 实际应用中，这里需要调用服务
-                        // await _systemConfigService.SetLoginEnabledAsync(value);
+                        await _systemConfigService.SetLoginEnabledAsync(value);
                     }
                     catch (Exception ex)
                     {
@@ -382,13 +389,53 @@ namespace ExcelProcessor.WPF.Pages
         #region 初始化方法
 
         /// <summary>
+        /// 异步加载系统设置
+        /// </summary>
+        private async void LoadSettingsAsync()
+        {
+            try
+            {
+                // 从系统配置服务加载设置
+                var settings = await _systemConfigService.GetSystemSettings();
+                
+                // 应用设置到UI
+                AutoSaveEnabled = settings.AutoSaveEnabled;
+                AutoSaveInterval = settings.AutoSaveInterval;
+                StartupMinimize = settings.StartupMinimize;
+                CheckForUpdates = settings.CheckForUpdates;
+                EnableLogging = settings.EnableLogging;
+                LogLevel = settings.LogLevel;
+                EnableNotifications = settings.EnableNotifications;
+                EnableLogin = settings.EnableLogin;
+                Language = settings.Language;
+                Theme = settings.Theme;
+                EnableAnimations = settings.EnableAnimations;
+                MaxRecentFiles = settings.MaxRecentFiles;
+                ConfirmBeforeClose = settings.ConfirmBeforeClose;
+                EnableBackup = settings.EnableBackup;
+                BackupRetentionDays = settings.BackupRetentionDays;
+
+                // 加载当前用户信息
+                CurrentUserDisplayName = "管理员";
+                CurrentUserRole = "超级管理员";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载设置时发生错误：{ex.Message}", "加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                
+                // 如果加载失败，使用默认设置
+                LoadDefaultSettings();
+            }
+        }
+
+        /// <summary>
         /// 加载默认设置
         /// </summary>
         private void LoadDefaultSettings()
         {
             try
             {
-                // 模拟加载默认设置
+                // 默认设置
                 AutoSaveEnabled = true;
                 AutoSaveInterval = 5;
                 StartupMinimize = false;
@@ -411,7 +458,7 @@ namespace ExcelProcessor.WPF.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载设置时发生错误：{ex.Message}", "加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"加载默认设置时发生错误：{ex.Message}", "加载失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -440,42 +487,41 @@ namespace ExcelProcessor.WPF.Pages
 
         #region 事件处理
 
-        private void SaveSettingsButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveSettingsButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 模拟保存设置
-                // 实际应用中，这里需要调用服务
-                // var settings = new SystemSettings
-                // {
-                //     AutoSaveEnabled = AutoSaveEnabled,
-                //     AutoSaveInterval = AutoSaveInterval,
-                //     StartupMinimize = StartupMinimize,
-                //     CheckForUpdates = CheckForUpdates,
-                //     EnableLogging = EnableLogging,
-                //     LogLevel = LogLevel,
-                //     EnableNotifications = EnableNotifications,
-                //     EnableLogin = EnableLogin,
-                //     Language = Language,
-                //     Theme = Theme,
-                //     EnableAnimations = EnableAnimations,
-                //     MaxRecentFiles = MaxRecentFiles,
-                //     ConfirmBeforeClose = ConfirmBeforeClose,
-                //     EnableBackup = EnableBackup,
-                //     BackupRetentionDays = BackupRetentionDays
-                // };
+                // 创建系统设置对象
+                var settings = new SystemSettings
+                {
+                    AutoSaveEnabled = AutoSaveEnabled,
+                    AutoSaveInterval = AutoSaveInterval,
+                    StartupMinimize = StartupMinimize,
+                    CheckForUpdates = CheckForUpdates,
+                    EnableLogging = EnableLogging,
+                    LogLevel = LogLevel,
+                    EnableNotifications = EnableNotifications,
+                    EnableLogin = EnableLogin,
+                    Language = Language,
+                    Theme = Theme,
+                    EnableAnimations = EnableAnimations,
+                    MaxRecentFiles = MaxRecentFiles,
+                    ConfirmBeforeClose = ConfirmBeforeClose,
+                    EnableBackup = EnableBackup,
+                    BackupRetentionDays = BackupRetentionDays
+                };
 
-                // // 保存设置到系统配置服务
-                // var result = await _systemConfigService.SaveSystemSettings(settings);
+                // 保存设置到系统配置服务
+                var result = await _systemConfigService.SaveSystemSettings(settings);
                 
-                // if (result)
-                // {
+                if (result)
+                {
                     MessageBox.Show("设置保存成功！", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
-                // }
-                // else
-                // {
-                //     MessageBox.Show("设置保存失败！", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                // }
+                }
+                else
+                {
+                    MessageBox.Show("设置保存失败！", "保存失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             catch (Exception ex)
             {
