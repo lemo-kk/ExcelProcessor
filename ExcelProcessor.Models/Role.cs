@@ -1,68 +1,188 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace ExcelProcessor.Models
 {
     /// <summary>
     /// 角色模型
     /// </summary>
-    public class Role
+    public class Role : INotifyPropertyChanged
     {
+        private int _id;
+        private string _code = string.Empty;
+        private string _name = string.Empty;
+        private string _description = string.Empty;
+        private RoleType _type = RoleType.Custom;
+        private bool _isSystem = false;
+        private bool _isEnabled = true;
+        private int _sortOrder = 0;
+        private DateTime _createdTime;
+        private DateTime _updatedTime;
+        private string _remarks = string.Empty;
+
         /// <summary>
         /// 角色ID
         /// </summary>
-        public int Id { get; set; }
+        public int Id
+        {
+            get => _id;
+            set
+            {
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 角色代码
         /// </summary>
         [Required]
         [StringLength(50)]
-        public string Code { get; set; } = string.Empty;
+        public string Code
+        {
+            get => _code;
+            set
+            {
+                _code = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 角色名称
         /// </summary>
         [Required]
         [StringLength(100)]
-        public string Name { get; set; } = string.Empty;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 角色描述
         /// </summary>
         [StringLength(500)]
-        public string? Description { get; set; }
+        public string Description
+        {
+            get => _description;
+            set
+            {
+                _description = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 角色类型
         /// </summary>
-        public RoleType Type { get; set; }
+        public RoleType Type
+        {
+            get => _type;
+            set
+            {
+                _type = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 是否系统角色
         /// </summary>
-        public bool IsSystem { get; set; } = false;
+        public bool IsSystem
+        {
+            get => _isSystem;
+            set
+            {
+                _isSystem = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 是否启用
         /// </summary>
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                _isEnabled = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 排序顺序
         /// </summary>
-        public int SortOrder { get; set; }
+        public int SortOrder
+        {
+            get => _sortOrder;
+            set
+            {
+                _sortOrder = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedTime { get; set; } = DateTime.Now;
+        public DateTime CreatedTime
+        {
+            get => _createdTime;
+            set
+            {
+                _createdTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// 创建时间（兼容性）
+        /// </summary>
+        public DateTime CreatedAt
+        {
+            get => _createdTime;
+            set
+            {
+                _createdTime = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime UpdatedTime { get; set; } = DateTime.Now;
+        public DateTime UpdatedTime
+        {
+            get => _updatedTime;
+            set
+            {
+                _updatedTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// 更新时间（兼容性）
+        /// </summary>
+        public DateTime UpdatedAt
+        {
+            get => _updatedTime;
+            set
+            {
+                _updatedTime = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// 角色权限列表
@@ -73,7 +193,22 @@ namespace ExcelProcessor.Models
         /// 备注
         /// </summary>
         [StringLength(500)]
-        public string? Remarks { get; set; }
+        public string Remarks
+        {
+            get => _remarks;
+            set
+            {
+                _remarks = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     /// <summary>

@@ -8,223 +8,248 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- 页面标题和操作栏 -->
-        <Border Grid.Row="0" Style="{StaticResource ConfigGroupStyle}" Margin="0,0,0,16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!-- 标题 -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="AccountMultiple" 
-                                           Width="24" 
-                                           Height="24" 
-                                           Foreground="{StaticResource CyberBlueBrush}"
-                                           VerticalAlignment="Center"
-                                           Margin="0,0,12,0" />
-                    <TextBlock Text="角色管理" 
-                             Style="{StaticResource ConfigGroupTitleStyle}"
-                             FontSize="22" 
-                             VerticalAlignment="Center" />
-                </StackPanel>
-
-                <!-- 操作按钮 -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button x:Name="AddRoleButton"
-                          Content="添加角色"
-                          Style="{StaticResource AccentButtonStyle}"
-                          Click="AddRoleButton_Click"
-                          Margin="0,0,8,0" />
-                    
-                    <Button x:Name="RefreshButton"
-                          Content="刷新"
-                          Style="{StaticResource ConfigButtonStyle}"
-                          Click="RefreshButton_Click" />
-                </StackPanel>
-            </Grid>
+        <!-- 页面标题 -->
+        <Border Grid.Row="0" Background="{StaticResource DarkBlueBrush}" Padding="24,16">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="Shield" 
+                                       Width="32" 
+                                       Height="32" 
+                                       Foreground="{StaticResource CyberBlueBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,16,0" />
+                <TextBlock Text="角色管理" 
+                         FontSize="24" 
+                         FontWeight="Bold" 
+                         Foreground="White"
+                         VerticalAlignment="Center" />
+            </StackPanel>
         </Border>
 
+
         <!-- 角色管理内容 -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="20" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="1" Style="{StaticResource ConfigGroupStyle}" Margin="24,16,24,24">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <!-- 角色列表 -->
-            <Border Grid.Column="0" Style="{StaticResource ConfigGroupStyle}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                <!-- 搜索和筛选工具栏 -->
+                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource ConfigItemContainerStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <!-- 搜索和筛选 -->
-                    <Border Grid.Row="0" Style="{StaticResource ConfigItemContainerStyle}" Margin="0,0,0,16">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                        <TextBox x:Name="SearchTextBox"
+                               Grid.Column="0"
+                               Style="{StaticResource ConfigInputStyle}"
+                               materialDesign:HintAssist.Hint="搜索角色名称或代码..."
+                               Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                               Margin="0,0,8,0" />
+                        
+                        <ComboBox x:Name="StatusFilterComboBox"
+                                Grid.Column="1"
+                                Style="{StaticResource ConfigComboBoxStyle}"
+                                materialDesign:HintAssist.Hint="状态筛选"
+                                Margin="0,0,8,0">
+                            <ComboBoxItem Content="全部状态" IsSelected="True" />
+                            <ComboBoxItem Content="启用" />
+                            <ComboBoxItem Content="禁用" />
+                        </ComboBox>
 
-                            <TextBox x:Name="RoleSearchTextBox"
-                                   Grid.Column="0"
-                                   Style="{StaticResource ConfigInputStyle}"
-                                   materialDesign:HintAssist.Hint="搜索角色..."
-                                   TextChanged="RoleSearchTextBox_TextChanged"
-                                   Margin="0,0,12,0" />
+                        <!-- 空白区域 -->
+                        <Grid Grid.Column="2" />
+                        
+                        <Button x:Name="ClearFilterButton"
+                              Grid.Column="3"
+                              Content="清除筛选"
+                              Style="{StaticResource ConfigButtonStyle}"
+                              Click="ClearFilterButton_Click"
+                              Margin="0,0,8,0" />
 
-                            <ComboBox x:Name="RoleTypeFilterComboBox"
-                                    Grid.Column="1"
-                                    Style="{StaticResource ConfigComboBoxStyle}"
-                                    Width="150"
-                                    materialDesign:HintAssist.Hint="角色类型"
-                                    SelectionChanged="RoleTypeFilterComboBox_SelectionChanged" />
-                        </Grid>
-                    </Border>
+                        <Button x:Name="AddRoleButton"
+                              Grid.Column="4"
+                              Content="添加角色"
+                              Style="{StaticResource AccentButtonStyle}"
+                              Click="AddRoleButton_Click" />
+                    </Grid>
+                </Border>
 
-                    <!-- 角色数据表格 -->
+                <!-- 角色数据网格 -->
+                <Grid Grid.Row="1" Grid.Column="0">
+                    <!-- 加载状态 -->
+                    <StackPanel HorizontalAlignment="Center" 
+                              VerticalAlignment="Center"
+                              Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ProgressBar IsIndeterminate="True" 
+                                   Width="200" 
+                                   Height="4" 
+                                   Margin="0,0,0,16" />
+                        <TextBlock Text="正在加载角色数据..." 
+                                 Foreground="{StaticResource TextSecondaryBrush}"
+                                 HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- 空数据提示 -->
+                    <StackPanel HorizontalAlignment="Center" 
+                              VerticalAlignment="Center"
+                              Visibility="{Binding Roles.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                        <materialDesign:PackIcon Kind="ShieldOutline" 
+                                               Width="64" 
+                                               Height="64" 
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               Margin="0,0,0,16" />
+                        <TextBlock Text="暂无角色数据" 
+                                 FontSize="18" 
+                                 Foreground="{StaticResource TextSecondaryBrush}"
+                                 Margin="0,0,0,8" />
+                        <TextBlock Text="点击&quot;添加角色&quot;按钮创建第一个角色" 
+                                 FontSize="14" 
+                                 Foreground="{StaticResource TextSecondaryBrush}"
+                                 HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- 数据网格 -->
                     <DataGrid x:Name="RolesDataGrid"
-                            Grid.Row="1"
                             Style="{StaticResource CustomDataGridStyle}"
+                            ItemsSource="{Binding Roles}"
+                            SelectedItem="{Binding SelectedRole}"
+                            SelectionChanged="RolesDataGrid_SelectionChanged"
                             AutoGenerateColumns="False"
                             CanUserAddRows="False"
                             CanUserDeleteRows="False"
-                            CanUserReorderColumns="True"
-                            CanUserResizeColumns="True"
-                            CanUserResizeRows="False"
-                            CanUserSortColumns="True"
+                            IsReadOnly="True"
                             GridLinesVisibility="Horizontal"
                             HeadersVisibility="Column"
-                            IsReadOnly="True"
-                            SelectionMode="Single"
-                            SelectionChanged="RolesDataGrid_SelectionChanged">
-
-                        <DataGrid.Columns>
-                            <!-- 角色ID -->
-                            <DataGridTextColumn Header="ID" 
-                                              Binding="{Binding Id}" 
-                                              Width="60" />
-
-                            <!-- 角色代码 -->
-                            <DataGridTextColumn Header="角色代码" 
-                                              Binding="{Binding Code}" 
-                                              Width="120" />
-
-                            <!-- 角色名称 -->
-                            <DataGridTextColumn Header="角色名称" 
-                                              Binding="{Binding Name}" 
-                                              Width="150" />
-
-                            <!-- 角色描述 -->
-                            <DataGridTextColumn Header="描述" 
-                                              Binding="{Binding Description}" 
-                                              Width="200" />
-
-                            <!-- 角色类型 -->
-                            <DataGridTextColumn Header="类型" 
-                                              Binding="{Binding Type}" 
-                                              Width="100" />
-
-                            <!-- 是否系统角色 -->
-                            <DataGridTemplateColumn Header="系统角色" Width="80">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <materialDesign:PackIcon Kind="{Binding IsSystem, Converter={StaticResource BoolToIconConverter}}"
-                                                               Foreground="{Binding IsSystem, Converter={StaticResource BoolToBrushConverter}}"
-                                                               HorizontalAlignment="Center" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-
-                            <!-- 状态 -->
-                            <DataGridTemplateColumn Header="状态" Width="80">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border Background="{Binding IsEnabled, Converter={StaticResource BoolToStatusBrushConverter}}"
-                                              CornerRadius="4"
-                                              Padding="6,2"
-                                              HorizontalAlignment="Center">
-                                            <TextBlock Text="{Binding IsEnabled, Converter={StaticResource BoolToStatusTextConverter}}"
-                                                     Foreground="White"
-                                                     FontSize="11"
-                                                     FontWeight="Bold" />
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-
-                            <!-- 操作 -->
-                            <DataGridTemplateColumn Header="操作" Width="*">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="编辑"
-                                                  Style="{StaticResource MaterialDesignOutlinedButton}"
-                                                  Click="EditRoleButton_Click"
-                                                  Tag="{Binding Id}"
-                                                  Margin="0,0,4,0" />
-                                            
-                                            <Button Content="删除"
-                                                  Style="{StaticResource MaterialDesignOutlinedButton}"
-                                                  Click="DeleteRoleButton_Click"
-                                                  Tag="{Binding Id}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
+                            AlternatingRowBackground="{StaticResource DarkGrayBrush}"
+                            RowHeaderWidth="0"
+                            Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" 
+                                          Binding="{Binding Id}" 
+                                          Width="60" 
+                                          HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}" />
+                        
+                        <DataGridTextColumn Header="角色代码" 
+                                          Binding="{Binding Code}" 
+                                          Width="120" 
+                                          HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}" />
+                        
+                        <DataGridTextColumn Header="角色名称" 
+                                          Binding="{Binding Name}" 
+                                          Width="150" 
+                                          HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}" />
+                        
+                        <DataGridTextColumn Header="描述" 
+                                          Binding="{Binding Description}" 
+                                          Width="*" 
+                                          MinWidth="200"
+                                          HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}" />
+                        
+                        <DataGridTextColumn Header="类型" 
+                                          Binding="{Binding Type}" 
+                                          Width="100" 
+                                          HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}" />
+                        
+                        <DataGridTemplateColumn Header="系统角色" 
+                                              Width="100" 
+                                              HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <materialDesign:PackIcon Kind="CheckCircle" 
+                                                               Width="16" 
+                                                               Height="16" 
+                                                               Foreground="{StaticResource NeonGreenBrush}"
+                                                               Visibility="{Binding IsSystem, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <materialDesign:PackIcon Kind="CloseCircle" 
+                                                               Width="16" 
+                                                               Height="16" 
+                                                               Foreground="{StaticResource ErrorRedBrush}"
+                                                               Visibility="{Binding IsSystem, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
+                        <DataGridTemplateColumn Header="状态" 
+                                              Width="100" 
+                                              HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding IsEnabled, Converter={StaticResource BoolToStatusBrushConverter}}"
+                                          CornerRadius="12"
+                                          Padding="8,4"
+                                          HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding IsEnabled, Converter={StaticResource BoolToStatusTextConverter}}"
+                                                 Foreground="White"
+                                                 FontSize="12"
+                                                 FontWeight="Bold"
+                                                 HorizontalAlignment="Center" />
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
+                        <DataGridTextColumn Header="排序" 
+                                          Binding="{Binding SortOrder}" 
+                                          Width="80" 
+                                          HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}" />
+                        
+                        <DataGridTextColumn Header="创建时间" 
+                                          Binding="{Binding CreatedTime, StringFormat=yyyy-MM-dd HH:mm}" 
+                                          Width="140" 
+                                          HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}" />
+                        
+                        <DataGridTemplateColumn Header="操作" 
+                                              Width="320" 
+                                              HeaderStyle="{StaticResource CustomDataGridColumnHeaderStyle}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button Content="编辑"
+                                              Style="{StaticResource SecondaryButtonStyle}"
+                                              Click="EditRoleButton_Click"
+                                              Margin="0,0,6,0"
+                                              Padding="12,6"
+                                              FontSize="12"
+                                              MinWidth="60"
+                                              Background="#FF2196F3"
+                                              Foreground="White"
+                                              BorderBrush="#FF2196F3" />
+                                        <Button Content="删除"
+                                              Style="{StaticResource SecondaryButtonStyle}"
+                                              Click="DeleteRoleButton_Click"
+                                              Margin="0,0,6,0"
+                                              Padding="12,6"
+                                              FontSize="12"
+                                              MinWidth="60" />
+                                        <Button Content="复制"
+                                              Style="{StaticResource SecondaryButtonStyle}"
+                                              Click="CopyRoleButton_Click"
+                                              Padding="12,6"
+                                              FontSize="12"
+                                              MinWidth="60" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
-            </Border>
-
-            <!-- 角色详情 -->
-            <Border Grid.Column="2" Style="{StaticResource ConfigGroupStyle}">
-                <StackPanel>
-                    <TextBlock Text="角色详情："
-                             Style="{StaticResource ConfigItemLabelStyle}"
-                             Margin="0,0,0,12" />
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="角色名称：" Style="{StaticResource ConfigItemLabelStyle}" />
-                        <TextBlock x:Name="RoleNameTextBlock" Grid.Row="0" Grid.Column="1" Text="未选择角色" Foreground="#CCCCCC" />
-
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="角色代码：" Style="{StaticResource ConfigItemLabelStyle}" />
-                        <TextBlock x:Name="RoleCodeTextBlock" Grid.Row="1" Grid.Column="1" Text="-" Foreground="#CCCCCC" />
-
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="角色类型：" Style="{StaticResource ConfigItemLabelStyle}" />
-                        <TextBlock x:Name="RoleTypeTextBlock" Grid.Row="2" Grid.Column="1" Text="-" Foreground="#CCCCCC" />
-
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="描述：" Style="{StaticResource ConfigItemLabelStyle}" />
-                        <TextBlock x:Name="RoleDescriptionTextBlock" Grid.Row="3" Grid.Column="1" Text="-" Foreground="#CCCCCC" />
-                    </Grid>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <!-- 消息提示 -->
-        <materialDesign:Snackbar x:Name="MainSnackbar"
-                               MessageQueue="{materialDesign:MessageQueue}"
-                               VerticalAlignment="Bottom"
-                               HorizontalAlignment="Left"
-                               Margin="24" />
+            </Grid>
+        </Border>
     </Grid>
 </Page> 

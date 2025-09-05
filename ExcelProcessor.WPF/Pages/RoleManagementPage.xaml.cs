@@ -8,47 +8,54 @@ using System.Windows;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
 using ExcelProcessor.Models;
-using ExcelProcessor.WPF.Dialogs;
 using ExcelProcessor.Core.Services;
+using ExcelProcessor.WPF.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace ExcelProcessor.WPF.Pages
 {
+    /// <summary>
+    /// 角色管理页面
+    /// </summary>
     public partial class RoleManagementPage : Page, INotifyPropertyChanged
     {
-        private ObservableCollection<Role> _allRoles;
-        private ObservableCollection<Role> _filteredRoles;
-        private Role _selectedRole;
-        private string _searchText = "";
-        private string _selectedTypeFilter = "全部";
-
-        // 服务依赖
         private readonly IRoleService _roleService;
+        private readonly IServiceProvider _serviceProvider;
+        private ObservableCollection<Role> _roles;
+        private Role _selectedRole;
+        private string _searchText = string.Empty;
+        private bool _isLoading = false;
+        private int _totalRoles = 0;
+        private int _systemRolesCount = 0;
+        private int _enabledRolesCount = 0;
+        private int _disabledRolesCount = 0;
+        private readonly ILogger<RoleManagementPage> _logger;
+        private ObservableCollection<PermissionTreeNode> _selectedRolePermissions;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public RoleManagementPage()
+        public RoleManagementPage(IServiceProvider serviceProvider)
         {
             InitializeComponent();
             DataContext = this;
-
-            // 获取服务依赖
-            var serviceProvider = App.Services;
+            _serviceProvider = serviceProvider;
             _roleService = serviceProvider.GetRequiredService<IRoleService>();
-
-            InitializeData();
-            InitializeFilters();
+            _roles = new ObservableCollection<Role>();
+            _selectedRolePermissions = new ObservableCollection<PermissionTreeNode>();
+            _logger = serviceProvider.GetRequiredService<ILogger<RoleManagementPage>>();
+            LoadRolesAsync();
         }
 
         #region 属性
 
-        public ObservableCollection<Role> FilteredRoles
+        public ObservableCollection<Role> Roles
         {
-            get => _filteredRoles;
+            get => _roles;
             set
             {
-                _filteredRoles = value;
-                OnPropertyChanged(nameof(FilteredRoles));
+                _roles = value;
+                OnPropertyChanged(nameof(Roles));
             }
         }
 
@@ -59,62 +66,262 @@ namespace ExcelProcessor.WPF.Pages
             {
                 _selectedRole = value;
                 OnPropertyChanged(nameof(SelectedRole));
-                UpdateRoleDetails();
             }
         }
+
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged(nameof(SearchText));
+                _ = FilterRolesAsync();
+            }
+        }
+
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
+
+        public int TotalRoles
+        {
+            get => _totalRoles;
+            set
+            {
+                _totalRoles = value;
+                OnPropertyChanged(nameof(TotalRoles));
+            }
+        }
+
+        public ObservableCollection<PermissionTreeNode> SelectedRolePermissions
+        {
+            get => _selectedRolePermissions;
+            set
+            {
+                _selectedRolePermissions = value;
+                OnPropertyChanged(nameof(SelectedRolePermissions));
+            }
+        }
+
+        public int SystemRolesCount
+        {
+            get => _systemRolesCount;
+            set
+            {
+                _systemRolesCount = value;
+                OnPropertyChanged(nameof(SystemRolesCount));
+            }
+        }
+
+        public int EnabledRolesCount
+        {
+            get => _enabledRolesCount;
+            set
+            {
+                _enabledRolesCount = value;
+                OnPropertyChanged(nameof(EnabledRolesCount));
+            }
+        }
+
+        public int DisabledRolesCount
+        {
+            get => _disabledRolesCount;
+            set
+            {
+                _disabledRolesCount = value;
+                OnPropertyChanged(nameof(DisabledRolesCount));
+            }
+        }
+
 
         #endregion
 
-        #region 初始化方法
+        #region 数据加载
 
-        private async void InitializeData()
+        private async Task LoadRolesAsync()
         {
             try
             {
-                // 从服务获取真实数据
+                IsLoading = true;
                 var roles = await _roleService.GetAllRolesAsync();
-                _allRoles = new ObservableCollection<Role>(roles);
-                FilteredRoles = new ObservableCollection<Role>(_allRoles);
+                Roles.Clear();
+                foreach (var role in roles)
+                {
+                    Roles.Add(role);
+                }
                 
-                RolesDataGrid.ItemsSource = FilteredRoles;
+                // 计算统计信息
+                TotalRoles = Roles.Count;
+                SystemRolesCount = Roles.Count(r => r.IsSystem);
+                EnabledRolesCount = Roles.Count(r => r.IsEnabled);
+                DisabledRolesCount = Roles.Count(r => !r.IsEnabled);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载角色数据失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                _logger.LogError(ex, "加载角色数据失败");
+                MessageBox.Show($"加载角色数据失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
-        private void InitializeFilters()
+        private async Task FilterRolesAsync()
         {
-            // 角色类型筛选
-            RoleTypeFilterComboBox.ItemsSource = new List<string> { "全部", "系统角色", "自定义角色", "临时角色" };
-            RoleTypeFilterComboBox.SelectedIndex = 0;
+            try
+            {
+                IsLoading = true;
+                var filteredRoles = await _roleService.SearchRolesAsync(SearchText);
+                Roles.Clear();
+                foreach (var role in filteredRoles)
+                {
+                    Roles.Add(role);
+                }
+                
+                // 计算筛选后的统计信息
+                TotalRoles = Roles.Count;
+                SystemRolesCount = Roles.Count(r => r.IsSystem);
+                EnabledRolesCount = Roles.Count(r => r.IsEnabled);
+                DisabledRolesCount = Roles.Count(r => !r.IsEnabled);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "筛选角色数据失败");
+                MessageBox.Show($"筛选角色数据失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private async Task LoadSelectedRolePermissionsAsync()
+        {
+            try
+            {
+                SelectedRolePermissions.Clear();
+                
+                if (SelectedRole == null)
+                    return;
+
+                // 模拟权限数据 - 实际项目中应该从服务获取
+                var permissions = GenerateMockPermissions(SelectedRole);
+                
+                foreach (var permission in permissions)
+                {
+                    SelectedRolePermissions.Add(permission);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "加载角色权限失败");
+            }
+        }
+
+        private ObservableCollection<PermissionTreeNode> GenerateMockPermissions(Role role)
+        {
+            var permissions = new ObservableCollection<PermissionTreeNode>();
+            
+            // 根据角色类型生成不同的权限
+            if (role.Type == RoleType.System)
+            {
+                var systemNode = new PermissionTreeNode
+                {
+                    Name = "系统管理",
+                    PermissionCode = "system",
+                    Icon = "Cog",
+                    Children = new ObservableCollection<PermissionTreeNode>
+                    {
+                        new PermissionTreeNode { Name = "用户管理", PermissionCode = "system.user", Icon = "Account" },
+                        new PermissionTreeNode { Name = "角色管理", PermissionCode = "system.role", Icon = "Shield" },
+                        new PermissionTreeNode { Name = "权限管理", PermissionCode = "system.permission", Icon = "Security" },
+                        new PermissionTreeNode { Name = "系统设置", PermissionCode = "system.setting", Icon = "Settings" }
+                    }
+                };
+                permissions.Add(systemNode);
+                
+                var dataNode = new PermissionTreeNode
+                {
+                    Name = "数据管理",
+                    PermissionCode = "data",
+                    Icon = "Database",
+                    Children = new ObservableCollection<PermissionTreeNode>
+                    {
+                        new PermissionTreeNode { Name = "Excel导入", PermissionCode = "data.excel.import", Icon = "FileImport" },
+                        new PermissionTreeNode { Name = "Excel导出", PermissionCode = "data.excel.export", Icon = "FileExport" },
+                        new PermissionTreeNode { Name = "数据查询", PermissionCode = "data.query", Icon = "Search" },
+                        new PermissionTreeNode { Name = "数据统计", PermissionCode = "data.statistics", Icon = "ChartLine" }
+                    }
+                };
+                permissions.Add(dataNode);
+            }
+            else if (role.Name.Contains("数据管理员"))
+            {
+                var dataNode = new PermissionTreeNode
+                {
+                    Name = "数据管理",
+                    PermissionCode = "data",
+                    Icon = "Database",
+                    Children = new ObservableCollection<PermissionTreeNode>
+                    {
+                        new PermissionTreeNode { Name = "Excel导入", PermissionCode = "data.excel.import", Icon = "FileImport" },
+                        new PermissionTreeNode { Name = "Excel导出", PermissionCode = "data.excel.export", Icon = "FileExport" },
+                        new PermissionTreeNode { Name = "数据查询", PermissionCode = "data.query", Icon = "Search" }
+                    }
+                };
+                permissions.Add(dataNode);
+            }
+            else
+            {
+                var basicNode = new PermissionTreeNode
+                {
+                    Name = "基础权限",
+                    PermissionCode = "basic",
+                    Icon = "CheckCircle",
+                    Children = new ObservableCollection<PermissionTreeNode>
+                    {
+                        new PermissionTreeNode { Name = "查看数据", PermissionCode = "basic.view", Icon = "Eye" },
+                        new PermissionTreeNode { Name = "导出数据", PermissionCode = "basic.export", Icon = "FileExport" }
+                    }
+                };
+                permissions.Add(basicNode);
+            }
+            
+            return permissions;
         }
 
         #endregion
 
         #region 事件处理
 
+        private void RolesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // 角色选择变化时的处理
+        }
+
         private void AddRoleButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ShowInfo("添加角色", "正在打开角色编辑对话框...");
                 var dialog = new RoleEditDialog();
                 dialog.Owner = Window.GetWindow(this);
                 if (dialog.ShowDialog() == true)
                 {
-                    var newRole = dialog.Role;
-                    newRole.Id = _allRoles.Count + 1;
-                    newRole.CreatedTime = DateTime.Now;
-                    _allRoles.Add(newRole);
-                    ApplyFilters();
-                    ShowSuccess("添加成功", "角色添加成功");
+                    _ = LoadRolesAsync();
                 }
             }
             catch (Exception ex)
             {
-                ShowError("添加失败", $"添加角色时发生错误：{ex.Message}");
+                _logger.LogError(ex, "添加角色失败");
+                MessageBox.Show($"添加角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -122,25 +329,20 @@ namespace ExcelProcessor.WPF.Pages
         {
             try
             {
-                var button = sender as Button;
-                var roleId = (int)button.Tag;
-                var role = _allRoles.FirstOrDefault(r => r.Id == roleId);
-
-                if (role != null)
+                if (sender is Button button && button.DataContext is Role role)
                 {
-                    ShowInfo("编辑角色", $"正在编辑角色：{role.Name}");
                     var dialog = new RoleEditDialog(role);
                     dialog.Owner = Window.GetWindow(this);
                     if (dialog.ShowDialog() == true)
                     {
-                        ApplyFilters();
-                        ShowSuccess("编辑成功", "角色编辑成功");
+                        _ = LoadRolesAsync();
                     }
                 }
             }
             catch (Exception ex)
             {
-                ShowError("编辑失败", $"编辑角色时发生错误：{ex.Message}");
+                _logger.LogError(ex, "编辑角色失败");
+                MessageBox.Show($"编辑角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -148,146 +350,96 @@ namespace ExcelProcessor.WPF.Pages
         {
             try
             {
-                var button = sender as Button;
-                var roleId = (int)button.Tag;
-                var role = _allRoles.FirstOrDefault(r => r.Id == roleId);
-
-                if (role != null)
+                if (sender is Button button && button.DataContext is Role role)
                 {
-                    if (role.IsSystem)
-                    {
-                        ShowError("删除失败", "系统角色不能删除");
-                        return;
-                    }
-
                     var result = MessageBox.Show($"确定要删除角色 '{role.Name}' 吗？", "确认删除", 
                         MessageBoxButton.YesNo, MessageBoxImage.Question);
-
+                    
                     if (result == MessageBoxResult.Yes)
                     {
-                        _allRoles.Remove(role);
-                        ApplyFilters();
-                        ShowSuccess("删除成功", "角色删除成功");
+                        // 这里应该调用删除服务
+                        MessageBox.Show("删除功能待实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                ShowError("删除失败", $"删除角色时发生错误：{ex.Message}");
+                _logger.LogError(ex, "删除角色失败");
+                MessageBox.Show($"删除角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+
+        private void CopyRoleButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ShowInfo("刷新", "正在刷新角色数据...");
-                InitializeData();
-                ShowSuccess("刷新成功", "角色数据已刷新");
+                if (sender is Button button && button.DataContext is Role role)
+                {
+                    var newRole = new Role
+                    {
+                        Id = 0,
+                        Code = $"{role.Code}_Copy",
+                        Name = $"{role.Name}_副本",
+                        Description = role.Description,
+                        Type = role.Type,
+                        IsSystem = false,
+                        IsEnabled = true,
+                        SortOrder = role.SortOrder + 1,
+                        CreatedTime = DateTime.Now,
+                        UpdatedTime = DateTime.Now,
+                        Remarks = role.Remarks
+                    };
+
+                    var dialog = new RoleEditDialog(newRole);
+                    dialog.Owner = Window.GetWindow(this);
+                    if (dialog.ShowDialog() == true)
+                    {
+                        _ = LoadRolesAsync();
+                    }
+                }
             }
             catch (Exception ex)
             {
-                ShowError("刷新失败", $"刷新角色数据时发生错误：{ex.Message}");
+                _logger.LogError(ex, "复制角色失败");
+                MessageBox.Show($"复制角色失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void RoleSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            _searchText = RoleSearchTextBox.Text;
-            ApplyFilters();
+            try
+            {
+                // 这里应该实现导出功能
+                MessageBox.Show("导出功能待实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "导出失败");
+                MessageBox.Show($"导出失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private void RoleTypeFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            _selectedTypeFilter = RoleTypeFilterComboBox.SelectedItem?.ToString() ?? "全部";
-            ApplyFilters();
-        }
-
-        private void RolesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            SelectedRole = RolesDataGrid.SelectedItem as Role;
+            try
+            {
+                SearchText = string.Empty;
+                StatusFilterComboBox.SelectedIndex = 0;
+                _ = LoadRolesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "清除筛选失败");
+                MessageBox.Show($"清除筛选失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         #endregion
 
-        #region 辅助方法
+        #region INotifyPropertyChanged
 
-        private void ApplyFilters()
-        {
-            var filtered = _allRoles.AsEnumerable();
-
-            // 搜索筛选
-            if (!string.IsNullOrWhiteSpace(_searchText))
-            {
-                filtered = filtered.Where(r => 
-                    r.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
-                    r.Code.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
-                    (r.Description?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false));
-            }
-
-            // 类型筛选
-            if (_selectedTypeFilter != "全部")
-            {
-                var roleType = _selectedTypeFilter switch
-                {
-                    "系统角色" => RoleType.System,
-                    "自定义角色" => RoleType.Custom,
-                    "临时角色" => RoleType.Temporary,
-                    _ => RoleType.Custom
-                };
-                filtered = filtered.Where(r => r.Type == roleType);
-            }
-
-            FilteredRoles = new ObservableCollection<Role>(filtered);
-            RolesDataGrid.ItemsSource = FilteredRoles;
-        }
-
-        private void UpdateRoleDetails()
-        {
-            if (_selectedRole != null)
-            {
-                RoleNameTextBlock.Text = _selectedRole.Name;
-                RoleCodeTextBlock.Text = _selectedRole.Code;
-                RoleTypeTextBlock.Text = _selectedRole.Type.ToString();
-                RoleDescriptionTextBlock.Text = _selectedRole.Description ?? "-";
-            }
-            else
-            {
-                RoleNameTextBlock.Text = "未选择角色";
-                RoleCodeTextBlock.Text = "-";
-                RoleTypeTextBlock.Text = "-";
-                RoleDescriptionTextBlock.Text = "-";
-            }
-        }
-
-        private void ShowSuccess(string title, string message)
-        {
-            var snackbar = FindName("MainSnackbar") as Snackbar;
-            if (snackbar != null)
-            {
-                snackbar.MessageQueue?.Enqueue(message, null, null, null, false, true, TimeSpan.FromSeconds(3));
-            }
-        }
-
-        private void ShowError(string title, string message)
-        {
-            var snackbar = FindName("MainSnackbar") as Snackbar;
-            if (snackbar != null)
-            {
-                snackbar.MessageQueue?.Enqueue(message, null, null, null, false, true, TimeSpan.FromSeconds(5));
-            }
-        }
-
-        private void ShowInfo(string title, string message)
-        {
-            var snackbar = FindName("MainSnackbar") as Snackbar;
-            if (snackbar != null)
-            {
-                snackbar.MessageQueue?.Enqueue(message, null, null, null, false, true, TimeSpan.FromSeconds(3));
-            }
-        }
-
-        protected virtual void OnPropertyChanged(string propertyName)
+        protected virtual void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

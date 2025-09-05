@@ -36,6 +36,7 @@ namespace ExcelProcessor.WPF.Pages
         // 文件路径设置属性 - 只使用相对路径
         private string _inputPath = "./data/input";
         private string _outputPath = "./data/output";
+        private bool _useRelativePath = true;
 
         // 账号管理属性
         private string _currentUserDisplayName = "管理员";
@@ -263,6 +264,16 @@ namespace ExcelProcessor.WPF.Pages
             {
                 _outputPath = value;
                 OnPropertyChanged(nameof(OutputPath));
+            }
+        }
+
+        public bool UseRelativePath
+        {
+            get => _useRelativePath;
+            set
+            {
+                _useRelativePath = value;
+                OnPropertyChanged(nameof(UseRelativePath));
             }
         }
 
@@ -728,7 +739,7 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // 导航到用户管理页面
-                var userManagementPage = new UserManagementPage();
+                var userManagementPage = new UserManagementPage(App.Services);
                 NavigationService?.Navigate(userManagementPage);
             }
             catch (Exception ex)
@@ -757,7 +768,7 @@ namespace ExcelProcessor.WPF.Pages
             try
             {
                 // 导航到角色管理页面
-                var roleManagementPage = new RoleManagementPage();
+                var roleManagementPage = new RoleManagementPage(App.Services);
                 NavigationService?.Navigate(roleManagementPage);
             }
             catch (Exception ex)

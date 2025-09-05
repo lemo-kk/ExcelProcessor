@@ -8,6 +8,16 @@ using MaterialDesignThemes.Wpf;
 namespace ExcelProcessor.WPF.Converters
 {
     /// <summary>
+    /// 密码强度枚举
+    /// </summary>
+    public enum PasswordStrength
+    {
+        Weak,
+        Medium,
+        Strong,
+        VeryStrong
+    }
+    /// <summary>
     /// 布尔值到可见性转换器
     /// </summary>
     public class BoolToVisibilityConverter : IValueConverter
@@ -292,4 +302,104 @@ namespace ExcelProcessor.WPF.Converters
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// 密码强度到画刷转换器
+    /// </summary>
+    public class PasswordStrengthToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is PasswordStrength strength)
+            {
+                return strength switch
+                {
+                    PasswordStrength.Weak => new SolidColorBrush(Color.FromRgb(244, 67, 54)), // 红色
+                    PasswordStrength.Medium => new SolidColorBrush(Color.FromRgb(255, 152, 0)), // 橙色
+                    PasswordStrength.Strong => new SolidColorBrush(Color.FromRgb(76, 175, 80)), // 绿色
+                    PasswordStrength.VeryStrong => new SolidColorBrush(Color.FromRgb(33, 150, 243)), // 蓝色
+                    _ => new SolidColorBrush(Color.FromRgb(158, 158, 158)) // 灰色
+                };
+            }
+            return new SolidColorBrush(Color.FromRgb(158, 158, 158));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 密码强度到文本转换器
+    /// </summary>
+    public class PasswordStrengthToTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is PasswordStrength strength)
+            {
+                return strength switch
+                {
+                    PasswordStrength.Weak => "弱",
+                    PasswordStrength.Medium => "中等",
+                    PasswordStrength.Strong => "强",
+                    PasswordStrength.VeryStrong => "很强",
+                    _ => "未知"
+                };
+            }
+            return "未知";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 反向布尔值转换器
+    /// </summary>
+    public class InverseBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return !boolValue;
+            }
+            return true;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return !boolValue;
+            }
+            return false;
+        }
+    }
+
+
+    /// <summary>
+    /// 布尔值到排序方向转换器
+    /// </summary>
+    public class BoolToSortDirectionConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool ascending)
+            {
+                return ascending ? "↑" : "↓";
+            }
+            return "↓";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 } 
