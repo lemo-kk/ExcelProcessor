@@ -124,7 +124,7 @@ namespace ExcelProcessor.WPF.Views
                     }
                     else
                     {
-                        MessageBox.Show("登录失败，请检查用户名和密码。", "登录失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Extensions.MessageBoxExtensions.Show("登录失败，请检查用户名和密码。", "登录失败", MessageBoxButton.OK, MessageBoxImage.Warning);
                         ShowLoginDialog(); // 重新显示登录对话框
                     }
                 }
@@ -137,7 +137,7 @@ namespace ExcelProcessor.WPF.Views
             catch (Exception ex)
             {
                 _logger.LogError(ex, "显示登录对话框时发生错误");
-                MessageBox.Show($"登录过程中发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"登录过程中发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
             }
         }
@@ -153,7 +153,7 @@ namespace ExcelProcessor.WPF.Views
         {
             try
             {
-                var result = MessageBox.Show(
+                var result = Extensions.MessageBoxExtensions.Show(
                     "确定要退出登录吗？",
                     "确认退出",
                     MessageBoxButton.YesNo,
@@ -187,7 +187,7 @@ namespace ExcelProcessor.WPF.Views
             catch (Exception ex)
             {
                 _logger.LogError(ex, "退出登录时发生错误");
-                MessageBox.Show($"退出登录时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"退出登录时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -285,7 +285,7 @@ namespace ExcelProcessor.WPF.Views
             catch (Exception ex)
             {
                 _logger.LogError(ex, "加载Excel导入页面失败");
-                MessageBox.Show($"加载Excel导入页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载Excel导入页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -305,7 +305,7 @@ namespace ExcelProcessor.WPF.Views
 
         private void LoadJobConfigPage()
         {
-            MessageBox.Show("此功能暂未实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                            Extensions.MessageBoxExtensions.Show("此功能暂未实现", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void LoadDataSourcePage()
@@ -324,7 +324,7 @@ namespace ExcelProcessor.WPF.Views
             catch (Exception ex)
             {
                 _logger.LogError(ex, "加载导入导出页面失败");
-                MessageBox.Show($"加载导入导出页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"加载导入导出页面失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -384,7 +384,7 @@ namespace ExcelProcessor.WPF.Views
             catch (Exception ex)
             {
                 Console.WriteLine($"MainWindow.ShowDialog 出错: {ex.Message}");
-                MessageBox.Show($"显示对话框时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Extensions.MessageBoxExtensions.Show($"显示对话框时出错：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -527,7 +527,7 @@ namespace ExcelProcessor.WPF.Views
                 _logger.LogInformation("主窗口正在关闭，开始清理资源...");
                 
                 // 询问用户是否确认关闭
-                var result = MessageBox.Show(
+                var result = Extensions.MessageBoxExtensions.Show(
                     "确定要关闭应用程序吗？",
                     "确认关闭",
                     MessageBoxButton.YesNo,
