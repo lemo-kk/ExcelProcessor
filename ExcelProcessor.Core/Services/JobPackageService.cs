@@ -74,6 +74,24 @@ namespace ExcelProcessor.Core.Services
                         await ExportJobConfigAsync(job, tempDir);
                     }
 
+                    // 导出Excel配置
+                    if (options.IncludeExcelConfigs)
+                    {
+                        await ExportExcelConfigsAsync(job, tempDir);
+                    }
+
+                    // 导出SQL配置
+                    if (options.IncludeSqlScripts)
+                    {
+                        await ExportSqlConfigsAsync(job, tempDir);
+                    }
+
+                    // 导出数据源配置
+                    if (options.IncludeDataSources)
+                    {
+                        await ExportDataSourceConfigsAsync(job, tempDir);
+                    }
+
                     // 创建ZIP包
                     var packagePath = await CreateZipPackageAsync(tempDir, job.Name, filePath);
 
@@ -125,11 +143,7 @@ namespace ExcelProcessor.Core.Services
                         Compatibility = "ExcelProcessor V1.0+",
                         Tags = new List<string> { "JobConfig", "ExcelProcessor" }
                     },
-                    Contents = new PackageContents
-                    {
-                        JobConfigCount = 1,
-                        JobConfigs = new List<ContentItem> { MapToContentItem(job) }
-                    },
+                    Contents = await BuildPackageContentsAsync(job),
                     Dependencies = new List<PackageDependency>(),
                     PotentialConflicts = new List<PackageConflict>(),
                     ImportRecommendations = new List<string>
@@ -428,6 +442,147 @@ namespace ExcelProcessor.Core.Services
             await File.WriteAllTextAsync(jobPath, JsonSerializer.Serialize(job, new JsonSerializerOptions { WriteIndented = true }));
         }
 
+        private async Task ExportExcelConfigsAsync(JobConfig job, string tempDir)
+        {
+            if (job.Steps == null || !job.Steps.Any())
+                return;
+
+            var excelConfigDir = Path.Combine(tempDir, "excel-configs");
+            Directory.CreateDirectory(excelConfigDir);
+
+            var excelConfigIds = new HashSet<string>();
+            foreach (var step in job.Steps)
+            {
+                if (step.Type == StepType.ExcelImport && !string.IsNullOrEmpty(step.ExcelConfigId))
+                {
+                    excelConfigIds.Add(step.ExcelConfigId);
+                }
+            }
+
+            foreach (var configId in excelConfigIds)
+            {
+                try
+                {
+                    var excelConfig = await _excelConfigService.GetConfigByIdAsync(configId);
+                    if (excelConfig != null)
+                    {
+                        var configPath = Path.Combine(excelConfigDir, $"{excelConfig.Id}.json");
+                        await File.WriteAllTextAsync(configPath, JsonSerializer.Serialize(excelConfig, new JsonSerializerOptions { WriteIndented = true }));
+                        _logger.LogInformation("导出Excel配置: {ConfigName} ({ConfigId})", excelConfig.ConfigName, excelConfig.Id);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导出Excel配置失败: {ConfigId}", configId);
+                }
+            }
+        }
+
+        private async Task ExportSqlConfigsAsync(JobConfig job, string tempDir)
+        {
+            if (job.Steps == null || !job.Steps.Any())
+                return;
+
+            var sqlConfigDir = Path.Combine(tempDir, "sql-configs");
+            Directory.CreateDirectory(sqlConfigDir);
+
+            var sqlConfigIds = new HashSet<string>();
+            foreach (var step in job.Steps)
+            {
+                if (step.Type == StepType.SqlExecution && !string.IsNullOrEmpty(step.SqlConfigId))
+                {
+                    sqlConfigIds.Add(step.SqlConfigId);
+                }
+            }
+
+            foreach (var configId in sqlConfigIds)
+            {
+                try
+                {
+                    var sqlConfig = await _sqlService.GetSqlConfigByIdAsync(configId);
+                    if (sqlConfig != null)
+                    {
+                        var configPath = Path.Combine(sqlConfigDir, $"{sqlConfig.Id}.json");
+                        await File.WriteAllTextAsync(configPath, JsonSerializer.Serialize(sqlConfig, new JsonSerializerOptions { WriteIndented = true }));
+                        _logger.LogInformation("导出SQL配置: {ConfigName} ({ConfigId})", sqlConfig.Name, sqlConfig.Id);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导出SQL配置失败: {ConfigId}", configId);
+                }
+            }
+        }
+
+        private async Task ExportDataSourceConfigsAsync(JobConfig job, string tempDir)
+        {
+            if (job.Steps == null || !job.Steps.Any())
+                return;
+
+            var dataSourceConfigDir = Path.Combine(tempDir, "data-source-configs");
+            Directory.CreateDirectory(dataSourceConfigDir);
+
+            var dataSourceIds = new HashSet<string>();
+            
+            // 从Excel配置中获取数据源ID
+            foreach (var step in job.Steps)
+            {
+                if (step.Type == StepType.ExcelImport && !string.IsNullOrEmpty(step.ExcelConfigId))
+                {
+                    try
+                    {
+                        var excelConfig = await _excelConfigService.GetConfigByIdAsync(step.ExcelConfigId);
+                                    if (excelConfig != null && !string.IsNullOrEmpty(excelConfig.TargetDataSourceId))
+                                    {
+                                        dataSourceIds.Add(excelConfig.TargetDataSourceId);
+                                    }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "获取Excel配置数据源失败: {ExcelConfigId}", step.ExcelConfigId);
+                    }
+                }
+            }
+
+            // 从SQL配置中获取数据源ID
+            foreach (var step in job.Steps)
+            {
+                if (step.Type == StepType.SqlExecution && !string.IsNullOrEmpty(step.SqlConfigId))
+                {
+                    try
+                    {
+                        var sqlConfig = await _sqlService.GetSqlConfigByIdAsync(step.SqlConfigId);
+                        if (sqlConfig != null && !string.IsNullOrEmpty(sqlConfig.DataSourceId))
+                        {
+                            dataSourceIds.Add(sqlConfig.DataSourceId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "获取SQL配置数据源失败: {SqlConfigId}", step.SqlConfigId);
+                    }
+                }
+            }
+
+            foreach (var dataSourceId in dataSourceIds)
+            {
+                try
+                {
+                    var dataSourceConfig = await _dataSourceService.GetDataSourceByIdAsync(dataSourceId);
+                    if (dataSourceConfig != null)
+                    {
+                        var configPath = Path.Combine(dataSourceConfigDir, $"{dataSourceConfig.Id}.json");
+                        await File.WriteAllTextAsync(configPath, JsonSerializer.Serialize(dataSourceConfig, new JsonSerializerOptions { WriteIndented = true }));
+                        _logger.LogInformation("导出数据源配置: {DataSourceName} ({DataSourceId})", dataSourceConfig.Name, dataSourceConfig.Id);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导出数据源配置失败: {DataSourceId}", dataSourceId);
+                }
+            }
+        }
+
         private async Task<string> CreateZipPackageAsync(string tempDir, string jobName, string targetPath)
         {
             // 如果目标路径是目录，则生成文件名
@@ -583,6 +738,133 @@ namespace ExcelProcessor.Core.Services
                 AlreadyExists = false,
                 ConflictType = null
             };
+        }
+
+        private ContentItem MapToContentItem(ExcelConfig config)
+        {
+            return new ContentItem
+            {
+                Id = config.Id,
+                Name = config.ConfigName,
+                Type = "ExcelConfig",
+                Description = config.Description,
+                CreatedTime = DateTime.TryParse(config.CreatedAt, out var createdTime) ? createdTime : DateTime.Now,
+                LastModifiedTime = DateTime.TryParse(config.UpdatedAt, out var updatedTime) ? updatedTime : DateTime.Now,
+                AlreadyExists = false,
+                ConflictType = null
+            };
+        }
+
+        private ContentItem MapToContentItem(SqlConfig config)
+        {
+            return new ContentItem
+            {
+                Id = config.Id,
+                Name = config.Name,
+                Type = "SqlConfig",
+                Description = config.Description,
+                CreatedTime = config.CreatedDate,
+                LastModifiedTime = config.LastModified,
+                AlreadyExists = false,
+                ConflictType = null
+            };
+        }
+
+        /// <summary>
+        /// 构建包内容信息
+        /// </summary>
+        private async Task<PackageContents> BuildPackageContentsAsync(JobConfig job)
+        {
+            var contents = new PackageContents
+            {
+                JobConfigCount = 1,
+                JobConfigs = new List<ContentItem> { MapToContentItem(job) },
+                ExcelConfigs = new List<ContentItem>(),
+                SqlScripts = new List<ContentItem>()
+            };
+
+            // 解析作业步骤配置
+            if (job.Steps != null && job.Steps.Any())
+            {
+                _logger.LogInformation("开始分析作业步骤，共 {Count} 个步骤", job.Steps.Count);
+
+                var excelConfigIds = new HashSet<string>();
+                var sqlConfigIds = new HashSet<string>();
+
+                // 收集所有配置ID
+                foreach (var step in job.Steps)
+                {
+                    _logger.LogInformation("分析步骤: {StepName} ({StepType})", step.Name, step.Type);
+
+                    if (step.Type == StepType.ExcelImport && !string.IsNullOrEmpty(step.ExcelConfigId))
+                    {
+                        excelConfigIds.Add(step.ExcelConfigId);
+                        _logger.LogInformation("发现Excel配置ID: {ConfigId}", step.ExcelConfigId);
+                    }
+                    else if (step.Type == StepType.SqlExecution && !string.IsNullOrEmpty(step.SqlConfigId))
+                    {
+                        sqlConfigIds.Add(step.SqlConfigId);
+                        _logger.LogInformation("发现SQL配置ID: {ConfigId}", step.SqlConfigId);
+                    }
+                }
+
+                // 获取Excel配置详情
+                foreach (var configId in excelConfigIds)
+                {
+                    try
+                    {
+                        var excelConfig = await _excelConfigService.GetConfigByIdAsync(configId);
+                        if (excelConfig != null)
+                        {
+                            contents.ExcelConfigs.Add(MapToContentItem(excelConfig));
+                            _logger.LogInformation("成功获取Excel配置: {ConfigName}", excelConfig.ConfigName);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Excel配置不存在: {ConfigId}", configId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "获取Excel配置失败: {ConfigId}", configId);
+                    }
+                }
+
+                // 获取SQL配置详情
+                foreach (var configId in sqlConfigIds)
+                {
+                    try
+                    {
+                        var sqlConfig = await _sqlService.GetSqlConfigByIdAsync(configId);
+                        if (sqlConfig != null)
+                        {
+                            contents.SqlScripts.Add(MapToContentItem(sqlConfig));
+                            _logger.LogInformation("成功获取SQL配置: {ConfigName}", sqlConfig.Name);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("SQL配置不存在: {ConfigId}", configId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "获取SQL配置失败: {ConfigId}", configId);
+                    }
+                }
+            }
+            else
+            {
+                _logger.LogWarning("作业没有步骤配置或步骤列表为空");
+            }
+
+            // 设置计数
+            contents.ExcelConfigCount = contents.ExcelConfigs.Count;
+            contents.SqlScriptCount = contents.SqlScripts.Count;
+
+            _logger.LogInformation("包内容构建完成: 作业配置={JobCount}, Excel配置={ExcelCount}, SQL配置={SqlCount}",
+                contents.JobConfigCount, contents.ExcelConfigCount, contents.SqlScriptCount);
+
+            return contents;
         }
 
         #endregion

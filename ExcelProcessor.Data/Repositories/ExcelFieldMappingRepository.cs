@@ -131,13 +131,13 @@ namespace ExcelProcessor.Data.Repositories
                     {
                         if (mapping.Id == 0)
                         {
-                            // 新增
-                            await AddAsync(mapping);
+                            // 新增 - 使用统一连接和事务
+                            await AddAsync(mapping, connection, transaction);
                         }
                         else
                         {
-                            // 更新
-                            await UpdateAsync(mapping);
+                            // 更新 - 使用统一连接和事务
+                            await UpdateAsync(mapping, connection, transaction);
                         }
                     }
 

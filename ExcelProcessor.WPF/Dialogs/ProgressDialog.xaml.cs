@@ -14,7 +14,7 @@ namespace ExcelProcessor.WPF.Dialogs
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string Title
+        public new string Title
         {
             get => _title;
             set

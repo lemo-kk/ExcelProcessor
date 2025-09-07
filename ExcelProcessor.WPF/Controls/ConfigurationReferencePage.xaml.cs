@@ -21,7 +21,7 @@ namespace ExcelProcessor.WPF.Controls
         private readonly ISqlService _sqlService;
         private readonly IDataSourceService _dataSourceService;
         
-        private ConfigurationReference? _currentReference;
+        private ConfigurationReference _currentReference;
         private bool _isEditMode = false;
 
         public ConfigurationReferencePage(
@@ -64,7 +64,7 @@ namespace ExcelProcessor.WPF.Controls
             }
         }
 
-        private async void NewReferenceButton_Click(object sender, RoutedEventArgs e)
+        private void NewReferenceButton_Click(object sender, RoutedEventArgs e)
         {
             _isEditMode = false;
             _currentReference = null;

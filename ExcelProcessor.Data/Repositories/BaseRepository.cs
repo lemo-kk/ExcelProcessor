@@ -95,9 +95,29 @@ namespace ExcelProcessor.Data.Repositories
             try
             {
                 using var connection = _dbContext.GetConnection();
+                return await AddAsync(entity, connection, null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "添加实体失败: {TableName}", _tableName);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 添加实体（使用指定连接和事务）
+        /// </summary>
+        /// <param name="entity">实体对象</param>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="transaction">数据库事务</param>
+        /// <returns>是否成功</returns>
+        public virtual async Task<bool> AddAsync(T entity, IDbConnection connection, IDbTransaction transaction = null)
+        {
+            try
+            {
                 var sql = GenerateInsertSql();
                 var parameters = GetParameters(entity);
-                var result = await connection.ExecuteAsync(sql, parameters);
+                var result = await connection.ExecuteAsync(sql, parameters, transaction);
                 return result > 0;
             }
             catch (Exception ex)
@@ -117,9 +137,29 @@ namespace ExcelProcessor.Data.Repositories
             try
             {
                 using var connection = _dbContext.GetConnection();
+                return await UpdateAsync(entity, connection, null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "更新实体失败: {TableName}", _tableName);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 更新实体（使用指定连接和事务）
+        /// </summary>
+        /// <param name="entity">实体对象</param>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="transaction">数据库事务</param>
+        /// <returns>是否成功</returns>
+        public virtual async Task<bool> UpdateAsync(T entity, IDbConnection connection, IDbTransaction transaction = null)
+        {
+            try
+            {
                 var sql = GenerateUpdateSql();
                 var parameters = GetParameters(entity);
-                var result = await connection.ExecuteAsync(sql, parameters);
+                var result = await connection.ExecuteAsync(sql, parameters, transaction);
                 return result > 0;
             }
             catch (Exception ex)

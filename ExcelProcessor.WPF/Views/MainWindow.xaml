@@ -15,6 +15,14 @@
         FontFamily="Segoe UI"
         Closing="Window_Closing"
         Closed="Window_Closed">
+        
+        <!-- 自定义标题栏样式 -->
+        <Window.Style>
+            <Style TargetType="Window">
+                <Setter Property="Background" Value="{StaticResource NavigationGradient}" />
+                <Setter Property="TextElement.Foreground" Value="White" />
+            </Style>
+        </Window.Style>
 
     <Window.Resources>
         <!-- 现代化导航按钮样式 -->

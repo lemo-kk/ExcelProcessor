@@ -1,0 +1,5 @@
+{
+    "cursor.ai.timeout": 60000,
+    "cursor.toolCall.timeout": 60000,
+    "cursor.assistant.timeout": 60000
+}

@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Nullable>disable</Nullable>
     <!-- <ApplicationIcon>Resources\app.ico</ApplicationIcon> -->
     <AssemblyTitle>Excel Processor</AssemblyTitle>
     <AssemblyDescription>Excel数据处理工具</AssemblyDescription>

@@ -79,7 +79,7 @@ namespace ExcelProcessor.WPF.Controls
         /// <summary>
         /// 卡片点击事件
         /// </summary>
-        private async void ManualJobCard_Click(object sender, MouseButtonEventArgs e)
+        private void ManualJobCard_Click(object sender, MouseButtonEventArgs e)
         {
             try
             {

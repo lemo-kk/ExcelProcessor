@@ -186,7 +186,7 @@ namespace ExcelProcessor.WPF.Dialogs
         /// <summary>
         /// 获取Excel配置信息
         /// </summary>
-        private async Task<ExcelConfig?> GetExcelConfigAsync(string excelConfigId)
+        private async Task<ExcelConfig> GetExcelConfigAsync(string excelConfigId)
         {
             try
             {
@@ -211,7 +211,7 @@ namespace ExcelProcessor.WPF.Dialogs
         /// <summary>
         /// 获取SQL配置信息
         /// </summary>
-        private async Task<SqlConfig?> GetSqlConfigAsync(string sqlConfigId)
+        private async Task<SqlConfig> GetSqlConfigAsync(string sqlConfigId)
         {
             try
             {
@@ -236,36 +236,36 @@ namespace ExcelProcessor.WPF.Dialogs
         /// <summary>
         /// 获取数据导出配置信息
         /// </summary>
-        private async Task<DataExportStepConfig?> GetDataExportConfigAsync(JobStep step)
+        private Task<DataExportStepConfig> GetDataExportConfigAsync(JobStep step)
         {
             try
             {
                 // 这里需要根据实际的配置存储方式来实现
                 // 暂时返回null，后续可以根据需要完善
-                return null;
+                return Task.FromResult(new DataExportStepConfig());
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"获取数据导出配置失败: {ex.Message}");
-                return null;
+                return Task.FromResult(new DataExportStepConfig());
             }
         }
 
         /// <summary>
         /// 获取文件操作配置信息
         /// </summary>
-        private async Task<FileOperationStepConfig?> GetFileOperationConfigAsync(JobStep step)
+        private Task<FileOperationStepConfig> GetFileOperationConfigAsync(JobStep step)
         {
             try
             {
                 // 这里需要根据实际的配置存储方式来实现
                 // 暂时返回null，后续可以根据需要完善
-                return null;
+                return Task.FromResult(new FileOperationStepConfig());
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"获取文件操作配置失败: {ex.Message}");
-                return null;
+                return Task.FromResult(new FileOperationStepConfig());
             }
         }
 

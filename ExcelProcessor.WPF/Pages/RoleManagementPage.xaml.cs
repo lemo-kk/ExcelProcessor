@@ -44,7 +44,7 @@ namespace ExcelProcessor.WPF.Pages
             _roles = new ObservableCollection<Role>();
             _selectedRolePermissions = new ObservableCollection<PermissionTreeNode>();
             _logger = serviceProvider.GetRequiredService<ILogger<RoleManagementPage>>();
-            LoadRolesAsync();
+            _ = LoadRolesAsync();
         }
 
         #region 属性
@@ -203,14 +203,14 @@ namespace ExcelProcessor.WPF.Pages
             }
         }
 
-        private async Task LoadSelectedRolePermissionsAsync()
+        private Task LoadSelectedRolePermissionsAsync()
         {
             try
             {
                 SelectedRolePermissions.Clear();
                 
                 if (SelectedRole == null)
-                    return;
+                    return Task.CompletedTask;
 
                 // 模拟权限数据 - 实际项目中应该从服务获取
                 var permissions = GenerateMockPermissions(SelectedRole);
@@ -219,10 +219,13 @@ namespace ExcelProcessor.WPF.Pages
                 {
                     SelectedRolePermissions.Add(permission);
                 }
+                
+                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "加载角色权限失败");
+                return Task.CompletedTask;
             }
         }
 

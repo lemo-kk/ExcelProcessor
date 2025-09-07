@@ -22,6 +22,7 @@ namespace ExcelProcessor.WPF.ViewModels
         // 服务依赖
         private readonly IJobService _jobService;
         private readonly IExcelConfigService _excelConfigService;
+        private readonly IExcelService _excelService;
         private readonly ISqlService _sqlService;
         private readonly IDataSourceService _dataSourceService;
         private readonly IJobPackageService _jobPackageService;
@@ -53,6 +54,7 @@ namespace ExcelProcessor.WPF.ViewModels
             // 通过依赖注入获取服务
             _jobService = App.Services.GetRequiredService<IJobService>();
             _excelConfigService = App.Services.GetRequiredService<IExcelConfigService>();
+            _excelService = App.Services.GetRequiredService<IExcelService>();
             _sqlService = App.Services.GetRequiredService<ISqlService>();
             _dataSourceService = App.Services.GetRequiredService<IDataSourceService>();
             _jobPackageService = App.Services.GetRequiredService<IJobPackageService>();
@@ -73,8 +75,8 @@ namespace ExcelProcessor.WPF.ViewModels
             _includeFieldMappings = true;
 
             // 加载初始数据
-            LoadAvailableJobsAsync();
-            LoadImportExportHistoryAsync();
+            _ = LoadAvailableJobsAsync();
+            _ = LoadImportExportHistoryAsync();
         }
 
         #region 属性
@@ -106,7 +108,7 @@ namespace ExcelProcessor.WPF.ViewModels
                 // 当选中作业改变时，更新导出内容预览
                 if (value != null)
                 {
-                    UpdateExportPreviewAsync();
+                    _ = UpdateExportPreviewAsync();
                 }
             }
         }
@@ -592,25 +594,25 @@ namespace ExcelProcessor.WPF.ViewModels
         /// <summary>
         /// 从历史记录重新导入
         /// </summary>
-        public async Task<(bool success, string message)> ReImportFromHistoryAsync(ImportExportHistoryViewModel history)
+        public Task<(bool success, string message)> ReImportFromHistoryAsync(ImportExportHistoryViewModel history)
         {
             try
             {
                 if (history == null)
                 {
-                    return (false, "历史记录为空");
+                    return Task.FromResult((false, "历史记录为空"));
                 }
 
                 // 这里应该调用服务执行重新导入
                 // 由于接口中没有ReImportFromHistoryAsync方法，我们暂时返回成功
                 System.Diagnostics.Debug.WriteLine($"从历史记录重新导入：{history.Id}");
                 
-                return (true, "重新导入成功");
+                return Task.FromResult((true, "重新导入成功"));
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"从历史记录重新导入失败：{ex.Message}");
-                return (false, $"重新导入失败：{ex.Message}");
+                return Task.FromResult((false, $"重新导入失败：{ex.Message}"));
             }
         }
 
@@ -700,21 +702,97 @@ namespace ExcelProcessor.WPF.ViewModels
                 {
                     try
                     {
-                        // 暂时使用模拟数据，因为接口方法还不存在
-                        // 后续可以根据实际的服务接口来完善
-                        
-                        // 模拟Excel配置数量
-                        var random = new Random(SelectedJob.Id.GetHashCode());
-                        previewInfo.ExcelConfigCount = random.Next(0, 5);
+                        // 根据JobStep获取实际的配置数量
+                        if (SelectedJob.Steps != null && SelectedJob.Steps.Any())
+                        {
+                            // 统计Excel配置数量
+                            var excelConfigIds = new HashSet<string>();
+                            foreach (var step in SelectedJob.Steps)
+                            {
+                                if (step.Type == StepType.ExcelImport && !string.IsNullOrEmpty(step.ExcelConfigId))
+                                {
+                                    excelConfigIds.Add(step.ExcelConfigId);
+                                }
+                            }
+                            previewInfo.ExcelConfigCount = excelConfigIds.Count;
 
-                        // 模拟SQL脚本数量
-                        previewInfo.SqlScriptCount = random.Next(0, 3);
+                            // 统计SQL脚本数量
+                            var sqlConfigIds = new HashSet<string>();
+                            foreach (var step in SelectedJob.Steps)
+                            {
+                                if (step.Type == StepType.SqlExecution && !string.IsNullOrEmpty(step.SqlConfigId))
+                                {
+                                    sqlConfigIds.Add(step.SqlConfigId);
+                                }
+                            }
+                            previewInfo.SqlScriptCount = sqlConfigIds.Count;
 
-                        // 模拟数据源数量
-                        previewInfo.DataSourceCount = random.Next(1, 3);
+                            // 统计数据源数量
+                            var dataSourceIds = new HashSet<string>();
+                            
+                            // 从Excel配置中获取数据源ID
+                            foreach (var excelConfigId in excelConfigIds)
+                            {
+                                try
+                                {
+                                    var excelConfig = await _excelConfigService.GetConfigByIdAsync(excelConfigId);
+                                    if (excelConfig != null && !string.IsNullOrEmpty(excelConfig.TargetDataSourceId))
+                                    {
+                                        dataSourceIds.Add(excelConfig.TargetDataSourceId);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"获取Excel配置数据源失败: {ex.Message}");
+                                }
+                            }
+                            
+                            // 从SQL配置中获取数据源ID
+                            foreach (var sqlConfigId in sqlConfigIds)
+                            {
+                                try
+                                {
+                                    var sqlConfig = await _sqlService.GetSqlConfigByIdAsync(sqlConfigId);
+                                    if (sqlConfig != null && !string.IsNullOrEmpty(sqlConfig.DataSourceId))
+                                    {
+                                        dataSourceIds.Add(sqlConfig.DataSourceId);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"获取SQL配置数据源失败: {ex.Message}");
+                                }
+                            }
+                            
+                            previewInfo.DataSourceCount = dataSourceIds.Count;
 
-                        // 模拟字段映射数量
-                        previewInfo.FieldMappingCount = random.Next(0, 8);
+                            // 统计字段映射数量（从Excel配置中获取）
+                            var fieldMappingCount = 0;
+                            foreach (var excelConfigId in excelConfigIds)
+                            {
+                                try
+                                {
+                                    var fieldMappings = await _excelService.GetFieldMappingsAsync(excelConfigId);
+                                    if (fieldMappings != null)
+                                    {
+                                        fieldMappingCount += fieldMappings.Count();
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"获取Excel配置字段映射失败: {ex.Message}");
+                                }
+                            }
+                            previewInfo.FieldMappingCount = fieldMappingCount;
+                        }
+                        else
+                        {
+                            // 如果没有步骤，所有数量都为0
+                            previewInfo.ExcelConfigCount = 0;
+                            previewInfo.SqlScriptCount = 0;
+                            previewInfo.DataSourceCount = 0;
+                            previewInfo.FieldMappingCount = 0;
+                        }
 
                         // 预估包大小（基于配置数量进行简单估算）
                         long estimatedSize = 0;

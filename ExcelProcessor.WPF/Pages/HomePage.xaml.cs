@@ -103,7 +103,7 @@ namespace ExcelProcessor.WPF.Pages
         /// <summary>
         /// 查看任务详情按钮点击事件
         /// </summary>
-        private async void ViewTaskDetails_Click(object sender, RoutedEventArgs e)
+        private void ViewTaskDetails_Click(object sender, RoutedEventArgs e)
         {
             try
             {

@@ -51,7 +51,7 @@ namespace ExcelProcessor.WPF.Pages
 
             _users = new ObservableCollection<User>();
 
-            LoadUsersAsync();
+            _ = LoadUsersAsync();
         }
 
         #region 属性

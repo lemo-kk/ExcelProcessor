@@ -7,7 +7,7 @@ namespace ExcelProcessor.WPF.Dialogs
     /// </summary>
     public partial class ErrorDialog : Window
     {
-        public string Title { get; set; }
+        public new string Title { get; set; }
         public string Message { get; set; }
         public string ButtonText { get; set; }
 
