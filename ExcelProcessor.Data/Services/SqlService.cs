@@ -804,7 +804,7 @@ namespace ExcelProcessor.Data.Services
                     return result;
                 }
 
-                // 5. 检查目标表是否存在（不再自动创建）
+                // 5. 检查目标表是否存在，如果不存在则自动创建
                 progressCallback?.UpdateOperation("正在检查目标表...");
                 progressCallback?.UpdateDetailMessage($"检查表 {targetTableName} 是否存在...");
                 
@@ -817,11 +817,28 @@ namespace ExcelProcessor.Data.Services
                 
                 var tableExists = await CheckTableExistsAsync(targetTableName, targetConnectionString);
                 if (!tableExists)
+                {
+                    // 自动创建表
+                    progressCallback?.UpdateOperation("正在创建目标表...");
+                    progressCallback?.UpdateDetailMessage($"根据查询结果创建表 {targetTableName}...");
+                    
+                    if (progressCallback?.IsCancelled() == true)
                     {
                         result.IsSuccess = false;
-                    result.ErrorMessage = $"目标表 {targetTableName} 不存在，请先在数据库中创建该表";
+                        result.ErrorMessage = "操作已取消";
                         return result;
                     }
+                    
+                    var createSuccess = await CreateTableFromQueryResultAsync(targetTableName, queryResult.Columns, targetConnectionString);
+                    if (!createSuccess)
+                    {
+                        result.IsSuccess = false;
+                        result.ErrorMessage = $"创建目标表 {targetTableName} 失败";
+                        return result;
+                    }
+                    
+                    _logger.LogInformation("目标表 {TargetTable} 创建成功", targetTableName);
+                }
                 
                 if (clearTableBeforeInsert)
                 {

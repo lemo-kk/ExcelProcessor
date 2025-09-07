@@ -102,6 +102,11 @@ namespace ExcelProcessor.Core.Services
         /// 是否包含执行历史记录
         /// </summary>
         public bool IncludeExecutionHistory { get; set; } = false;
+
+        /// <summary>
+        /// 是否包含作业步骤配置
+        /// </summary>
+        public bool IncludeJobSteps { get; set; } = true;
     }
 
     /// <summary>

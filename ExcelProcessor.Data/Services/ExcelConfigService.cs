@@ -28,8 +28,11 @@ namespace ExcelProcessor.Data.Services
                 _logger.LogInformation($"开始保存配置: {config.ConfigName}");
                 _logger.LogInformation($"配置详情: FilePath={config.FilePath}, TargetDataSource={config.TargetDataSource}, SheetName={config.SheetName}, HeaderRow={config.HeaderRow}");
 
-                // 生成GUID格式的ID
-                config.Id = Guid.NewGuid().ToString();
+                // 如果没有ID，则生成GUID格式的ID
+                if (string.IsNullOrEmpty(config.Id))
+                {
+                    config.Id = Guid.NewGuid().ToString();
+                }
 
                 var sql = @"
                     INSERT INTO ExcelConfigs (Id, ConfigName, Description, FilePath, TargetDataSourceId, TargetDataSourceName, TargetTableName, SheetName, HeaderRow, DataStartRow, MaxRows, SkipEmptyRows, SplitEachRow, ClearTableDataBeforeImport, EnableValidation, EnableTransaction, ErrorHandlingStrategy, Status, CreatedAt, UpdatedAt)
@@ -169,34 +172,48 @@ namespace ExcelProcessor.Data.Services
             {
                 var sql = @"
                     UPDATE ExcelConfigs 
-                    SET FilePath = @FilePath, TargetDataSourceName = @TargetDataSourceName, SheetName = @SheetName, 
-                        HeaderRow = @HeaderRow, SkipEmptyRows = @SkipEmptyRows, SplitEachRow = @SplitEachRow, 
-                        ClearTableDataBeforeImport = @ClearTableDataBeforeImport, Status = @Status, UpdatedAt = @UpdatedAt
-                    WHERE ConfigName = @ConfigName";
+                    SET ConfigName = @ConfigName, Description = @Description, FilePath = @FilePath, 
+                        TargetDataSourceId = @TargetDataSourceId, TargetDataSourceName = @TargetDataSourceName, 
+                        TargetTableName = @TargetTableName, SheetName = @SheetName, 
+                        HeaderRow = @HeaderRow, DataStartRow = @DataStartRow, MaxRows = @MaxRows,
+                        SkipEmptyRows = @SkipEmptyRows, SplitEachRow = @SplitEachRow, 
+                        ClearTableDataBeforeImport = @ClearTableDataBeforeImport, 
+                        EnableValidation = @EnableValidation, EnableTransaction = @EnableTransaction,
+                        ErrorHandlingStrategy = @ErrorHandlingStrategy, Status = @Status, UpdatedAt = @UpdatedAt
+                    WHERE Id = @Id";
 
                 var parameters = new
                 {
+                    config.Id,
                     config.ConfigName,
+                    Description = config.Description ?? "",
                     config.FilePath,
-                    TargetDataSourceName = config.TargetDataSourceName,
+                    TargetDataSourceId = !string.IsNullOrWhiteSpace(config.TargetDataSourceId) ? config.TargetDataSourceId : "default",
+                    TargetDataSourceName = config.TargetDataSourceName ?? config.TargetDataSource ?? "默认数据源",
+                    TargetTableName = config.TargetTableName ?? "ImportedData",
                     config.SheetName,
                     config.HeaderRow,
+                    DataStartRow = config.DataStartRow > 0 ? config.DataStartRow : 2,
+                    MaxRows = config.MaxRows > 0 ? config.MaxRows : 0,
                     SkipEmptyRows = config.SkipEmptyRows ? 1 : 0,
                     SplitEachRow = config.SplitEachRow ? 1 : 0,
                     ClearTableDataBeforeImport = config.ClearTableDataBeforeImport ? 1 : 0,
-                    Status = "Active",
+                    EnableValidation = config.EnableValidation ? 1 : 0,
+                    EnableTransaction = config.EnableTransaction ? 1 : 0,
+                    ErrorHandlingStrategy = config.ErrorHandlingStrategy ?? "Log",
+                    Status = config.Status ?? "Active",
                     UpdatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };
 
                 using var connection = _dbContext.GetConnection();
                 var result = await connection.ExecuteAsync(sql, parameters);
                 
-                _logger.LogInformation($"配置 '{config.ConfigName}' 更新成功");
+                _logger.LogInformation($"配置 '{config.ConfigName}' (ID: {config.Id}) 更新成功");
                 return result > 0;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"更新配置 '{config.ConfigName}' 时出错");
+                _logger.LogError(ex, $"更新配置 '{config.ConfigName}' (ID: {config.Id}) 时出错");
                 return false;
             }
         }

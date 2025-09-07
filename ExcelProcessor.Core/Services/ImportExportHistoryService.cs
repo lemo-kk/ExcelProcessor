@@ -357,7 +357,7 @@ namespace ExcelProcessor.Core.Services
                 if (statistics.TotalOperations > 0)
                 {
                     statistics.AverageDurationMs = _historyStore.Average(h => h.DurationMs);
-                    statistics.TotalFileSize = _historyStore.Where(h => h.FileSize.HasValue).Sum(h => h.FileSize.Value);
+                    statistics.TotalFileSize = _historyStore.Where(h => h.FileSize.HasValue).Sum(h => h.FileSize!.Value);
                 }
                 
                 return await Task.FromResult(statistics);
@@ -390,7 +390,7 @@ namespace ExcelProcessor.Core.Services
                 if (statistics.TotalOperations > 0)
                 {
                     statistics.AverageDurationMs = historiesInRange.Average(h => h.DurationMs);
-                    statistics.TotalFileSize = historiesInRange.Where(h => h.FileSize.HasValue).Sum(h => h.FileSize.Value);
+                    statistics.TotalFileSize = historiesInRange.Where(h => h.FileSize.HasValue).Sum(h => h.FileSize!.Value);
                 }
                 
                 return await Task.FromResult(statistics);
