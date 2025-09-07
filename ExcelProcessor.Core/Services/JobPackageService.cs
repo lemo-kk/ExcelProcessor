@@ -19,6 +19,7 @@ namespace ExcelProcessor.Core.Services
         private readonly ILogger<JobPackageService> _logger;
         private readonly IJobService _jobService;
         private readonly IExcelConfigService _excelConfigService;
+        private readonly IExcelService _excelService;
         private readonly ISqlService _sqlService;
         private readonly IDataSourceService _dataSourceService;
         private readonly IImportExportHistoryService _historyService;
@@ -27,6 +28,7 @@ namespace ExcelProcessor.Core.Services
             ILogger<JobPackageService> logger,
             IJobService jobService,
             IExcelConfigService excelConfigService,
+            IExcelService excelService,
             ISqlService sqlService,
             IDataSourceService dataSourceService,
             IImportExportHistoryService historyService)
@@ -34,6 +36,7 @@ namespace ExcelProcessor.Core.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _jobService = jobService ?? throw new ArgumentNullException(nameof(jobService));
             _excelConfigService = excelConfigService ?? throw new ArgumentNullException(nameof(excelConfigService));
+            _excelService = excelService ?? throw new ArgumentNullException(nameof(excelService));
             _sqlService = sqlService ?? throw new ArgumentNullException(nameof(sqlService));
             _dataSourceService = dataSourceService ?? throw new ArgumentNullException(nameof(dataSourceService));
             _historyService = historyService ?? throw new ArgumentNullException(nameof(historyService));
@@ -80,6 +83,12 @@ namespace ExcelProcessor.Core.Services
                         await ExportExcelConfigsAsync(job, tempDir);
                     }
 
+                    // 导出字段映射配置
+                    if (options.IncludeFieldMappings)
+                    {
+                        await ExportFieldMappingsAsync(job, tempDir);
+                    }
+
                     // 导出SQL配置
                     if (options.IncludeSqlScripts)
                     {
@@ -90,6 +99,12 @@ namespace ExcelProcessor.Core.Services
                     if (options.IncludeDataSources)
                     {
                         await ExportDataSourceConfigsAsync(job, tempDir);
+                    }
+
+                    // 导出作业步骤配置
+                    if (options.IncludeJobSteps)
+                    {
+                        await ExportJobStepsAsync(job, tempDir);
                     }
 
                     // 创建ZIP包
@@ -206,7 +221,32 @@ namespace ExcelProcessor.Core.Services
                     var packageInfo = JsonSerializer.Deserialize<PackageBasicInfo>(
                         await File.ReadAllTextAsync(packageInfoPath));
 
-                    // 导入作业配置
+                    // 导入各种配置（按依赖顺序）
+                    // 1. 先导入数据源配置（其他配置的依赖）
+                    if (Directory.Exists(Path.Combine(tempDir, "data-source-configs")))
+                    {
+                        await ImportDataSourceConfigsAsync(tempDir, options);
+                    }
+
+                    // 2. 导入Excel配置
+                    if (Directory.Exists(Path.Combine(tempDir, "excel-configs")))
+                    {
+                        await ImportExcelConfigsAsync(tempDir, options);
+                    }
+
+                    // 3. 导入SQL配置
+                    if (Directory.Exists(Path.Combine(tempDir, "sql-configs")))
+                    {
+                        await ImportSqlConfigsAsync(tempDir, options);
+                    }
+
+                    // 4. 导入字段映射配置
+                    if (Directory.Exists(Path.Combine(tempDir, "field-mappings")))
+                    {
+                        await ImportFieldMappingsAsync(tempDir, options);
+                    }
+
+                    // 5. 最后导入作业配置（包含步骤配置）
                     if (Directory.Exists(Path.Combine(tempDir, "job-config")))
                     {
                         await ImportJobConfigAsync(tempDir, options);
@@ -245,7 +285,7 @@ namespace ExcelProcessor.Core.Services
 
                 if (!File.Exists(filePath))
                 {
-                    return (false, "配置包文件不存在", null);
+                    return (false, "配置包文件不存在", (object)null!);
                 }
 
                 // 创建临时目录
@@ -261,7 +301,7 @@ namespace ExcelProcessor.Core.Services
                     var packageInfoPath = Path.Combine(tempDir, "package-info.json");
                     if (!File.Exists(packageInfoPath))
                     {
-                        return (false, "配置包格式错误：缺少包信息文件", null);
+                        return (false, "配置包格式错误：缺少包信息文件", (object)null!);
                     }
 
                     var packageInfo = JsonSerializer.Deserialize<PackageBasicInfo>(
@@ -290,7 +330,7 @@ namespace ExcelProcessor.Core.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "验证作业配置包失败，路径: {FilePath}", filePath);
-                return (false, $"验证失败: {ex.Message}", null);
+                return (false, $"验证失败: {ex.Message}", (object)null!);
             }
         }
 
@@ -478,6 +518,42 @@ namespace ExcelProcessor.Core.Services
             }
         }
 
+        private async Task ExportFieldMappingsAsync(JobConfig job, string tempDir)
+        {
+            if (job.Steps == null || !job.Steps.Any())
+                return;
+
+            var fieldMappingDir = Path.Combine(tempDir, "field-mappings");
+            Directory.CreateDirectory(fieldMappingDir);
+
+            var excelConfigIds = new HashSet<string>();
+            foreach (var step in job.Steps)
+            {
+                if (step.Type == StepType.ExcelImport && !string.IsNullOrEmpty(step.ExcelConfigId))
+                {
+                    excelConfigIds.Add(step.ExcelConfigId);
+                }
+            }
+
+            foreach (var configId in excelConfigIds)
+            {
+                try
+                {
+                    var fieldMappings = await _excelService.GetFieldMappingsAsync(configId);
+                    if (fieldMappings != null && fieldMappings.Any())
+                    {
+                        var mappingPath = Path.Combine(fieldMappingDir, $"{configId}_field-mappings.json");
+                        await File.WriteAllTextAsync(mappingPath, JsonSerializer.Serialize(fieldMappings, new JsonSerializerOptions { WriteIndented = true }));
+                        _logger.LogInformation("导出字段映射配置: {ConfigId} ({Count}个映射)", configId, fieldMappings.Count());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导出字段映射配置失败: {ConfigId}", configId);
+                }
+            }
+        }
+
         private async Task ExportSqlConfigsAsync(JobConfig job, string tempDir)
         {
             if (job.Steps == null || !job.Steps.Any())
@@ -583,7 +659,46 @@ namespace ExcelProcessor.Core.Services
             }
         }
 
-        private async Task<string> CreateZipPackageAsync(string tempDir, string jobName, string targetPath)
+        private async Task ExportJobStepsAsync(JobConfig job, string tempDir)
+        {
+            if (job.Steps == null || !job.Steps.Any())
+            {
+                _logger.LogInformation("作业 {JobName} 没有步骤配置，跳过导出", job.Name);
+                return;
+            }
+
+            var jobStepsDir = Path.Combine(tempDir, "job-steps");
+            Directory.CreateDirectory(jobStepsDir);
+
+            foreach (var step in job.Steps)
+            {
+                try
+                {
+                    var stepPath = Path.Combine(jobStepsDir, $"{step.Id}.json");
+                    await File.WriteAllTextAsync(stepPath, JsonSerializer.Serialize(step, new JsonSerializerOptions { WriteIndented = true }));
+                    _logger.LogInformation("导出作业步骤: {StepName} ({StepId}) - 类型: {StepType}", step.Name, step.Id, step.Type);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导出作业步骤失败: {StepId}", step.Id);
+                }
+            }
+
+            // 导出步骤顺序配置文件
+            try
+            {
+                var stepOrder = job.Steps.Select((step, index) => new { StepId = step.Id, Order = index + 1, Name = step.Name }).ToList();
+                var orderPath = Path.Combine(jobStepsDir, "step-order.json");
+                await File.WriteAllTextAsync(orderPath, JsonSerializer.Serialize(stepOrder, new JsonSerializerOptions { WriteIndented = true }));
+                _logger.LogInformation("导出作业步骤顺序配置，共 {Count} 个步骤", stepOrder.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "导出作业步骤顺序配置失败");
+            }
+        }
+
+        private Task<string> CreateZipPackageAsync(string tempDir, string jobName, string targetPath)
         {
             // 如果目标路径是目录，则生成文件名
             if (Directory.Exists(targetPath))
@@ -600,7 +715,7 @@ namespace ExcelProcessor.Core.Services
             }
             
             ZipFile.CreateFromDirectory(tempDir, targetPath);
-            return targetPath;
+            return Task.FromResult(targetPath);
         }
 
         private async Task RecordExportHistoryAsync(JobConfig job, string packagePath, ExportOptions options)
@@ -647,27 +762,408 @@ namespace ExcelProcessor.Core.Services
             await _historyService.AddHistoryAsync(history);
         }
 
+        private async Task ImportDataSourceConfigsAsync(string tempDir, ImportOptions options)
+        {
+            var dataSourceConfigDir = Path.Combine(tempDir, "data-source-configs");
+            if (!Directory.Exists(dataSourceConfigDir)) return;
+
+            _logger.LogInformation("开始导入数据源配置");
+
+            foreach (var file in Directory.GetFiles(dataSourceConfigDir, "*.json"))
+            {
+                try
+                {
+                    var configJson = await File.ReadAllTextAsync(file);
+                    var dataSource = JsonSerializer.Deserialize<DataSourceConfig>(configJson);
+                    
+                    if (dataSource != null)
+                    {
+                        // 特殊处理：如果导入的数据源名称是默认importDB
+                        if (dataSource.Name == "默认importDB" || dataSource.Name == "importDB")
+                        {
+                            await HandleDefaultImportDBAsync(dataSource, options);
+                        }
+                        else
+                        {
+                            // 普通数据源的处理逻辑
+                            if (options.OverwriteExisting)
+                            {
+                                await _dataSourceService.UpdateDataSourceAsync(dataSource);
+                                _logger.LogInformation("更新数据源配置: {DataSourceName} ({DataSourceId})", dataSource.Name, dataSource.Id);
+                            }
+                            else
+                            {
+                                await _dataSourceService.SaveDataSourceAsync(dataSource);
+                                _logger.LogInformation("创建数据源配置: {DataSourceName} ({DataSourceId})", dataSource.Name, dataSource.Id);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导入数据源配置失败: {File}", file);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 处理默认importDB数据源的特殊导入逻辑
+        /// </summary>
+        private async Task HandleDefaultImportDBAsync(DataSourceConfig importedDataSource, ImportOptions options)
+        {
+            try
+            {
+                _logger.LogInformation("处理默认importDB数据源导入: {DataSourceId}", importedDataSource.Id);
+
+                // 检查本地是否存在默认importDB
+                DataSourceConfig? localDefaultDataSource = null;
+                try
+                {
+                    localDefaultDataSource = await _dataSourceService.GetDataSourceByNameAsync("默认importDB");
+                }
+                catch (InvalidOperationException)
+                {
+                    // 本地没有默认importDB，这是正常情况
+                    _logger.LogInformation("本地不存在默认importDB，将创建新的");
+                }
+
+                if (localDefaultDataSource != null)
+                {
+                    // 本地存在默认importDB，用导入的替换本地的
+                    _logger.LogInformation("本地存在默认importDB (ID: {LocalId})，将被导入的 (ID: {ImportedId}) 替换", 
+                        localDefaultDataSource.Id, importedDataSource.Id);
+
+                    // 删除本地的默认importDB
+                    await _dataSourceService.DeleteDataSourceAsync(localDefaultDataSource.Id);
+                    _logger.LogInformation("已删除本地默认importDB: {LocalId}", localDefaultDataSource.Id);
+
+                    // 保存导入的默认importDB
+                    await _dataSourceService.SaveDataSourceAsync(importedDataSource);
+                    _logger.LogInformation("已保存导入的默认importDB: {ImportedId}", importedDataSource.Id);
+                }
+                else
+                {
+                    // 本地不存在默认importDB，直接保存导入的
+                    await _dataSourceService.SaveDataSourceAsync(importedDataSource);
+                    _logger.LogInformation("本地不存在默认importDB，已创建新的: {ImportedId}", importedDataSource.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "处理默认importDB数据源导入失败: {DataSourceId}", importedDataSource.Id);
+                throw;
+            }
+        }
+
+        private async Task ImportExcelConfigsAsync(string tempDir, ImportOptions options)
+        {
+            var excelConfigDir = Path.Combine(tempDir, "excel-configs");
+            if (!Directory.Exists(excelConfigDir)) return;
+
+            _logger.LogInformation("开始导入Excel配置");
+
+            foreach (var file in Directory.GetFiles(excelConfigDir, "*.json"))
+            {
+                try
+                {
+                    var configJson = await File.ReadAllTextAsync(file);
+                    var excelConfig = JsonSerializer.Deserialize<ExcelConfig>(configJson);
+                    
+                    if (excelConfig != null)
+                    {
+                        // 检查配置是否已存在
+                        var existingConfig = await _excelConfigService.GetConfigByIdAsync(excelConfig.Id);
+                        
+                        if (existingConfig != null)
+                        {
+                            if (options.OverwriteExisting)
+                            {
+                                await _excelConfigService.UpdateConfigAsync(excelConfig);
+                                _logger.LogInformation("更新Excel配置: {ConfigName} ({ConfigId})", excelConfig.ConfigName, excelConfig.Id);
+                            }
+                            else
+                            {
+                                _logger.LogInformation("Excel配置已存在，跳过: {ConfigName} ({ConfigId})", excelConfig.ConfigName, excelConfig.Id);
+                            }
+                        }
+                        else
+                        {
+                            // 配置不存在，直接创建（保持原有ID）
+                            await _excelConfigService.SaveConfigAsync(excelConfig);
+                            _logger.LogInformation("创建Excel配置: {ConfigName} ({ConfigId})", excelConfig.ConfigName, excelConfig.Id);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导入Excel配置失败: {File}", file);
+                }
+            }
+        }
+
+        private async Task ImportSqlConfigsAsync(string tempDir, ImportOptions options)
+        {
+            var sqlConfigDir = Path.Combine(tempDir, "sql-configs");
+            if (!Directory.Exists(sqlConfigDir)) return;
+
+            _logger.LogInformation("开始导入SQL配置");
+
+            foreach (var file in Directory.GetFiles(sqlConfigDir, "*.json"))
+            {
+                try
+                {
+                    var configJson = await File.ReadAllTextAsync(file);
+                    var sqlConfig = JsonSerializer.Deserialize<SqlConfig>(configJson);
+                    
+                    if (sqlConfig != null)
+                    {
+                        // 检查SQL配置是否已存在
+                        var existingConfig = await _sqlService.GetSqlConfigByIdAsync(sqlConfig.Id);
+                        
+                        if (existingConfig != null)
+                        {
+                            if (options.OverwriteExisting)
+                            {
+                                await _sqlService.UpdateSqlConfigAsync(sqlConfig);
+                                _logger.LogInformation("更新SQL配置: {ConfigName} ({ConfigId})", sqlConfig.Name, sqlConfig.Id);
+                            }
+                            else
+                            {
+                                _logger.LogInformation("SQL配置已存在，跳过: {ConfigName} ({ConfigId})", sqlConfig.Name, sqlConfig.Id);
+                            }
+                        }
+                        else
+                        {
+                            // 配置不存在，直接创建
+                            await _sqlService.CreateSqlConfigAsync(sqlConfig);
+                            _logger.LogInformation("创建SQL配置: {ConfigName} ({ConfigId})", sqlConfig.Name, sqlConfig.Id);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导入SQL配置失败: {File}", file);
+                }
+            }
+        }
+
+        private async Task ImportFieldMappingsAsync(string tempDir, ImportOptions options)
+        {
+            var fieldMappingDir = Path.Combine(tempDir, "field-mappings");
+            if (!Directory.Exists(fieldMappingDir)) return;
+
+            _logger.LogInformation("开始导入字段映射配置");
+
+            foreach (var file in Directory.GetFiles(fieldMappingDir, "*_field-mappings.json"))
+            {
+                try
+                {
+                    var mappingJson = await File.ReadAllTextAsync(file);
+                    var fieldMappings = JsonSerializer.Deserialize<List<ExcelFieldMapping>>(mappingJson);
+                    
+                    if (fieldMappings != null && fieldMappings.Any())
+                    {
+                        // 从文件名提取Excel配置ID
+                        var fileName = Path.GetFileNameWithoutExtension(file);
+                        var excelConfigId = fileName.Replace("_field-mappings", "");
+                        
+                        // 验证Excel配置是否存在
+                        var excelConfig = await _excelConfigService.GetConfigByIdAsync(excelConfigId);
+                        if (excelConfig == null)
+                        {
+                            _logger.LogWarning("Excel配置不存在，跳过字段映射导入: {ExcelConfigId}", excelConfigId);
+                            continue;
+                        }
+                        
+                        if (options.OverwriteExisting)
+                        {
+                            // 获取现有映射并删除
+                            var existingMappings = await _excelService.GetFieldMappingsAsync(excelConfigId);
+                            if (existingMappings != null)
+                            {
+                                foreach (var existingMapping in existingMappings)
+                                {
+                                    await _excelService.DeleteFieldMappingAsync(existingMapping.Id);
+                                }
+                            }
+                        }
+                        
+                        // 批量创建字段映射
+                        foreach (var mapping in fieldMappings)
+                        {
+                            // 确保ExcelConfigId正确设置
+                            mapping.ExcelConfigId = excelConfigId;
+                            await _excelService.CreateFieldMappingAsync(mapping);
+                        }
+                        
+                        _logger.LogInformation("导入字段映射配置: {ExcelConfigId} ({Count}个映射)", excelConfigId, fieldMappings.Count);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导入字段映射配置失败: {File}", file);
+                }
+            }
+        }
+
         private async Task ImportJobConfigAsync(string tempDir, ImportOptions options)
         {
             var jobConfigDir = Path.Combine(tempDir, "job-config");
             if (!Directory.Exists(jobConfigDir)) return;
 
+            _logger.LogInformation("开始导入作业配置");
+
             foreach (var file in Directory.GetFiles(jobConfigDir, "*.json"))
+            {
+                try
             {
                 var jobJson = await File.ReadAllTextAsync(file);
                 var job = JsonSerializer.Deserialize<JobConfig>(jobJson);
                 
                 if (job != null)
+                    {
+                        // 检查作业是否已存在
+                        var existingJob = await _jobService.GetJobByIdAsync(job.Id);
+                        
+                        if (existingJob != null)
                 {
                     if (options.OverwriteExisting)
                     {
                         await _jobService.UpdateJobAsync(job);
+                                _logger.LogInformation("更新作业配置: {JobName} ({JobId})", job.Name, job.Id);
                     }
                     else
                     {
+                                _logger.LogInformation("作业配置已存在，跳过: {JobName} ({JobId})", job.Name, job.Id);
+                            }
+                        }
+                        else
+                        {
+                            // 作业不存在，直接创建
                         await _jobService.CreateJobAsync(job);
+                            _logger.LogInformation("创建作业配置: {JobName} ({JobId})", job.Name, job.Id);
+                        }
+
+                        // 导入作业步骤
+                        await ImportJobStepsAsync(job.Id, tempDir, options);
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "导入作业配置失败: {File}", file);
+                }
+            }
+        }
+
+        private async Task ImportJobStepsAsync(string jobId, string tempDir, ImportOptions options)
+        {
+            var jobStepsDir = Path.Combine(tempDir, "job-steps");
+            if (!Directory.Exists(jobStepsDir))
+            {
+                _logger.LogInformation("作业步骤目录不存在，跳过步骤导入: {JobId}", jobId);
+                return;
+            }
+
+            _logger.LogInformation("开始导入作业步骤，作业ID: {JobId}", jobId);
+
+            try
+            {
+                // 获取当前作业配置
+                var job = await _jobService.GetJobByIdAsync(jobId);
+                if (job == null)
+                {
+                    _logger.LogWarning("作业配置不存在，跳过步骤导入: {JobId}", jobId);
+                    return;
+                }
+
+                var steps = new List<JobStep>();
+
+                // 读取步骤顺序配置
+                var stepOrderPath = Path.Combine(jobStepsDir, "step-order.json");
+                var stepOrder = new List<dynamic>();
+                
+                if (File.Exists(stepOrderPath))
+                {
+                    try
+                    {
+                        var orderJson = await File.ReadAllTextAsync(stepOrderPath);
+                        stepOrder = JsonSerializer.Deserialize<List<dynamic>>(orderJson) ?? new List<dynamic>();
+                        _logger.LogInformation("读取到步骤顺序配置，共 {Count} 个步骤", stepOrder.Count);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "读取步骤顺序配置失败");
+                    }
+                }
+
+                // 按顺序导入步骤
+                foreach (var orderItem in stepOrder)
+                {
+                    try
+                    {
+                        var stepId = orderItem.GetProperty("StepId").GetString();
+                        var stepFile = Path.Combine(jobStepsDir, $"{stepId}.json");
+                        
+                        if (File.Exists(stepFile))
+                        {
+                            var stepJson = await File.ReadAllTextAsync(stepFile);
+                            var step = JsonSerializer.Deserialize<JobStep>(stepJson);
+                            
+                            if (step != null)
+                            {
+                                // 设置作业ID
+                                step.JobId = jobId;
+                                steps.Add(step);
+                                _logger.LogInformation("导入作业步骤: {StepName} ({StepId}) - 类型: {StepType}", step.Name, step.Id, step.Type);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var stepId = orderItem.GetProperty("StepId").GetString() ?? "unknown";
+                        _logger.LogInformation($"导入作业步骤失败: {stepId}, 错误: {ex.Message}");
+                    }
+                }
+
+                // 如果没有步骤顺序配置，则导入所有步骤文件
+                if (!stepOrder.Any())
+                {
+                    foreach (var stepFile in Directory.GetFiles(jobStepsDir, "*.json"))
+                    {
+                        try
+                        {
+                            var fileName = Path.GetFileNameWithoutExtension(stepFile);
+                            if (fileName == "step-order") continue; // 跳过顺序配置文件
+
+                            var stepJson = await File.ReadAllTextAsync(stepFile);
+                            var step = JsonSerializer.Deserialize<JobStep>(stepJson);
+                            
+                            if (step != null)
+                            {
+                                // 设置作业ID
+                                step.JobId = jobId;
+                                steps.Add(step);
+                                _logger.LogInformation("导入作业步骤: {StepName} ({StepId}) - 类型: {StepType}", step.Name, step.Id, step.Type);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "导入作业步骤失败: {StepFile}", stepFile);
+                        }
+                    }
+                }
+
+                // 更新作业配置的步骤
+                if (steps.Any())
+                {
+                    job.Steps = steps;
+                    await _jobService.UpdateJobAsync(job);
+                    _logger.LogInformation("更新作业配置步骤，共 {Count} 个步骤", steps.Count);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "导入作业步骤失败，作业ID: {JobId}", jobId);
             }
         }
 
@@ -770,6 +1266,21 @@ namespace ExcelProcessor.Core.Services
             };
         }
 
+        private ContentItem MapToContentItem(ExcelFieldMapping mapping)
+        {
+            return new ContentItem
+            {
+                Id = mapping.Id.ToString(),
+                Name = $"{mapping.ExcelColumnName} → {mapping.TargetFieldName}",
+                Type = "FieldMapping",
+                Description = $"Excel列 '{mapping.ExcelColumnName}' 映射到数据库字段 '{mapping.TargetFieldName}' ({mapping.TargetFieldType})",
+                CreatedTime = mapping.CreatedAt,
+                LastModifiedTime = mapping.UpdatedAt ?? mapping.CreatedAt,
+                AlreadyExists = false,
+                ConflictType = null
+            };
+        }
+
         /// <summary>
         /// 构建包内容信息
         /// </summary>
@@ -780,7 +1291,8 @@ namespace ExcelProcessor.Core.Services
                 JobConfigCount = 1,
                 JobConfigs = new List<ContentItem> { MapToContentItem(job) },
                 ExcelConfigs = new List<ContentItem>(),
-                SqlScripts = new List<ContentItem>()
+                SqlScripts = new List<ContentItem>(),
+                FieldMappings = new List<ContentItem>()
             };
 
             // 解析作业步骤配置
@@ -818,6 +1330,24 @@ namespace ExcelProcessor.Core.Services
                         {
                             contents.ExcelConfigs.Add(MapToContentItem(excelConfig));
                             _logger.LogInformation("成功获取Excel配置: {ConfigName}", excelConfig.ConfigName);
+
+                            // 获取字段映射配置
+                            try
+                            {
+                                var fieldMappings = await _excelService.GetFieldMappingsAsync(configId);
+                                if (fieldMappings != null && fieldMappings.Any())
+                                {
+                                    foreach (var mapping in fieldMappings)
+                                    {
+                                        contents.FieldMappings.Add(MapToContentItem(mapping));
+                                    }
+                                    _logger.LogInformation("成功获取字段映射配置: {ConfigId} ({Count}个映射)", configId, fieldMappings.Count());
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogWarning(ex, "获取字段映射配置失败: {ConfigId}", configId);
+                            }
                         }
                         else
                         {
@@ -860,9 +1390,10 @@ namespace ExcelProcessor.Core.Services
             // 设置计数
             contents.ExcelConfigCount = contents.ExcelConfigs.Count;
             contents.SqlScriptCount = contents.SqlScripts.Count;
+            contents.FieldMappingCount = contents.FieldMappings.Count;
 
-            _logger.LogInformation("包内容构建完成: 作业配置={JobCount}, Excel配置={ExcelCount}, SQL配置={SqlCount}",
-                contents.JobConfigCount, contents.ExcelConfigCount, contents.SqlScriptCount);
+            _logger.LogInformation("包内容构建完成: 作业配置={JobCount}, Excel配置={ExcelCount}, SQL配置={SqlCount}, 字段映射={FieldMappingCount}",
+                contents.JobConfigCount, contents.ExcelConfigCount, contents.SqlScriptCount, contents.FieldMappingCount);
 
             return contents;
         }
