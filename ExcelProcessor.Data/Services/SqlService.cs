@@ -162,7 +162,11 @@ namespace ExcelProcessor.Data.Services
                 using var connection = new SQLiteConnection(_connectionString);
                 await connection.OpenAsync();
 
-                sqlConfig.Id = Guid.NewGuid().ToString();
+                // 只有在ID为空时才生成新的ID，保持导入时的原始ID
+                if (string.IsNullOrEmpty(sqlConfig.Id))
+                {
+                    sqlConfig.Id = Guid.NewGuid().ToString();
+                }
                 sqlConfig.CreatedDate = DateTime.Now;
                 sqlConfig.LastModified = DateTime.Now;
 
