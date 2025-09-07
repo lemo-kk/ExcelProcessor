@@ -339,19 +339,24 @@ namespace ExcelProcessor.WPF.Dialogs
                                     }
                                     else
                                     {
-                                        // 如果路径不存在，尝试打开父目录
+                                        // 如果路径不存在，尝试创建目录并打开
                                         var directory = Path.GetDirectoryName(excelFilePath);
                                         if (!string.IsNullOrEmpty(directory))
                                         {
                                             try
                                             {
+                                                // 创建目录（如果不存在）
+                                                if (!Directory.Exists(directory))
+                                                {
+                                                    Directory.CreateDirectory(directory);
+                                                }
                                                 Process.Start("explorer.exe", directory);
                                                 return;
                                             }
-                                            catch
+                                            catch (Exception createEx)
                                             {
-                                                // 如果父目录也不存在，显示提示信息
-                                                Extensions.MessageBoxExtensions.Show($"Excel文件路径不存在：{excelFilePath}\n\nSheet名称：{sheetName}\n\n请检查配置的路径是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                                                // 如果创建目录失败，显示提示信息
+                                                Extensions.MessageBoxExtensions.Show($"无法创建目录：{directory}\n\n错误：{createEx.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                                                 return;
                                             }
                                         }
@@ -382,7 +387,37 @@ namespace ExcelProcessor.WPF.Dialogs
                     }
                     else
                     {
-                        Extensions.MessageBoxExtensions.Show($"路径不存在：{filePath}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        // 路径不存在，尝试创建目录并打开
+                        try
+                        {
+                            // 判断是文件路径还是目录路径
+                            if (Path.HasExtension(filePath))
+                            {
+                                // 如果是文件路径，创建文件所在目录
+                                var directory = Path.GetDirectoryName(filePath);
+                                if (!string.IsNullOrEmpty(directory))
+                                {
+                                    if (!Directory.Exists(directory))
+                                    {
+                                        Directory.CreateDirectory(directory);
+                                    }
+                                    Process.Start("explorer.exe", directory);
+                                }
+                            }
+                            else
+                            {
+                                // 如果是目录路径，直接创建目录
+                                if (!Directory.Exists(filePath))
+                                {
+                                    Directory.CreateDirectory(filePath);
+                                }
+                                Process.Start("explorer.exe", filePath);
+                            }
+                        }
+                        catch (Exception createEx)
+                        {
+                            Extensions.MessageBoxExtensions.Show($"无法创建路径：{filePath}\n\n错误：{createEx.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                 }
             }
