@@ -40,6 +40,7 @@ namespace ExcelProcessor.WPF.ViewModels
         private bool _includeJobConfig;
         private bool _includeDataSources;
         private bool _includeFieldMappings;
+        private bool _includeJobSteps;
         private ObservableCollection<ImportExportHistoryViewModel> _importExportHistory;
         private int _historyCount;
 
@@ -73,6 +74,7 @@ namespace ExcelProcessor.WPF.ViewModels
             _includeJobConfig = true;
             _includeDataSources = true;
             _includeFieldMappings = true;
+            _includeJobSteps = true;
 
             // 加载初始数据
             _ = LoadAvailableJobsAsync();
@@ -226,6 +228,19 @@ namespace ExcelProcessor.WPF.ViewModels
             set
             {
                 _includeFieldMappings = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// 是否包含作业步骤配置
+        /// </summary>
+        public bool IncludeJobSteps
+        {
+            get => _includeJobSteps;
+            set
+            {
+                _includeJobSteps = value;
                 OnPropertyChanged();
             }
         }
@@ -458,6 +473,7 @@ namespace ExcelProcessor.WPF.ViewModels
                     IncludeJobConfig = IncludeJobConfig,
                     IncludeDataSources = IncludeDataSources,
                     IncludeFieldMappings = IncludeFieldMappings,
+                    IncludeJobSteps = IncludeJobSteps,
                     IncludeExecutionHistory = false
                 };
 
@@ -784,6 +800,9 @@ namespace ExcelProcessor.WPF.ViewModels
                                 }
                             }
                             previewInfo.FieldMappingCount = fieldMappingCount;
+
+                            // 统计作业步骤数量
+                            previewInfo.JobStepCount = SelectedJob.Steps.Count;
                         }
                         else
                         {
@@ -792,6 +811,7 @@ namespace ExcelProcessor.WPF.ViewModels
                             previewInfo.SqlScriptCount = 0;
                             previewInfo.DataSourceCount = 0;
                             previewInfo.FieldMappingCount = 0;
+                            previewInfo.JobStepCount = 0;
                         }
 
                         // 预估包大小（基于配置数量进行简单估算）
@@ -800,6 +820,7 @@ namespace ExcelProcessor.WPF.ViewModels
                         estimatedSize += previewInfo.SqlScriptCount * 1024;  // 每个SQL脚本约1KB
                         estimatedSize += previewInfo.DataSourceCount * 512;  // 每个数据源约512B
                         estimatedSize += previewInfo.FieldMappingCount * 256; // 每个字段映射约256B
+                        estimatedSize += previewInfo.JobStepCount * 512;     // 每个作业步骤约512B
                         estimatedSize += 1024; // 基础包信息约1KB
                         previewInfo.EstimatedPackageSize = estimatedSize;
 
@@ -807,7 +828,7 @@ namespace ExcelProcessor.WPF.ViewModels
                         var baseTime = TimeSpan.FromSeconds(2); // 基础时间2秒
                         var configTime = TimeSpan.FromMilliseconds(100); // 每个配置项100毫秒
                         var totalConfigs = previewInfo.ExcelConfigCount + previewInfo.SqlScriptCount + 
-                                         previewInfo.DataSourceCount + previewInfo.FieldMappingCount;
+                                         previewInfo.DataSourceCount + previewInfo.FieldMappingCount + previewInfo.JobStepCount;
                         previewInfo.EstimatedExportTime = baseTime + (configTime * totalConfigs);
 
                         // 分析依赖关系

@@ -18,6 +18,7 @@ namespace ExcelProcessor.WPF.Models
         private int _sqlScriptCount;
         private int _dataSourceCount;
         private int _fieldMappingCount;
+        private int _jobStepCount;
         private long _estimatedPackageSize;
         private TimeSpan _estimatedExportTime;
         private List<string> _dependencies;
@@ -131,6 +132,19 @@ namespace ExcelProcessor.WPF.Models
             set
             {
                 _fieldMappingCount = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// 作业步骤数量
+        /// </summary>
+        public int JobStepCount
+        {
+            get => _jobStepCount;
+            set
+            {
+                _jobStepCount = value;
                 OnPropertyChanged();
             }
         }

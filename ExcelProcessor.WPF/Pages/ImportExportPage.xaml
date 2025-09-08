@@ -266,6 +266,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             
                                             <StackPanel Grid.Column="0" HorizontalAlignment="Center">
@@ -286,6 +287,11 @@
                                             <StackPanel Grid.Column="3" HorizontalAlignment="Center">
                                                 <TextBlock Text="{Binding ExportPreviewInfo.FieldMappingCount}" Foreground="#9C27B0" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="字段映射" Foreground="#CCCCCC" FontSize="10" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="4" HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding ExportPreviewInfo.JobStepCount}" Foreground="#00BCD4" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="作业步骤" Foreground="#CCCCCC" FontSize="10" HorizontalAlignment="Center"/>
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>

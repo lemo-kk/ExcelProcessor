@@ -4,8 +4,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="用户登录"
-        Height="500" 
-        Width="400"
+        Height="700" 
+        Width="500"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="{StaticResource MaterialDesignPaper}"
@@ -49,17 +49,22 @@
                     Margin="40">
             
             <!-- Logo和标题 -->
-            <StackPanel HorizontalAlignment="Center" Margin="0,0,0,40">
+            <StackPanel HorizontalAlignment="Center" Margin="0,20,0,50">
                 <materialDesign:PackIcon Kind="TableLarge" 
                                        Width="64" 
                                        Height="64"
                                        Foreground="{StaticResource MaterialDesignPrimary}"
                                        HorizontalAlignment="Center"
                                        Margin="0,0,0,16" />
-                <TextBlock Text="Excel Processor" 
-                         Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+                <TextBlock Text="EXCEL PROCESSOR" 
+                         FontSize="24"
+                         FontWeight="Bold"
+                         Foreground="{StaticResource MaterialDesignBody}"
                          HorizontalAlignment="Center"
-                         Margin="0,0,0,8" />
+                         VerticalAlignment="Center"
+                         Margin="0,0,0,16"
+                         TextWrapping="Wrap"
+                         LineHeight="32" />
                 <TextBlock Text="数据处理工具" 
                          Style="{StaticResource MaterialDesignBody1TextBlock}"
                          Foreground="{StaticResource MaterialDesignBodyLight}"
